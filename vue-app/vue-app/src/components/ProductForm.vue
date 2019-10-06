@@ -13,7 +13,7 @@
                         <label class="label">Category</label>
                         <div class="field is-grouped">
                             <div class="control is-expanded">
-                                <select class="select" ref="category" @focus="clearStatus" @keypress="clearStatus" v-model="product.category" type="text">
+                                <select class="input" ref="category" @focus="clearStatus" @keypress="clearStatus" v-model="product.category" type="text">
                                     <option v-for="category in categories" v-bind:key="category.id">{{ category.name }}</option>
                                 </select>
                             </div>
@@ -126,7 +126,6 @@ export default {
                 this.axios.get('http://localhost:5000/categories')
                 .then(response => {
                     this.categories = response.data[0]['categories']
-                    console.log(this.categories)
                 })
                 .catch(error => {
                     this.response = error

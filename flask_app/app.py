@@ -85,15 +85,38 @@ def add_products():
         print(e)
         return make_response(jsonify({'success': False}, 400))
 
-@app.route('/products', methods=['GET'])
+@app.route('/products', methods=['POST'])
 def get_products():
-    page = request.args.get('page', type=int)
-    per_page = 21
-    product = Product.query.paginate(page,per_page,error_out=False)
-    print(type(product))
-    product_schema = ProductSchema(many=True)
-    output = product_schema.dump(product)
-    return make_response(jsonify({'success': True, 'body': output}, 200))
+    try:
+        # page = request.args.get('page', type=int)
+        per_page = 24
+
+        resp = json.loads(request.data)
+        page = resp['page']
+        search = resp['search']
+        category = resp['category']
+        print(page, search, category)
+
+        if search != '' and category != '':
+            print("searching text and category")
+            products = Product.query.filter(Product.description.like(search)).join(Category).filter(Category.name == category).paginate(page=page, per_page=per_page, error_out=False)
+        elif category != '':
+            print("searching category")
+            products = Product.query.join(Category).filter(Category.name == category).paginate(page=page, per_page=per_page, error_out=False)
+        elif search != '':
+            print("searching")
+            products = Product.query.filter(Product.description.like(search)).paginate(page=page, per_page=per_page, error_out=False)
+        else:
+            products = Product.query.paginate(page=page, per_page=per_page, error_out=False)
+
+        product_schema = ProductSchema(many=True)
+        output = product_schema.dump(products.items)
+        return make_response(jsonify({'success': True, 'body': output,
+                                        'page': products.page, 'prev': products.has_prev,
+                                        'next': products.has_next}, 200))
+    except:
+        return make_response(jsonify({'success': False}, 400))
+
 
 @app.route('/products/names', methods=['GET'])
 def get_product_names():
