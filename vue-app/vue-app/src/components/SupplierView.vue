@@ -1,0 +1,164 @@
+<template>
+    <div id="product-table">
+        <div class="tile is-parent">
+            <article class="tile is-child">
+                
+                <div class="field is-grouped">
+                    <div class="control is-expanded">
+                        <p class="title">All Suppliers</p>
+                        <p class="subtitle">Manage all your suppliers.</p>
+                    </div>
+                    <div class="control"><a class="button" @click="show">Add Supplier</a></div>
+                </div>
+                <br>
+
+                <div class="field is-grouped">
+                    <p class="control is-expanded">
+                        <input v-model="search.text" class="input" type="text" placeholder="Search Suppliers">
+                    </p>
+                    <p class="control">
+                        <a @click="getSuppliers(1)" class="button is-info">
+                        Search
+                        </a>
+                    </p>
+                </div>
+
+                <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal>
+
+                <p v-if="suppliers.length < 1" class="empty-table">No Suppliers</p>
+
+                <div class="content" style="margin:20px 20px 20px 20px">
+                    <div v-for="supplier in suppliers" :key="supplier.id">
+                        <div class="box">
+                            <article class="media">
+                                <div class="media-content">
+                                    <div class="content">
+                                        <p class="title is-4">{{ supplier.business_name }}</p>
+                                        <p class="subtitle is-6"><strong>{{ supplier.contact_person }}</strong> {{ supplier.email }} {{ supplier.phone }}</p>
+                                    </div>
+                                    <!-- <nav class="level is-mobile">
+                                        <div class="level-left">
+                                        <a class="level-item" aria-label="reply">
+                                            <span class="icon is-small">
+                                            <i class="fas fa-reply" aria-hidden="true"></i>
+                                            </span>
+                                        </a>
+                                        <a class="level-item" aria-label="retweet">
+                                            <span class="icon is-small">
+                                            <i class="fas fa-retweet" aria-hidden="true"></i>
+                                            </span>
+                                        </a>
+                                        <a class="level-item" aria-label="like">
+                                            <span class="icon is-small">
+                                            <i class="fas fa-heart" aria-hidden="true"></i>
+                                            </span>
+                                        </a>
+                                        </div>
+                                    </nav> -->
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                
+                <!-- <nav class="pagination" role="navigation" aria-label="pagination">
+                    <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getProducts(pages.page-1)">Previous</a>
+                    <a class="button pagination-next" :disabled="pages.next==false" @click="getProducts(pages.page+1)">Next page</a>
+                </nav> -->
+                </div>
+            </article>
+        </div>
+    </div>
+</template>
+
+<script>
+import SupplierForm from '@/components/SupplierForm.vue'
+
+export default {
+    name: 'supplier-view',
+    components: {
+       SupplierForm
+    },
+    data() {
+        return {
+            suppliers: [],
+            pages: {
+                page: null,
+                next: null,
+                prev: null
+            },
+            search: {
+                text: ''
+            },
+            editing: null,
+            response: null,
+        }
+    },
+    mounted() {
+        this.getSuppliers(1)
+    },
+    methods: {
+        getSuppliers(page) {
+            try {
+                this.axios.post('http://localhost:5000/suppliers', {'page':page, 'search':this.search.text})
+                .then(response => {
+                    this.suppliers = response.data[0].body
+                    this.pages.page = response.data[0].page
+                    this.pages.next = response.data[0].next
+                    this.pages.prev = response.data[0].prev
+                })
+                .catch(e => {
+                    this.response = e
+                })
+            } catch (error) {
+                this.response = error
+            }
+        },
+        show () {
+           this.$modal.show('add-supplier');
+        },
+        editMode(product) {
+            this.cachedProduct = Object.assign({}, product);
+            this.editing = product.id
+        },
+        cancelEdit(product) {
+            Object.assign(product, this.cachedProduct)
+            this.editing = null
+        },
+        editProduct(updatedProduct) {
+            try {
+                this.axios.put('http://localhost:5000/products/edit?id='+updatedProduct.id, {'product': updatedProduct}, {'Content-Type': 'application/json'})
+                .then(response => {
+                    this.response = response
+                    this.products = this.products.map(product => product.id === updatedProduct.id ? product: updatedProduct)
+                })
+                .catch(error => {
+                    this.response = error
+                })
+            } catch(error) {
+                this.response = error
+            }
+        },
+        deleteProduct(id) {
+            try {
+                this.axios.delete('http://localhost:5000/products/delete?id='+id)
+                .then(response => {
+                    this.response = response
+                    this.products = this.products.filter(product => product.id !== id);
+                })
+                .catch(error => {
+                    this.response = error
+                })
+            } catch (error) {
+                this.response = error
+            }
+        },
+    }
+}
+</script>
+
+
+<style scoped>
+button {
+    margin: 0 0.5 rem 0;
+}
+</style>

@@ -71,11 +71,10 @@ class Supplier(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     business_name = db.Column(db.String())
     contact_person = db.Column(db.String())
-    email_one = db.Column(db.String())
-    email_two = db.Column(db.String())
-    phone_one = db.Column(db.String())
-    phone_two = db.Column(db.String())
+    email = db.Column(db.String())
+    phone = db.Column(db.String())
     plus_code = db.Column(db.String())
+    address = db.Column(db.String())
     additional_info = db.Column(db.String())
 
     def __repr__(self):
@@ -108,7 +107,7 @@ class SupplierSchema(ma.ModelSchema):
 class CategorySchema(ma.ModelSchema):
     class Meta:
         model = Category
-        
+
 class ProductSchema(ma.ModelSchema):
     class Meta:
         model = Product

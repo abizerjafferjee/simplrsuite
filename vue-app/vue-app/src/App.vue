@@ -19,11 +19,12 @@
             Procurement
           </p>
           <ul class="menu-list">
-            <li><router-link to="/view-products">Products</router-link></li>
-            <li><a>Suppliers</a></li>
-            <li><a>Payments</a></li>
-            <li><router-link to="/add-products">Add Products</router-link></li>
+            <li><router-link to="/products">Products</router-link></li>
+            <li><router-link to="/suppliers">Supplier</router-link></li>
+            <li><router-link to="/add-products">Add Product</router-link></li>
+            <li><router-link to="/add-supplier">Add Supplier</router-link></li>
             <li><router-link to="/add-inventory">Add Inventory</router-link></li>
+            <li><a>Payments</a></li>
             <li><router-link to="/add-inventory">Stocking Note</router-link></li>
           </ul>
           <p class="menu-label">

@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import ProductForm from '@/components/ProductForm.vue'
-import ProductTable from '@/components/ProductTable'
+import ProductView from '@/components/ProductView'
 import MailListForm from '@/components/MailListForm'
 import ProcurementForm from '@/components/ProcurementForm'
+import SupplierForm from '@/components/SupplierForm'
+import SupplierView from '@/components/SupplierView'
 import Dashboard from '@/components/Dashboard'
 
 Vue.use(VueRouter)
@@ -20,9 +22,9 @@ const routes = [
         component: ProductForm
     },
     {
-        path: '/view-products',
-        name: 'ProductTable',
-        component: ProductTable
+        path: '/products',
+        name: 'ProductView',
+        component: ProductView
     },
     {
         path: '/add-contact',
@@ -33,6 +35,16 @@ const routes = [
         path: '/add-inventory',
         name: 'ProcurementForm',
         component: ProcurementForm
+    },
+    {
+        path: '/suppliers',
+        name: 'SupplierView',
+        component: SupplierView
+    },
+    {
+        path: '/add-supplier',
+        name: 'SupplierForm',
+        component: SupplierForm
     },
 ];
 

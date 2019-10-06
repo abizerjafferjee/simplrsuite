@@ -1,0 +1,156 @@
+<template>
+    <div id="product-form">
+
+        <div class="tile is-parent">
+            <article class="tile is-child">
+                <p class="title">Add Supplier</p>
+                <p class="subtitle">Manage your supplier information. This will be helpful in inventory tracking.</p>
+                <div class="content">
+                    <p v-if="error && submitting" class="error-message">!Please fill out all required fields</p>
+                    <p v-if="success" class="success-message">Supplier successfully added</p>
+                    <form @submit.prevent="handleSubmit">
+
+                        <label class="label">Supplier Name</label>
+                        <input class="input" ref="business_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.business_name" type="text" placeholder="e.g. thumbtack"/>
+
+                        <label class="label">Contact Name</label>
+                        <input class="input" ref="contact_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.contact_person" type="text" placeholder="e.g. John Doe"/>
+
+                        <label class="label">Phone Number</label>
+                        <div class="field is-horizontal">
+                        <div class="field-body">
+                            <div class="field is-expanded">
+                            <div class="field has-addons">
+                                <p class="control"><a class="button is-static">+255</a></p>
+                                <p class="control is-expanded">
+                                <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
+                                </p>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <label class="label">Email</label>
+                        <div class="field">
+                            <div class="control">
+                                <input ref="email" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.email" class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
+                            </div>
+                        </div>
+
+                        <label class="label">Plus Code</label>
+                        <div class="field">
+                            <div class="control">
+                                <input ref="plus_code" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.plus_code" class="input" type="text" placeholder="">
+                            </div>
+                        </div>
+
+                        <label class="label">Address</label>
+                        <div class="field">
+                            <div class="control">
+                                <input ref="address" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.address" class="input" type="text" placeholder="">
+                            </div>
+                        </div>
+
+                        <label class="label">Additional Info</label>
+                        <textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.additional_info"></textarea>
+
+                        <button id="submit" class="button is-primary">Add Supplier</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+
+    </div>
+</template>
+
+<script>
+export default {
+   name: 'supplier-form',
+   data() {
+       return {
+           submitting: false,
+           error: false,
+           success: false,
+           supplier: {
+               business_name: null,
+               contact_person: null,
+               phone: null,
+               email: null,
+               plus_code: null,
+               address: null,
+               additional_info: null
+           },
+           response: null
+       }
+   },
+   methods: {
+        handleSubmit() {
+            this.submitting = true
+            this.clearStatus()
+            this.addSupplier(this.supplier)
+        },
+        clearStatus() {
+            this.error = false
+            this.success = false
+        },
+        showError() {
+            this.error = true
+            this.submitting = true
+            this.success = false
+        },
+        showSuccess() {
+            this.error = false
+            this.submitting = false
+            this.success = true
+            this.clearForm()
+            // this.$refs.category.focus()
+        },
+        addSupplier(supplier) {
+            try {
+                this.axios.post('http://localhost:5000/suppliers/add', {'body': supplier})
+                .then(response => {
+                    this.response = response
+                    this.showSuccess()
+                })
+                .catch(e => {
+                    this.response = e
+                    this.showError()
+                })
+            } catch (error) {
+                this.response = error
+                this.showError()
+            }
+        },
+        clearForm() {
+           this.supplier = {
+               business_name: null,
+               contact_person: null,
+               phone: null,
+               email: null,
+               plus_code: null,
+               address: null,
+               additional_info: null
+           }
+        },
+    }
+}
+</script>
+
+<style scoped>
+#submit {
+    align-self: center
+}
+form {
+    margin-bottom: 2rem;
+}
+[class*='-message'] {
+    font-weight: 500;
+}
+.error-message {
+    color: #d33c40;
+}
+
+.success-message {
+    color: #32a95d;
+}
+</style>

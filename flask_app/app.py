@@ -95,7 +95,6 @@ def get_products():
         page = resp['page']
         search = resp['search']
         category = resp['category']
-        print(page, search, category)
 
         if search != '' and category != '':
             print("searching text and category")
@@ -123,8 +122,6 @@ def get_product_names():
     try:
         products = Product.query.all()
         product_names = [{'value': p.id, 'text': p.description} for p in products]
-        # product_schema = ProductSchema(many=True)
-        # output = product_schema.dump(product)
         return make_response(jsonify({'success': True, 'products': product_names}, 200))
     except:
         return make_response(jsonify({'success': False}, 400))
@@ -225,6 +222,61 @@ def add_mailer():
         except Exception as e:
             print(e)
             return make_response(jsonify({'success': False, 'error': 'Unable to get data. Please make sure input is valid.'}, 400))
+
+###############################################################
+# manage suppliers
+###############################################################
+@app.route('/suppliers/add', methods=['POST'])
+def add_suppliers():
+
+    body = json.loads(request.data)['body']
+    try:
+        supplier = Supplier(
+            business_name = body['business_name'],
+            contact_person = body['contact_person'],
+            email = body['email'],
+            phone = body['phone'],
+            plus_code = body['plus_code'],
+            address = body['address'],
+            additional_info = body['additional_info']
+        )
+        
+        db.session.add(supplier)
+        db.session.commit()
+
+        supplier_schema = SupplierSchema()
+        output = supplier_schema.dump(supplier)
+        print(output)
+        return make_response(jsonify({'success': True, 'body': supplier}, 200))
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'success': False, 'error': 'Unable to get data. Please make sure input is valid.'}, 400))
+
+@app.route('/suppliers', methods=['POST'])
+def get_suppliers():
+    try:
+        # page = request.args.get('page', type=int)
+        per_page = 24
+
+        resp = json.loads(request.data)
+        page = resp['page']
+        search = resp['search']
+
+        if search != '':
+            print("searching")
+            suppliers = Supplier.query.filter(Supplier.business_name.like(search)).paginate(page=page, per_page=per_page, error_out=False)
+        else:
+            suppliers = Supplier.query.paginate(page=page, per_page=per_page, error_out=False)
+
+        supplier_schema = SupplierSchema(many=True)
+        output = supplier_schema.dump(suppliers.items)
+        return make_response(jsonify({'success': True, 'body': output,
+                                        'page': suppliers.page, 'prev': suppliers.has_prev,
+                                        'next': suppliers.has_next}, 200))
+    except:
+        return make_response(jsonify({'success': False}, 400))
+
+
 
 port = os.getenv('PORT', '5000')
 if __name__ == "__main__":
