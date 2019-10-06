@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Wordcount</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+      .container {
+        max-width: 1000px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Add Product</h1>
+      <form role="form" method='POST' action='/'>
+        <div class="form-group">
+            <label>category</label>
+          <input type="text" name="category" class="form-control" id="category-box" placeholder="" style="max-width: 300px;" autofocus required>
+        </div>
+        <div class="form-group">
+            <label>description</label>
+            <input type="text" name="description" class="form-control" id="description-box" placeholder="" style="max-width: 300px;" autofocus required>
+        </div>
+        <div class="form-group">
+            <label>code</label>
+            <input type="text" name="code" class="form-control" id="code-box" placeholder="" style="max-width: 300px;" autofocus required>
+        </div>
+        <div class="form-group">
+            <label>packaging</label>
+            <input type="text" name="packing" class="form-control" id="packing-box" placeholder="" style="max-width: 300px;" autofocus required>
+        </div>
+        <div class="form-group">
+            <label>price</label>
+            <input type="text" name="price" class="form-control" id="price-box" placeholder="" style="max-width: 300px;" autofocus required>
+        </div>
+        <div class="form-group">
+            <label>quantity</label>
+            <input type="text" name="quantity" class="form-control" id="quantity-box" placeholder="quantity" style="max-width: 300px;" autofocus required>
+        </div>
+        <div class="form-group">
+            <label>cost</label>
+            <input type="text" name="cost" class="form-control" id="cost-box" placeholder="cost" style="max-width: 300px;" autofocus required>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      <br>
+      {% for error in errors %}
+        <h4>{{ error }}</h4>
+      {% endfor %}
+    </div>
+    <script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  </body>
+</html>
