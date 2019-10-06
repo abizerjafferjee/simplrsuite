@@ -1,0 +1,65 @@
+<template>
+  <div id="app" class="container is-fullhd">
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="https://bulma.io">
+          <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+        </a>
+      </div>
+    </nav>
+
+    <div class="columns">
+      <div class="column is-one-fifth">
+        <aside class="menu">
+          <ul class="menu-list">
+            <li><router-link to="/dashboard">Dashboard</router-link></li>
+            <li><router-link to="/add-contact">Mailing List</router-link></li>
+          </ul>
+          <p class="menu-label">
+            Procurement
+          </p>
+          <ul class="menu-list">
+            <li><router-link to="/view-products">Products</router-link></li>
+            <li><a>Suppliers</a></li>
+            <li><a>Payments</a></li>
+            <li><router-link to="/add-products">Add Products</router-link></li>
+            <li><router-link to="/add-inventory">Add Inventory</router-link></li>
+            <li><router-link to="/add-inventory">Stocking Note</router-link></li>
+          </ul>
+          <p class="menu-label">
+            Sales
+          </p>
+          <ul class="menu-list">
+            <li><a>Customers</a></li>
+            <li><a>Orders</a></li>
+            <li><a>Credit Note</a></li>
+          </ul>
+          <p class="menu-label">
+            Resources
+          </p>
+          <ul class="menu-list">
+            <li><a>Employees</a></li>
+          </ul>
+        </aside>
+      </div>
+
+      <div class="column">
+        <router-view></router-view>
+        <!-- <h1>Add Products</h1> -->
+        <!-- <product-form @add:product="addProduct" /> -->
+        <!-- <product-table v-bind:products="products" @delete:product="deleteProduct" @edit:product="editProduct" /> -->
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+
+export default {
+  name: 'app',
+}
+</script>
+
+<style>
+@import "~bulma/css/bulma.css";
+</style>
