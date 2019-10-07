@@ -8,6 +8,7 @@ import json
 import pandas as pd
 from numpy import genfromtxt
 from flask_marshmallow import Marshmallow
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config.from_object(config.Config)
@@ -22,19 +23,39 @@ cors = CORS(app)
 from models import *
 
 #############################################################
+# helpers
+#############################################################
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+def allowed_file(filename):  
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+#############################################################
 # manage products
 #############################################################
 @app.route('/products/add', methods=['POST'])
 def add_product():
-    body = json.loads(request.data)['body']
     try:
+        file = None
+        if 'file' in request.files:
+            file = request.files['file']
+        
+        filepath = None
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+        body = json.loads(request.form['body'])
+
         category = Category.query.filter_by(name=body['category']).first()
         product = Product(
             category = category,
             description = body['description'],
             code = body['code'],
             packing = body['packing'],
-            price = float(body['price'])
+            price = float(body['price']),
+            image_path = filepath
         )
         
         db.session.add(product)
@@ -42,6 +63,7 @@ def add_product():
 
         product_schema = ProductSchema()
         output = product_schema.dump(product)
+
         return make_response(jsonify({'success': True, 'body': output}, 200))
     except Exception as e:
         print(e)
@@ -115,7 +137,6 @@ def get_products():
                                         'next': products.has_next}, 200))
     except:
         return make_response(jsonify({'success': False}, 400))
-
 
 @app.route('/products/names', methods=['GET'])
 def get_product_names():
@@ -246,8 +267,8 @@ def add_suppliers():
 
         supplier_schema = SupplierSchema()
         output = supplier_schema.dump(supplier)
-        print(output)
-        return make_response(jsonify({'success': True, 'body': supplier}, 200))
+
+        return make_response(jsonify({'success': True, 'body': output}, 200))
     except Exception as e:
         print(e)
         return make_response(jsonify({'success': False, 'error': 'Unable to get data. Please make sure input is valid.'}, 400))
@@ -256,7 +277,7 @@ def add_suppliers():
 def get_suppliers():
     try:
         # page = request.args.get('page', type=int)
-        per_page = 24
+        per_page = 6
 
         resp = json.loads(request.data)
         page = resp['page']
@@ -276,7 +297,57 @@ def get_suppliers():
     except:
         return make_response(jsonify({'success': False}, 400))
 
+@app.route('/suppliers/names', methods=['GET'])
+def get_supplier_names():
+    try:
+        suppliers = Supplier.query.all()
+        supplier_names = [{'value': s.id, 'text': s.business_name} for s in suppliers]
+        return make_response(jsonify({'success': True, 'suppliers': supplier_names}, 200))
+    except:
+        return make_response(jsonify({'success': False}, 400))
 
+###############################################################
+# manage inventory and procurement
+###############################################################
+@app.route('/inventory/add', methods=['POST'])
+def update_inventory():
+    try:
+        body = json.loads(request.data)['body']
+        supplier = Supplier.query.filter_by(id=body['supplier']).first()
+        product = Product.query.filter_by(id=body['product']).first()
+        quantity = float(body['quantity'])
+        unit_cost = float(body['unit_cost'])
+        total_cost = float(body['total_cost'])
+
+        inventory = Inventory.query.filter_by(product_id = body['product']).first()
+
+        if inventory:
+            inventory.quantity += quantity
+            db.session.commit()
+        else:
+            inventory = Inventory(
+                product = product,
+                quantity = quantity
+            )
+            db.session.add(inventory)
+            db.session.commit()
+
+        procurement = Procurement(
+            product = product,
+            supplier = supplier,
+            quantity = quantity,
+            unit_cost = unit_cost,
+            total_cost = total_cost
+        )
+
+        db.session.add(procurement)
+        db.session.commit()
+
+        return make_response(jsonify({'success': True}, 200))
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'success': False}, 400))
+        
 
 port = os.getenv('PORT', '5000')
 if __name__ == "__main__":

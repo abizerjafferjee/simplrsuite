@@ -18,6 +18,7 @@ class Procurement(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
     unit_cost = db.Column(db.Float())
     quantity = db.Column(db.Float())
     total_cost = db.Column(db.Float())
@@ -34,6 +35,7 @@ class Product(db.Model):
     code = db.Column(db.String())
     packing = db.Column(db.String())
     price = db.Column(db.Float())
+    image_path = db.Column(db.String())
     created = db.Column(db.DateTime())
 
     procurements = relationship("Procurement", backref='product')
@@ -77,6 +79,8 @@ class Supplier(db.Model):
     address = db.Column(db.String())
     additional_info = db.Column(db.String())
 
+    procurements = relationship("Procurement", backref='supplier') 
+
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
@@ -112,7 +116,6 @@ class ProductSchema(ma.ModelSchema):
     class Meta:
         model = Product
     category = ma.Nested(CategorySchema)
-
 
 class MailListSchema(ma.ModelSchema):
     class Meta:

@@ -27,9 +27,9 @@
 
                 <p v-if="suppliers.length < 1" class="empty-table">No Suppliers</p>
 
-                <div class="content" style="margin:20px 20px 20px 20px">
+                <div class="content">
                     <div v-for="supplier in suppliers" :key="supplier.id">
-                        <div class="box">
+                        <div class="box" style="margin:0px 0px 10px 0px">
                             <article class="media">
                                 <div class="media-content">
                                     <div class="content">
@@ -60,10 +60,10 @@
                         </div>
                     </div>
                 
-                <!-- <nav class="pagination" role="navigation" aria-label="pagination">
-                    <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getProducts(pages.page-1)">Previous</a>
-                    <a class="button pagination-next" :disabled="pages.next==false" @click="getProducts(pages.page+1)">Next page</a>
-                </nav> -->
+                <nav class="pagination" role="navigation" aria-label="pagination">
+                    <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getSuppliers(pages.page-1)">Previous</a>
+                    <a class="button pagination-next" :disabled="pages.next==false" @click="getSuppliers(pages.page+1)">Next page</a>
+                </nav>
                 </div>
             </article>
         </div>

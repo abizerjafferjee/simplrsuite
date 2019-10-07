@@ -6,7 +6,7 @@
                 <p class="title">Add Product</p>
                 <p class="subtitle">Add products, costs, quantities and prices. This will be added to your catalog.</p>
                 <div class="content">
-                    <p v-if="error && submitting" class="error-message">!Please fill out all required fields</p>
+                    <p v-if="error && submitting" class="error-message">!Please fill out all fields with an asterisk (*).</p>
                     <p v-if="success" class="success-message">Product successfully added</p>
                     <form @submit.prevent="handleSubmit">
 
@@ -22,8 +22,21 @@
 
                         <modal name="add-category"><category-form @add:category="addCategory"></category-form></modal>
                         
-                        <label class="label">Product (Label/ Description)</label>
+                        <label class="label">* Product (Label/ Description)</label>
                         <input class="input" ref="description" @focus="clearStatus" @keypress="clearStatus" v-model="product.description" type="text" placeholder="cash book 4q"/>
+                        
+                        <label class="label">Upload Image of Product</label>
+                        <div class="file has-name is-fullwidth">
+                            <label class="file-label">
+                                <input class="file-input" type="file" name="file" ref="file" @focus="clearStatus" @keypress="clearStatus" v-on:change="handleFile()">
+                                <span class="file-cta">
+                                    <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                    <span class="file-label">Choose a file…</span>
+                                </span>
+                                <span class="file-name" v-if="product_file">{{ product_file.name }}</span>
+                                <span class="file-name" v-else>image.png</span>
+                            </label>
+                        </div>
 
                         <label class="label">Packing</label>
                         <input class="input" ref="packing" @focus="clearStatus" @keypress="clearStatus" v-model="product.packing" type="text" placeholder="e.g. 10 pieces per pack"/>
@@ -32,8 +45,21 @@
                         <input class="input" ref="code" @focus="clearStatus" @keypress="clearStatus" v-model="product.code" type="text" placeholder="e.g. AB-250" />
                         
                         <label class="label">Selling Price</label>
-                        <input class="input" ref="price" @focus="clearStatus" @keypress="clearStatus" v-model="product.price" type="number" />
+                        <div class="field is-horizontal">
+                        <div class="field-body">
+                            <div class="field is-expanded">
+                            <div class="field has-addons">
+                                <p class="control"><a class="button is-static">TZS</a></p>
+                                <p class="control is-expanded">
+                                <input ref="price" @focus="clearStatus" @keypress="clearStatus" v-model="product.price" class="input" type="number" placeholder="5000">
+                                </p>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
 
+                        <label class="label">Additional Info</label>
+                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="product.additional_info"></textarea></div>
                         
                         <button id="submit" class="button is-primary">Add Product</button>
                     </form>
@@ -63,8 +89,10 @@ export default {
                product_type: null,
                packing: null,
                code: null,
-               price: null
+               price: null,
+               additional_info: null,
            },
+           product_file: null,
            categories: [],
            response: null
        }
@@ -73,12 +101,19 @@ export default {
        this.getCategories()
    },
    computed: {
+        invalidProduct() {
+           return this.product.description === null
+        }
    },
    methods: {
         handleSubmit() {
             this.submitting = true
+            if (this.invalidProduct) {
+                this.showError()
+                return
+            }
             this.clearStatus()
-            this.addProduct(this.product)
+            this.addProduct()
         },
         clearStatus() {
             this.error = false
@@ -96,9 +131,13 @@ export default {
             this.clearForm()
             // this.$refs.category.focus()
         },
-        addProduct(product) {
+        addProduct() { 
             try {
-                this.axios.post('http://localhost:5000/products/add', {'body': product})
+                let formData = new FormData()
+                formData.append('file', this.product_file)
+                formData.append('body', JSON.stringify(this.product))
+                
+                this.axios.post('http://localhost:5000/products/add', formData, { headers: {'Content-Type': 'multipart/form-data'}})
                 .then(response => {
                     this.response = response
                     this.showSuccess()
@@ -133,6 +172,9 @@ export default {
         },
         show () {
            this.$modal.show('add-category');
+        },
+        handleFile() {
+            this.product_file = this.$refs.file.files[0];
         },
         addCategory(category) {
             try {

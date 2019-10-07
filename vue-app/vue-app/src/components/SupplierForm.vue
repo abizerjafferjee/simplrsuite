@@ -6,17 +6,20 @@
                 <p class="title">Add Supplier</p>
                 <p class="subtitle">Manage your supplier information. This will be helpful in inventory tracking.</p>
                 <div class="content">
-                    <p v-if="error && submitting" class="error-message">!Please fill out all required fields</p>
+                    <div v-if="error && submitting">
+                        <p class="error-message" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+                    </div>
+                    <!-- <p v-if="error && submitting" class="error-message">!Please fill out all fields with an asterisk (*).</p> -->
                     <p v-if="success" class="success-message">Supplier successfully added</p>
                     <form @submit.prevent="handleSubmit">
 
-                        <label class="label">Supplier Name</label>
+                        <label class="label">* Supplier Name</label>
                         <input class="input" ref="business_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.business_name" type="text" placeholder="e.g. thumbtack"/>
 
                         <label class="label">Contact Name</label>
                         <input class="input" ref="contact_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.contact_person" type="text" placeholder="e.g. John Doe"/>
 
-                        <label class="label">Phone Number</label>
+                        <label class="label">* Phone Number</label>
                         <div class="field is-horizontal">
                         <div class="field-body">
                             <div class="field is-expanded">
@@ -30,7 +33,7 @@
                         </div>
                         </div>
 
-                        <label class="label">Email</label>
+                        <label class="label">* Email</label>
                         <div class="field">
                             <div class="control">
                                 <input ref="email" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.email" class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
@@ -52,7 +55,7 @@
                         </div>
 
                         <label class="label">Additional Info</label>
-                        <textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.additional_info"></textarea>
+                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.additional_info"></textarea></div>
 
                         <button id="submit" class="button is-primary">Add Supplier</button>
                     </form>
@@ -70,6 +73,7 @@ export default {
        return {
            submitting: false,
            error: false,
+           errors: [],
            success: false,
            supplier: {
                business_name: null,
@@ -83,15 +87,46 @@ export default {
            response: null
        }
    },
+   computed: {
+        invalidSupplier() {
+           if (this.supplier.business_name === null) {
+               this.errors.push({'id':1, 'e':'!Supplier Name is Empty.'})
+               return true
+           }
+        },
+        invalidPhone() {
+            if (this.supplier.phone === null) {
+                this.errors.push({'id':2, 'e':'!Phone Number is Empty.'})
+                return true
+            } else if (!this.validPhone(this.supplier.phone)) {
+                this.errors.push({'id': 5, 'e':'!Phone Number should be 9 digits.'})
+                return true
+            }
+        },
+        invalidEmail() {
+            if (this.supplier.email === null) {
+                this.errors.push({'id':3, 'e':'!Email is Empty.'})
+                return true
+            } else if (!this.validEmail(this.supplier.email)) {
+                this.errors.push({'id':4, 'e':'!Email is invalid.'})
+                return true
+            }
+        }
+   },
    methods: {
         handleSubmit() {
             this.submitting = true
+            if (this.invalidSupplier || this.invalidPhone || this.invalidEmail) {
+                this.showError()
+                return
+            }
             this.clearStatus()
             this.addSupplier(this.supplier)
         },
         clearStatus() {
             this.error = false
             this.success = false
+            this.errors = []
         },
         showError() {
             this.error = true
@@ -132,6 +167,14 @@ export default {
                additional_info: null
            }
         },
+        validEmail: function (email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        },
+        validPhone: function (phone) {
+            var re = /^\+?\d{9}$/;
+            return re.test(phone);
+        }
     }
 }
 </script>
