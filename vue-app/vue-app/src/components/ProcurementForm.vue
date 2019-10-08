@@ -37,7 +37,7 @@
                         </div>
                         </div>
 
-                        <p class="subtitle is-5">Add Procurement</p>
+                        <p class="subtitle is-5">Record Procurement</p>
 
                         <label class="label">* Supplier</label>
                         <div class="field is-grouped">
@@ -131,18 +131,6 @@ export default {
         this.getSupplierNames()
     },
     computed: {
-        invalidProduct() {
-           if (this.procurement.product === null) {
-               this.errors.push({'id':1, 'e':'!Product Name is required.'})
-               return true
-           }
-        },
-        invalidSupplier() {
-            if (this.procurement.supplier === null) {
-                this.errors.push({'id':2, 'e':'!Supplier Name is required.'})
-                return true
-            }
-        }
     },
     methods: {
         handleSubmit() {
@@ -239,6 +227,18 @@ export default {
 
             } catch (error) {
                 this.response = error
+            }
+        },
+        invalidProduct() {
+           if (this.procurement.product === null) {
+               this.errors.push({'id':1, 'e':'!Product Name is required.'})
+               return true
+           }
+        },
+        invalidSupplier() {
+            if (this.procurement.supplier === null) {
+                this.errors.push({'id':2, 'e':'!Supplier Name is required.'})
+                return true
             }
         }
     }

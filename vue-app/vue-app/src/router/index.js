@@ -44,7 +44,8 @@ const routes = [
     {
         path: '/add-supplier',
         name: 'SupplierForm',
-        component: SupplierForm
+        component: SupplierForm,
+        props: true
     },
 ];
 

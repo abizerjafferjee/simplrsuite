@@ -250,20 +250,30 @@ def add_mailer():
 @app.route('/suppliers/add', methods=['POST'])
 def add_suppliers():
 
-    body = json.loads(request.data)['body']
     try:
-        supplier = Supplier(
-            business_name = body['business_name'],
-            contact_person = body['contact_person'],
-            email = body['email'],
-            phone = body['phone'],
-            plus_code = body['plus_code'],
-            address = body['address'],
-            additional_info = body['additional_info']
-        )
-        
-        db.session.add(supplier)
-        db.session.commit()
+        req = json.loads(request.data)
+        body = req['body']
+        if 'supplier' in req:
+            # edit supplier
+            id = req['supplier']
+            supplier = Supplier.query.get(id)
+            for key in body:
+                supplier[key] = body[key]
+            db.session.commit()
+            print(supplier)
+        else:
+            supplier = Supplier(
+                business_name = body['business_name'],
+                contact_person = body['contact_person'],
+                email = body['email'],
+                phone = body['phone'],
+                plus_code = body['plus_code'],
+                address = body['address'],
+                additional_info = body['additional_info']
+            )
+            
+            db.session.add(supplier)
+            db.session.commit()
 
         supplier_schema = SupplierSchema()
         output = supplier_schema.dump(supplier)
@@ -294,6 +304,17 @@ def get_suppliers():
         return make_response(jsonify({'success': True, 'body': output,
                                         'page': suppliers.page, 'prev': suppliers.has_prev,
                                         'next': suppliers.has_next}, 200))
+    except:
+        return make_response(jsonify({'success': False}, 400))
+
+@app.route('/suppliers/get', methods=['GET'])
+def get_supplier():
+    try:
+        supplier_id = request.args.get('id', type=int)
+        supplier = Supplier.query.get(supplier_id)
+        supplier_schema = SupplierSchema()
+        output = supplier_schema.dump(supplier)
+        return make_response(jsonify({'success': True, 'body': output}, 200))
     except:
         return make_response(jsonify({'success': False}, 400))
 

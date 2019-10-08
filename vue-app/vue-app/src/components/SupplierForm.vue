@@ -11,7 +11,7 @@
                     </div>
                     <!-- <p v-if="error && submitting" class="error-message">!Please fill out all fields with an asterisk (*).</p> -->
                     <p v-if="success" class="success-message">Supplier successfully added</p>
-                    <form @submit.prevent="handleSubmit">
+                    <form>
 
                         <label class="label">* Supplier Name</label>
                         <input class="input" ref="business_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.business_name" type="text" placeholder="e.g. thumbtack"/>
@@ -21,16 +21,16 @@
 
                         <label class="label">* Phone Number</label>
                         <div class="field is-horizontal">
-                        <div class="field-body">
-                            <div class="field is-expanded">
-                            <div class="field has-addons">
-                                <p class="control"><a class="button is-static">+255</a></p>
-                                <p class="control is-expanded">
-                                <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
-                                </p>
+                            <div class="field-body">
+                                <div class="field is-expanded">
+                                <div class="field has-addons">
+                                    <p class="control"><a class="button is-static">+255</a></p>
+                                    <p class="control is-expanded">
+                                    <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
+                                    </p>
+                                </div>
+                                </div>
                             </div>
-                            </div>
-                        </div>
                         </div>
 
                         <label class="label">* Email</label>
@@ -57,7 +57,7 @@
                         <label class="label">Additional Info</label>
                         <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.additional_info"></textarea></div>
 
-                        <button id="submit" class="button is-primary">Add Supplier</button>
+                        <button id="submit" class="button is-primary" @click="handleSubmit()">Add Supplier</button>
                     </form>
                 </div>
             </article>
@@ -69,6 +69,7 @@
 <script>
 export default {
    name: 'supplier-form',
+   props: ['editSupplier'],
    data() {
        return {
            submitting: false,
@@ -84,39 +85,23 @@ export default {
                address: null,
                additional_info: null
            },
+           editing: false,
            response: null
        }
    },
-   computed: {
-        invalidSupplier() {
-           if (this.supplier.business_name === null) {
-               this.errors.push({'id':1, 'e':'!Supplier Name is Empty.'})
-               return true
-           }
-        },
-        invalidPhone() {
-            if (this.supplier.phone === null) {
-                this.errors.push({'id':2, 'e':'!Phone Number is Empty.'})
-                return true
-            } else if (!this.validPhone(this.supplier.phone)) {
-                this.errors.push({'id': 5, 'e':'!Phone Number should be 9 digits.'})
-                return true
-            }
-        },
-        invalidEmail() {
-            if (this.supplier.email === null) {
-                this.errors.push({'id':3, 'e':'!Email is Empty.'})
-                return true
-            } else if (!this.validEmail(this.supplier.email)) {
-                this.errors.push({'id':4, 'e':'!Email is invalid.'})
-                return true
-            }
-        }
+   mounted () {
+    //    eslint-disable-next-line
+    //    console.log(this.$route.query.editSupplier)
+       if (this.$route.query.editSupplier) {
+           this.editing = true
+           var supplier_id = this.$route.query.editSupplier
+           this.editSupplierForm(supplier_id)
+       }
    },
    methods: {
         handleSubmit() {
             this.submitting = true
-            if (this.invalidSupplier || this.invalidPhone || this.invalidEmail) {
+            if (this.invalidSupplier() || this.invalidPhone() || this.invalidEmail()) {
                 this.showError()
                 return
             }
@@ -141,6 +126,7 @@ export default {
             // this.$refs.category.focus()
         },
         addSupplier(supplier) {
+            console.log("adding supplier")
             try {
                 this.axios.post('http://localhost:5000/suppliers/add', {'body': supplier})
                 .then(response => {
@@ -156,6 +142,28 @@ export default {
                 this.showError()
             }
         },
+        editSupplierForm(supplier_id) {
+            try {
+                this.axios.get('http://localhost:5000/suppliers/get?id='+supplier_id)
+                .then(response => {
+                    var body = response.data[0].body
+                    this.supplier.business_name = body['business_name']
+                    this.supplier.contact_person = body['contact_person']
+                    this.supplier.phone = body['phone']
+                    this.supplier.email = body['email']
+                    this.supplier.plus_code = body['plus_code']
+                    this.supplier.address = body['address']
+                    this.supplier.additional_info = body['additional_info']
+                    // eslint-disable-next-line
+                    // console.log(this.supplier)
+                })
+                .catch(error => {
+                    this.response = error
+                })
+            } catch (error) {
+                this.response = error
+            }
+        },
         clearForm() {
            this.supplier = {
                business_name: null,
@@ -168,12 +176,42 @@ export default {
            }
         },
         validEmail: function (email) {
-            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
         },
         validPhone: function (phone) {
             var re = /^\+?\d{9}$/;
             return re.test(phone);
+        },
+        invalidSupplier() {
+           if (this.supplier.business_name === null) {
+               this.errors.push({'id':1, 'e':'!Supplier Name is Empty.'})
+               return true
+           } else {
+               return false
+           }
+        },
+        invalidPhone() {
+            if (this.supplier.phone === null) {
+                this.errors.push({'id':2, 'e':'!Phone Number is Empty.'})
+                return true
+            } else if (!this.validPhone(this.supplier.phone)) {
+                this.errors.push({'id': 5, 'e':'!Phone Number should be 9 digits.'})
+                return true
+            } else {
+                return false
+            }
+        },
+        invalidEmail() {
+            if (this.supplier.email === null) {
+                this.errors.push({'id':3, 'e':'!Email is Empty.'})
+                return true
+            } else if (!this.validEmail(this.supplier.email)) {
+                this.errors.push({'id':4, 'e':'!Email is invalid.'})
+                return true
+            } else {
+                return false
+            }
         }
     }
 }

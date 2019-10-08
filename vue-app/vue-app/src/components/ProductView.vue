@@ -131,7 +131,7 @@ export default {
                 this.axios.post('http://localhost:5000/products', {'page':page, 'search':this.search.text, 'category': this.search.category})
                 .then(response => {
                     this.products = response.data[0].body
-                    console.log(this.products)
+                    // console.log(this.products)
                     this.pages.page = response.data[0].page
                     this.pages.next = response.data[0].next
                     this.pages.prev = response.data[0].prev

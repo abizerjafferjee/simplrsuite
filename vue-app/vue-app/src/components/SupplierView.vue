@@ -1,17 +1,18 @@
 <template>
     <div id="product-table">
-        <nav class="level">
-            <div class="level-left">
-                <p class="title">All Suppliers</p>
-            </div>
-            <div class="level-right">
-                <p class="level-item"><a class="button" @click="show">Add Supplier</a></p>
-            </div>
-        </nav>
-        <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal>
-
         <div class="tile is-parent">
             <article class="tile is-child">
+
+                <nav class="level">
+                    <div class="level-left">
+                        <p class="title">All Suppliers</p>
+                    </div>
+                    <div class="level-right">
+                        <p class="level-item"><a class="button" @click="show">Add Supplier</a></p>
+                    </div>
+                </nav>
+                <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal>
+
 
                 <p v-if="suppliers.length < 1" class="empty-table">No Suppliers</p>
 
@@ -32,28 +33,25 @@
                             <article class="media">
                                 <div class="media-content">
                                     <div class="content">
-                                        <p class="title is-4">{{ supplier.business_name }}</p>
-                                        <p class="subtitle is-6"><strong>{{ supplier.contact_person }}</strong> {{ supplier.email }} {{ supplier.phone }}</p>
+                                        <p class="title is-4">{{ supplier.business_name }} <small>@{{ supplier.contact_person }}</small></p>
+                                        <p class="subtitle is-6">{{ supplier.email }} {{ supplier.phone }}</p>
                                     </div>
-                                    <!-- <nav class="level is-mobile">
+                                    <nav class="level is-mobile">
                                         <div class="level-left">
-                                        <a class="level-item" aria-label="reply">
-                                            <span class="icon is-small">
-                                            <i class="fas fa-reply" aria-hidden="true"></i>
-                                            </span>
+                                        <a class="level-item" aria-label="transactions">
+                                            <button class="button is-small is-success">Payments</button>
                                         </a>
-                                        <a class="level-item" aria-label="retweet">
-                                            <span class="icon is-small">
-                                            <i class="fas fa-retweet" aria-hidden="true"></i>
-                                            </span>
+                                        <a class="level-item" aria-label="transactions">
+                                            <button class="button is-small is-success">Transactions</button>
                                         </a>
-                                        <a class="level-item" aria-label="like">
-                                            <span class="icon is-small">
-                                            <i class="fas fa-heart" aria-hidden="true"></i>
-                                            </span>
+                                        <a class="level-item" aria-label="edit">
+                                            <button class="button is-small is-primary"><router-link :to="{ path: '/add-supplier', query: {editSupplier: supplier.id}}">Edit</router-link></button>
+                                        </a>
+                                        <a class="level-item" aria-label="delete">
+                                            <button class="button is-small is-danger">Delete</button>
                                         </a>
                                         </div>
-                                    </nav> -->
+                                    </nav>
                                 </div>
                             </article>
                         </div>
