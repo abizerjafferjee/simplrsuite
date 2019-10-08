@@ -4,26 +4,25 @@
             <article class="tile is-child">
                 <p class="title">All Product</p>
                 <p class="subtitle">View products, costs, quantities and prices.</p>
-                
-                <div class="field is-grouped">
-                    <p class="control is-expanded">
-                        <input v-model="search.text" class="input" type="text" placeholder="Search Products">
-                    </p>
-                    <p class="control">
-                        <a @click="getProducts(1)" class="button is-info">
-                        Search
-                        </a>
-                    </p>
-                    <p class="control">
-                        <select @change="getProducts(1)" v-model="search.category" class="input">
-                            <option disabled selected>Category</option>
-                            <option v-for="category in categories" v-bind:key="category.id">{{ category.name }}</option>
-                        </select>
-                    </p>
-                </div>
-
                 <p v-if="products.length < 1" class="empty-table">No Products</p>
                 <div class="content" v-else>
+                    <div class="field is-grouped">
+                        <p class="control is-expanded">
+                            <input v-model="search.text" class="input" type="text" placeholder="Search Products">
+                        </p>
+                        <p class="control">
+                            <a @click="getProducts(1)" class="button is-info">
+                            Search
+                            </a>
+                        </p>
+                        <p class="control">
+                            <select @change="getProducts(1)" v-model="search.category" class="input">
+                                <option disabled selected>Category</option>
+                                <option v-for="category in categories" v-bind:key="category.id">{{ category.name }}</option>
+                            </select>
+                        </p>
+                    </div>
+
                     <div class="columns is-multiline is-scrollable">
                         <div class="column is-3" v-for="product in products" :key="product.id">
                             <div class="card">
@@ -132,6 +131,7 @@ export default {
                 this.axios.post('http://localhost:5000/products', {'page':page, 'search':this.search.text, 'category': this.search.category})
                 .then(response => {
                     this.products = response.data[0].body
+                    console.log(this.products)
                     this.pages.page = response.data[0].page
                     this.pages.next = response.data[0].next
                     this.pages.prev = response.data[0].prev

@@ -3,8 +3,8 @@
 
         <div class="tile is-parent">
             <article class="tile is-child">
-                <p class="title">Add Inventory</p>
-                <p class="subtitle">Add to your inventory and track total cost of stock.</p>
+                <p class="title">Add to your inventory and track total cost of stock</p>
+                <form @submit.prevent="handleSubmit">
                 <div class="content">
                     <div v-if="error && submitting">
                         <p class="error-message" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
@@ -12,17 +12,8 @@
                     <!-- <p v-if="error && submitting" class="error-message">!Please fill out all required fields</p> -->
                     <p v-if="success" class="success-message">Product successfully added</p>
 
-                    <form @submit.prevent="handleSubmit">
+                        <p class="subtitle is-5">Add Inventory</p>
 
-                        <label class="label">* Supplier</label>
-                        <div class="field is-grouped">
-                            <div class="control is-expanded">
-                                <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="procurement.supplier" placeholder="select item"></model-select>
-                            </div>
-                            <div class="control"><a class="button" @click="show(1)">Add Supplier</a></div>
-                        </div>
-                        <modal name="add-supplier" :width="800" :height="860"><supplier-form></supplier-form></modal>
-                        
                         <label class="label">* Product</label>
                         <div class="field is-grouped">
                             <div class="control is-expanded">
@@ -31,20 +22,6 @@
                             <div class="control"><a class="button" @click="show(2)">Add Product</a></div>
                         </div>
                         <modal name="add-product" :width="800" :height="600"><product-form></product-form></modal>
-                        
-                        <label class="label">* Unit Cost</label>
-                        <div class="field is-horizontal">
-                        <div class="field-body">
-                            <div class="field is-expanded">
-                            <div class="field has-addons">
-                                <p class="control"><a class="button is-static">TZS</a></p>
-                                <p class="control is-expanded">
-                                    <input class="input" ref="unit_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.unit_cost" type="number" placeholder="e.g. 1000"/>
-                                </p>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
 
                         <label class="label">* Quantity</label>
                         <div class="field is-horizontal">
@@ -60,6 +37,35 @@
                         </div>
                         </div>
 
+                        <p class="subtitle is-5">Add Procurement</p>
+
+                        <label class="label">* Supplier</label>
+                        <div class="field is-grouped">
+                            <div class="control is-expanded">
+                                <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="procurement.supplier" placeholder="select item"></model-select>
+                            </div>
+                            <div class="control"><a class="button" @click="show(1)">Add Supplier</a></div>
+                        </div>
+                        <modal name="add-supplier" :width="800" :height="860"><supplier-form></supplier-form></modal>
+                        
+                        <label class="label">Invoice Number</label>
+                        <input class="input" ref="invoice" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.invoice" type="text" placeholder=""/>
+
+                        <label class="label">* Unit Cost</label>
+                        <div class="field is-horizontal">
+                        <div class="field-body">
+                            <div class="field is-expanded">
+                            <div class="field has-addons">
+                                <p class="control"><a class="button is-static">TZS</a></p>
+                                <p class="control is-expanded">
+                                    <input class="input" ref="unit_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.unit_cost" type="number" placeholder="e.g. 1000"/>
+                                </p>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+
+
                         <label class="label">* Total Cost</label>
                         <div class="field is-horizontal">
                         <div class="field-body">
@@ -74,10 +80,13 @@
                             <label class="checkbox"><input type="checkbox" @click="checkbox()">Unit Cost * Quantity</label>
                         </div>
                         </div>
+
+                        <label class="label">Additional Info</label>
+                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.additional_info"></textarea></div>
                         
-                        <button id="submit" class="button is-primary">Add to Inventory</button>
-                    </form>
-                </div>
+                        <button id="submit" class="button is-primary">Add</button>
+                    </div>
+                </form>
             </article>
         </div>
 
@@ -104,9 +113,11 @@ export default {
             procurement: {
                 supplier: null,
                 product: null,
+                invoice: null,
                 quantity: 0,
                 unit_cost: 0,
-                total_cost: 0
+                total_cost: 0,
+                additional_info: null
             },
             response: null,
             productNames: [],
@@ -187,9 +198,10 @@ export default {
             this.procurement = {
                 supplier: null,
                 product: null,
-                quantity: null,
-                unit_cost: null,
-                total_cost: null
+                invoice: null,
+                quantity: 0,
+                unit_cost: 0,
+                total_cost: 0
             }
         },
         checkbox () {

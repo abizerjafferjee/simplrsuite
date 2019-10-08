@@ -315,9 +315,11 @@ def update_inventory():
         body = json.loads(request.data)['body']
         supplier = Supplier.query.filter_by(id=body['supplier']).first()
         product = Product.query.filter_by(id=body['product']).first()
-        quantity = float(body['quantity'])
-        unit_cost = float(body['unit_cost'])
-        total_cost = float(body['total_cost'])
+        quantity = body['quantity']
+        unit_cost = body['unit_cost']
+        total_cost = body['total_cost']
+        invoice = body['invoice']
+        additional_info = body['additional_info']
 
         inventory = Inventory.query.filter_by(product_id = body['product']).first()
 
@@ -337,7 +339,9 @@ def update_inventory():
             supplier = supplier,
             quantity = quantity,
             unit_cost = unit_cost,
-            total_cost = total_cost
+            total_cost = total_cost,
+            invoice = invoice,
+            additional_info = additional_info
         )
 
         db.session.add(procurement)

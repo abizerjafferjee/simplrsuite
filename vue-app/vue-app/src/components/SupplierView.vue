@@ -1,33 +1,32 @@
 <template>
     <div id="product-table">
+        <nav class="level">
+            <div class="level-left">
+                <p class="title">All Suppliers</p>
+            </div>
+            <div class="level-right">
+                <p class="level-item"><a class="button" @click="show">Add Supplier</a></p>
+            </div>
+        </nav>
+        <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal>
+
         <div class="tile is-parent">
             <article class="tile is-child">
-                
-                <div class="field is-grouped">
-                    <div class="control is-expanded">
-                        <p class="title">All Suppliers</p>
-                        <p class="subtitle">Manage all your suppliers.</p>
-                    </div>
-                    <div class="control"><a class="button" @click="show">Add Supplier</a></div>
-                </div>
-                <br>
-
-                <div class="field is-grouped">
-                    <p class="control is-expanded">
-                        <input v-model="search.text" class="input" type="text" placeholder="Search Suppliers">
-                    </p>
-                    <p class="control">
-                        <a @click="getSuppliers(1)" class="button is-info">
-                        Search
-                        </a>
-                    </p>
-                </div>
-
-                <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal>
 
                 <p v-if="suppliers.length < 1" class="empty-table">No Suppliers</p>
 
-                <div class="content">
+                <div class="content" v-else>
+                    <div class="field is-grouped">
+                        <p class="control is-expanded">
+                            <input v-model="search.text" class="input" type="text" placeholder="Search Suppliers">
+                        </p>
+                        <p class="control">
+                            <a @click="getSuppliers(1)" class="button is-info">
+                            Search
+                            </a>
+                        </p>
+                    </div>
+
                     <div v-for="supplier in suppliers" :key="supplier.id">
                         <div class="box" style="margin:0px 0px 10px 0px">
                             <article class="media">
@@ -59,11 +58,12 @@
                             </article>
                         </div>
                     </div>
-                
-                <nav class="pagination" role="navigation" aria-label="pagination">
-                    <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getSuppliers(pages.page-1)">Previous</a>
-                    <a class="button pagination-next" :disabled="pages.next==false" @click="getSuppliers(pages.page+1)">Next page</a>
-                </nav>
+
+                    <br>
+                    <nav class="pagination" role="navigation" aria-label="pagination">
+                        <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getSuppliers(pages.page-1)">Previous</a>
+                        <a class="button pagination-next" :disabled="pages.next==false" @click="getSuppliers(pages.page+1)">Next page</a>
+                    </nav>
                 </div>
             </article>
         </div>

@@ -22,6 +22,8 @@ class Procurement(db.Model):
     unit_cost = db.Column(db.Float())
     quantity = db.Column(db.Float())
     total_cost = db.Column(db.Float())
+    invoice = db.Column(db.String())
+    additional_info = db.Column(db.String())
 
     def __repr__(self):
         return '<id {}>'.format(self.id) 
