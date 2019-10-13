@@ -5,7 +5,6 @@ import config
 
 from app import app, db
 
-
 app.config.from_object(config.Config)
 
 migrate = Migrate(app, db)

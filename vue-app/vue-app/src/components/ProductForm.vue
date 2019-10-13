@@ -3,6 +3,17 @@
 
         <div class="tile is-parent">
             <article class="tile is-child">
+
+                <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><router-link to="/products">Products</router-link></li>
+                    <li class="is-active">
+                        <!-- <a v-if="this.editing" href="#" aria-current="page">Edit Supplier</a> -->
+                        <a href="#" aria-current="page">Add Product</a>
+                    </li>
+                </ul>
+                </nav>
+
                 <p class="title">Add Product</p>
                 <p class="subtitle">Add products, costs, quantities and prices. This will be added to your catalog.</p>
                 <div class="content">
@@ -178,7 +189,7 @@ export default {
         },
         addCategory(category) {
             try {
-                this.axios.post('http://localhost:5000/categories/add', {'body': category})
+                this.axios.post('http://localhost:5000/categories', {'body': category})
                 .then(response => {
                     var newCategory = response.data[0]['category']
                     this.categories.push(newCategory)

@@ -3,14 +3,24 @@
 
         <div class="tile is-parent">
             <article class="tile is-child">
+                <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><router-link to="/inventory">Inventory</router-link></li>
+                    <li class="is-active">
+                        <!-- <a v-if="this.editing" href="#" aria-current="page">Edit Supplier</a> -->
+                        <a href="#" aria-current="page">Add Inventory</a>
+                    </li>
+                </ul>
+                </nav>
+
                 <p class="title">Add to your inventory and track total cost of stock</p>
-                <form @submit.prevent="handleSubmit">
                 <div class="content">
                     <div v-if="error && submitting">
                         <p class="error-message" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
                     </div>
                     <!-- <p v-if="error && submitting" class="error-message">!Please fill out all required fields</p> -->
-                    <p v-if="success" class="success-message">Product successfully added</p>
+                    <p v-if="success" class="success-message">Successfully added to Inventory</p>
+                    <form @submit.prevent="handleSubmit">
 
                         <p class="subtitle is-5">Add Inventory</p>
 
@@ -19,9 +29,10 @@
                             <div class="control is-expanded">
                                 <model-select class="input" ref="product" @focus="clearStatus" @keypress="clearStatus" :options="productNames" v-model="procurement.product" placeholder="select item"></model-select>
                             </div>
-                            <div class="control"><a class="button" @click="show(2)">Add Product</a></div>
+                            <!-- <div class="control"><a class="button" @click="show(2)">Add Product</a></div> -->
+                            <div class="control"><router-link to="/add-product" class="button">Add Product</router-link></div>
                         </div>
-                        <modal name="add-product" :width="800" :height="600"><product-form></product-form></modal>
+                        <!-- <modal name="add-product" :width="800" :height="600"><product-form></product-form></modal> -->
 
                         <label class="label">* Quantity</label>
                         <div class="field is-horizontal">
@@ -44,9 +55,11 @@
                             <div class="control is-expanded">
                                 <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="procurement.supplier" placeholder="select item"></model-select>
                             </div>
-                            <div class="control"><a class="button" @click="show(1)">Add Supplier</a></div>
+                            <!-- <div class="control"><a class="button" @click="show(1)">Add Supplier</a></div> -->
+                            <div class="control"><router-link to="/add-supplier" class="button">Add Supplier</router-link></div>
+                            
                         </div>
-                        <modal name="add-supplier" :width="800" :height="860"><supplier-form></supplier-form></modal>
+                        <!-- <modal name="add-supplier" :width="800" :height="860"><supplier-form></supplier-form></modal> -->
                         
                         <label class="label">Invoice Number</label>
                         <input class="input" ref="invoice" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.invoice" type="text" placeholder=""/>
@@ -85,8 +98,8 @@
                         <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.additional_info"></textarea></div>
                         
                         <button id="submit" class="button is-primary">Add</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </article>
         </div>
 
@@ -135,21 +148,21 @@ export default {
     methods: {
         handleSubmit() {
             this.submitting = true
-            if (this.invalidSupplier || this.invalidProduct) {
+            if (this.invalidSupplier() || this.invalidProduct()) {
                 this.showError()
                 return
             }
             this.clearStatus()
-            this.addProcurement(this.procurement)
+            this.addProcurement()
  
         },
         clearStatus() {
             this.error = false
             this.success = false
         },
-        addProcurement(procurement) {
+        addProcurement() {
             try {
-                this.axios.post('http://localhost:5000/inventory/add', {'body': procurement})
+                this.axios.post('http://localhost:5000/inventory', {'body': this.procurement})
                 .then(response => {
                     this.response = response
                     this.showSuccess()
@@ -173,7 +186,7 @@ export default {
             this.submitting = false
             this.success = true
             this.clearForm()
-            this.$refs.supplier.focus()
+            // this.$refs.supplier.focus()
         },
         show (form_number) {
             if (form_number === 1) {

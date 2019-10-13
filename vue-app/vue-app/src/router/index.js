@@ -4,6 +4,7 @@ import ProductForm from '@/components/ProductForm.vue'
 import ProductView from '@/components/ProductView'
 import MailListForm from '@/components/MailListForm'
 import ProcurementForm from '@/components/ProcurementForm'
+import ProcurementView from '@/components/ProcurementView'
 import SupplierForm from '@/components/SupplierForm'
 import SupplierView from '@/components/SupplierView'
 import Dashboard from '@/components/Dashboard'
@@ -17,7 +18,7 @@ const routes = [
         component: Dashboard
     },
     {
-        path: '/add-products',
+        path: '/add-product',
         name: 'ProductForm',
         component: ProductForm
     },
@@ -30,6 +31,11 @@ const routes = [
         path: '/add-contact',
         name: 'MailListForm',
         component: MailListForm
+    },
+    {
+        path: '/inventory',
+        name: 'ProcurementView',
+        component: ProcurementView
     },
     {
         path: '/add-inventory',

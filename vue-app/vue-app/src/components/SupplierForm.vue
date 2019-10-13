@@ -1,8 +1,18 @@
 <template>
     <div id="product-form">
-
         <div class="tile is-parent">
             <article class="tile is-child">
+
+                <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><router-link to="/suppliers">Suppliers</router-link></li>
+                    <li class="is-active">
+                        <a v-if="this.editing" href="#" aria-current="page">Edit Supplier</a>
+                        <a href="#" aria-current="page" v-else>Add Supplier</a>
+                    </li>
+                </ul>
+                </nav>
+
                 <p class="title">Add Supplier</p>
                 <p class="subtitle">Manage your supplier information. This will be helpful in inventory tracking.</p>
                 <div class="content">
@@ -11,7 +21,7 @@
                     </div>
                     <!-- <p v-if="error && submitting" class="error-message">!Please fill out all fields with an asterisk (*).</p> -->
                     <p v-if="success" class="success-message">Supplier successfully added</p>
-                    <form>
+                    <form @submit.prevent="handleSubmit">
 
                         <label class="label">* Supplier Name</label>
                         <input class="input" ref="business_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.business_name" type="text" placeholder="e.g. thumbtack"/>
@@ -57,7 +67,8 @@
                         <label class="label">Additional Info</label>
                         <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.additional_info"></textarea></div>
 
-                        <button id="submit" class="button is-primary" @click="handleSubmit()">Add Supplier</button>
+                        <button id="submit" class="button is-primary" v-if="editing">Save</button>
+                        <button id="submit" class="button is-primary" v-else>Add Supplier</button>
                     </form>
                 </div>
             </article>
@@ -86,6 +97,7 @@ export default {
                additional_info: null
            },
            editing: false,
+           supplier_id: null,
            response: null
        }
    },
@@ -94,8 +106,8 @@ export default {
     //    console.log(this.$route.query.editSupplier)
        if (this.$route.query.editSupplier) {
            this.editing = true
-           var supplier_id = this.$route.query.editSupplier
-           this.editSupplierForm(supplier_id)
+           this.supplier_id = this.$route.query.editSupplier
+           this.editSupplierForm()
        }
    },
    methods: {
@@ -106,7 +118,11 @@ export default {
                 return
             }
             this.clearStatus()
-            this.addSupplier(this.supplier)
+            if (this.editing) {
+                this.saveSupplier()
+            } else {
+                this.addSupplier()
+            }
         },
         clearStatus() {
             this.error = false
@@ -125,10 +141,9 @@ export default {
             this.clearForm()
             // this.$refs.category.focus()
         },
-        addSupplier(supplier) {
-            console.log("adding supplier")
+        addSupplier() {
             try {
-                this.axios.post('http://localhost:5000/suppliers/add', {'body': supplier})
+                this.axios.post('http://localhost:5000/suppliers', {'body': this.supplier})
                 .then(response => {
                     this.response = response
                     this.showSuccess()
@@ -142,9 +157,25 @@ export default {
                 this.showError()
             }
         },
-        editSupplierForm(supplier_id) {
+        saveSupplier() {
             try {
-                this.axios.get('http://localhost:5000/suppliers/get?id='+supplier_id)
+                this.axios.put('http://localhost:5000/suppliers?id='+this.supplier_id, {'body': this.supplier})
+                .then(response => {
+                    this.response = response
+                    this.showSuccess()
+                })
+                .catch(e => {
+                    this.response = e
+                    this.showError()
+                })
+            } catch (error) {
+                this.response = error
+                this.showError()
+            }
+        },
+        editSupplierForm() {
+            try {
+                this.axios.get('http://localhost:5000/suppliers/'+this.supplier_id)
                 .then(response => {
                     var body = response.data[0].body
                     this.supplier.business_name = body['business_name']

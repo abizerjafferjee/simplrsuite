@@ -20,14 +20,15 @@
           </p>
           <ul class="menu-list">
             <li><router-link to="/products">Products</router-link></li>
-            <li><router-link to="/suppliers">Supplier</router-link></li>
-            <li><router-link to="/add-products">Add Product</router-link></li>
-            <li><router-link to="/add-supplier">Add Supplier</router-link></li>
-            <li><router-link to="/add-inventory">Add Inventory</router-link></li>
+            <!-- <li><router-link to="/add-product">Add Product</router-link></li> -->
+            <li><router-link to="/suppliers">Suppliers</router-link></li>
+            <!-- <li><router-link to="/add-supplier">Add Supplier</router-link></li> -->
+            <li><router-link to="/inventory">Inventory</router-link></li>
+            <!-- <li><router-link to="/add-inventory">Add Inventory</router-link></li> -->
             <li><a>Payments</a></li>
-            <li><router-link to="/add-inventory">Stocking Note</router-link></li>
+            <!-- <li><router-link to="/add-inventory">Stocking Note</router-link></li> -->
           </ul>
-          <p class="menu-label">
+          <!-- <p class="menu-label">
             Sales
           </p>
           <ul class="menu-list">
@@ -40,7 +41,7 @@
           </p>
           <ul class="menu-list">
             <li><a>Employees</a></li>
-          </ul>
+          </ul> -->
         </aside>
       </div>
 

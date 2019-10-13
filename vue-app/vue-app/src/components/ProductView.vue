@@ -2,8 +2,20 @@
     <div id="product-table">
         <div class="tile is-parent">
             <article class="tile is-child">
-                <p class="title">All Product</p>
-                <p class="subtitle">View products, costs, quantities and prices.</p>
+
+                <nav class="level">
+                    <div class="level-left">
+                        <p class="title">All Products</p>
+                    </div>
+                    <div class="level-right">
+                        <!-- <p class="level-item"><a class="button" @click="show">Add Supplier</a></p> -->
+                        <p class="level-item"><router-link to="/add-product" class="button">Add Product</router-link></p>
+                    </div>
+                </nav>
+
+                <!-- <p class="title">All Product</p> -->
+                <!-- <p class="subtitle">View products, costs, quantities and prices.</p> -->
+
                 <p v-if="products.length < 1" class="empty-table">No Products</p>
                 <div class="content" v-else>
                     <div class="field is-grouped">
@@ -121,14 +133,14 @@ export default {
             response: null,
         }
     },
-    mounted() {
+    created() {
         this.getProducts(1)
         this.getCategories()
     },
     methods: {
         getProducts(page) {
             try {
-                this.axios.post('http://localhost:5000/products', {'page':page, 'search':this.search.text, 'category': this.search.category})
+                this.axios.get('http://localhost:5000/products?page='+page+'&search='+this.search.text+'&category='+this.search.category)
                 .then(response => {
                     this.products = response.data[0].body
                     // console.log(this.products)

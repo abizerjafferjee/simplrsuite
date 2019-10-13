@@ -3,6 +3,8 @@ from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 from sqlalchemy.orm import relationship
 
+
+
 class Inventory(db.Model):
     __tablename__ = 'inventory'
 
@@ -130,3 +132,6 @@ class InventorySchema(ma.ModelSchema):
 class ProcurementSchema(ma.ModelSchema):
     class Meta:
         model = Procurement
+
+    product = ma.Nested(ProductSchema)
+    supplier = ma.Nested(SupplierSchema)

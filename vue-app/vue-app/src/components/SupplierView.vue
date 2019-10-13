@@ -8,10 +8,11 @@
                         <p class="title">All Suppliers</p>
                     </div>
                     <div class="level-right">
-                        <p class="level-item"><a class="button" @click="show">Add Supplier</a></p>
+                        <!-- <p class="level-item"><a class="button" @click="show">Add Supplier</a></p> -->
+                        <p class="level-item"><router-link to="/add-supplier" class="button">Add Supplier</router-link></p>
                     </div>
                 </nav>
-                <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal>
+                <!-- <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal> -->
 
 
                 <p v-if="suppliers.length < 1" class="empty-table">No Suppliers</p>
@@ -91,13 +92,13 @@ export default {
             response: null,
         }
     },
-    mounted() {
+    created() {
         this.getSuppliers(1)
     },
     methods: {
         getSuppliers(page) {
             try {
-                this.axios.post('http://localhost:5000/suppliers', {'page':page, 'search':this.search.text})
+                this.axios.get('http://localhost:5000/suppliers?page='+page+'&search='+this.search.text)
                 .then(response => {
                     this.suppliers = response.data[0].body
                     this.pages.page = response.data[0].page
