@@ -2,16 +2,23 @@
     <div id="product-table">
         <div class="tile is-parent">
             <article class="tile is-child">
-                <div class="content">
-                    <nav class="level">
-                        <div class="level-left">
-                            <p class="title">Procurement</p>
-                        </div>
-                        <div class="level-right">
-                            <!-- <p class="level-item"><a class="button" @click="show">Add Supplier</a></p> -->
-                            <p class="level-item"><router-link to="/add-inventory" class="button">Add Inventory</router-link></p>
-                        </div>
-                    </nav>
+                <nav class="level">
+                    <div class="level-left">
+                        <p class="title">Procurement</p>
+                    </div>
+                    <div class="level-right">
+                        <!-- <p class="level-item"><a class="button" @click="show">Add Supplier</a></p> -->
+                        <p class="level-item"><router-link to="/add-inventory" class="button">Add Inventory</router-link></p>
+                    </div>
+                </nav>
+
+                <div v-if="procurements && procurements.length < 1" class="notification">
+                    You have no suppliers. Click Add Supplier to add your first supplier.
+                </div>
+
+                <div class="content" v-else>
+
+                    <p class="notification">Your 10 latest procurements.</p>
 
                     <table class="table">
                         <thead>

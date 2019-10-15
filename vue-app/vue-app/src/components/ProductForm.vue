@@ -32,11 +32,27 @@
                         </div>
 
                         <modal name="add-category"><category-form @add:category="addCategory"></category-form></modal>
+
+                        <label class="label">* Product Title</label>
+                        <input class="input" ref="description" @focus="clearStatus" @keypress="clearStatus" v-model="product.description" type="text" placeholder="Cash Book 4Q"/>
                         
-                        <label class="label">* Product (Label/ Description)</label>
-                        <input class="input" ref="description" @focus="clearStatus" @keypress="clearStatus" v-model="product.description" type="text" placeholder="cash book 4q"/>
+                        <label class="checkbox">
+                        <input type="checkbox" @click="codeCheckBox()">
+                            A SKU (item number) will be automatically generated for you. You can choose to enter another unique identifier below.
+                        </label>
                         
-                        <label class="label">Upload Image of Product</label>
+                        <label class="label">Code</label>
+                        <input class="input" ref="code" @focus="clearStatus" @keypress="clearStatus" v-model="product.code" type="text" :disabled="enterCode === true" placeholder="e.g. H10000M02" />
+
+                        <label class="label">Product Type</label>
+                        <div class="field">
+                            <select class="input" ref="product_type" @focus="clearStatus" @keypress="clearStatus" v-model="product.product_type" type="text">
+                                <option>Finished Good</option>
+                                <option>Raw Material</option>
+                            </select>
+                        </div>
+
+                        <label class="label">Product Image</label>
                         <div class="file has-name is-fullwidth">
                             <label class="file-label">
                                 <input class="file-input" type="file" name="file" ref="file" @focus="clearStatus" @keypress="clearStatus" v-on:change="handleFile()">
@@ -50,27 +66,43 @@
                         </div>
 
                         <label class="label">Packing</label>
-                        <input class="input" ref="packing" @focus="clearStatus" @keypress="clearStatus" v-model="product.packing" type="text" placeholder="e.g. 10 pieces per pack"/>
-
-                        <label class="label">Code</label>
-                        <input class="input" ref="code" @focus="clearStatus" @keypress="clearStatus" v-model="product.code" type="text" placeholder="e.g. AB-250" />
-                        
-                        <label class="label">Selling Price</label>
-                        <div class="field is-horizontal">
-                        <div class="field-body">
-                            <div class="field is-expanded">
-                            <div class="field has-addons">
-                                <p class="control"><a class="button is-static">TZS</a></p>
-                                <p class="control is-expanded">
-                                <input ref="price" @focus="clearStatus" @keypress="clearStatus" v-model="product.price" class="input" type="number" placeholder="5000">
-                                </p>
-                            </div>
-                            </div>
+                        <div class="field has-addons">
+                        <p class="control">
+                            <span class="select">
+                            <select class="button is-light" ref="packing_type" @focus="clearStatus" @keypress="clearStatus" v-model="product.packing_type" type="text">
+                                <option>Piece</option>
+                                <option>Dozen</option>
+                                <option>Carton</option>
+                                <option>Pack</option>
+                                <option>Pallet</option>
+                            </select>
+                            </span>
+                        </p>
+                        <p class="control is-expanded">
+                            <input class="input" ref="packing" @focus="clearStatus" @keypress="clearStatus" v-model="product.packing" type="text" placeholder="e.g. 10 pieces per pack"/>
+                        </p>
                         </div>
+
+                        <label class="label">Selling Price</label>
+                        <div class="field has-addons">
+                        <p class="control">
+                            <span class="select">
+                            <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="product.currency" type="text">
+                                <option>TZS</option>
+                                <option>KES</option>
+                                <option>USD</option>
+                                <option>RMB</option>
+                                <option>AED</option>
+                            </select>
+                            </span>
+                        </p>
+                        <p class="control is-expanded">
+                            <input ref="price" @focus="clearStatus" @keypress="clearStatus" v-model="product.price" class="input" type="number" placeholder="5000">
+                        </p>
                         </div>
 
                         <label class="label">Additional Info</label>
-                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="product.additional_info"></textarea></div>
+                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="product.additional_info" placeholder="e.g. Product description, dimensions, weight and colors."></textarea></div>
                         
                         <button id="submit" class="button is-primary">Add Product</button>
                     </form>
@@ -98,14 +130,17 @@ export default {
                category: null,
                description: null,
                product_type: null,
+               packing_type: "Piece",
                packing: null,
                code: null,
+               currency: "TZS",
                price: null,
                additional_info: null,
            },
            product_file: null,
            categories: [],
-           response: null
+           response: null,
+           enterCode: true
        }
    },
    created: function() {
@@ -148,7 +183,7 @@ export default {
                 formData.append('file', this.product_file)
                 formData.append('body', JSON.stringify(this.product))
                 
-                this.axios.post('http://localhost:5000/products/add', formData, { headers: {'Content-Type': 'multipart/form-data'}})
+                this.axios.post('http://localhost:5000/products', formData, { headers: {'Content-Type': 'multipart/form-data'}})
                 .then(response => {
                     this.response = response
                     this.showSuccess()
@@ -167,9 +202,12 @@ export default {
                category: null,
                description: null,
                product_type: null,
+               packing_type: "Piece",
                packing: null,
                code: null,
-               price: null
+               currency: "TZS",
+               price: null,
+               additional_info: null,
            }
         },
         getCategories() {
@@ -186,6 +224,12 @@ export default {
         },
         handleFile() {
             this.product_file = this.$refs.file.files[0];
+        },
+        codeCheckBox () {
+            this.enterCode = !this.enterCode
+            if (this.enterCode === false) {
+                this.product.code = null
+            }
         },
         addCategory(category) {
             try {

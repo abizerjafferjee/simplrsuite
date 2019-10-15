@@ -36,16 +36,16 @@
 
                         <label class="label">* Quantity</label>
                         <div class="field is-horizontal">
-                        <div class="field-body">
-                            <div class="field is-expanded">
-                            <div class="field has-addons">
-                                <p class="control"><a class="button is-static">Units</a></p>
-                                <p class="control is-expanded">
-                                <input class="input" ref="quantity" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.quantity" type="number" placeholder="e.g. 10"/>
-                                </p>
+                            <div class="field-body">
+                                <div class="field is-expanded">
+                                <div class="field has-addons">
+                                    <p class="control"><a class="button is-light">Units</a></p>
+                                    <p class="control is-expanded">
+                                    <input class="input" ref="quantity" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.quantity" type="number" placeholder="e.g. 10"/>
+                                    </p>
+                                </div>
+                                </div>
                             </div>
-                            </div>
-                        </div>
                         </div>
 
                         <p class="subtitle is-5">Record Procurement</p>
@@ -61,41 +61,54 @@
                         </div>
                         <!-- <modal name="add-supplier" :width="800" :height="860"><supplier-form></supplier-form></modal> -->
                         
+                        <label class="label">Location</label>
+                        <input class="input" ref="location" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.location" type="text" placeholder="e.g. Shop or Warehouse"/>
+
                         <label class="label">Invoice Number</label>
                         <input class="input" ref="invoice" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.invoice" type="text" placeholder=""/>
 
                         <label class="label">* Unit Cost</label>
-                        <div class="field is-horizontal">
-                        <div class="field-body">
-                            <div class="field is-expanded">
-                            <div class="field has-addons">
-                                <p class="control"><a class="button is-static">TZS</a></p>
-                                <p class="control is-expanded">
-                                    <input class="input" ref="unit_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.unit_cost" type="number" placeholder="e.g. 1000"/>
-                                </p>
-                            </div>
-                            </div>
-                        </div>
+                        <div class="field has-addons">
+                            <p class="control">
+                                <span class="select">
+                                <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.currency" type="text">
+                                    <option>TZS</option>
+                                    <option>KES</option>
+                                    <option>USD</option>
+                                    <option>RMB</option>
+                                    <option>AED</option>
+                                </select>
+                                </span>
+                            </p>
+                            <p class="control is-expanded">
+                                <input class="input" ref="unit_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.unit_cost" type="number" placeholder="e.g. 1000"/>
+                            </p>
                         </div>
 
 
                         <label class="label">* Total Cost</label>
-                        <div class="field is-horizontal">
-                        <div class="field-body">
-                            <div class="field is-expanded">
-                            <div class="field has-addons">
-                                <p class="control"><a class="button is-static">TZS</a></p>
-                                <p class="control is-expanded">
-                                    <input class="input" ref="total_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.total_cost" type="number" placeholder="e.g. 50000" />
-                                </p>
-                            </div>
-                            </div>
-                            <label class="checkbox"><input type="checkbox" @click="checkbox()">Unit Cost * Quantity</label>
-                        </div>
+                        <div class="field has-addons">
+                            <p class="control">
+                                <span class="select">
+                                <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.currency" type="text">
+                                    <option>TZS</option>
+                                    <option>KES</option>
+                                    <option>USD</option>
+                                    <option>RMB</option>
+                                    <option>AED</option>
+                                </select>
+                                </span>
+                            </p>
+                            <p class="control is-expanded">
+                                <input class="input" ref="total_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.total_cost" type="number" placeholder="e.g. 50000" />
+                            </p>
+                            <p class="control">
+                                <label class="checkbox"><input type="checkbox" @click="checkbox()">Unit Cost * Quantity</label>
+                            </p>
                         </div>
 
                         <label class="label">Additional Info</label>
-                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.additional_info"></textarea></div>
+                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.additional_info" placeholder="e.g. Delivery note number for reference, note of damage to goods etc"></textarea></div>
                         
                         <button id="submit" class="button is-primary">Add</button>
                     </form>
@@ -126,8 +139,10 @@ export default {
             procurement: {
                 supplier: null,
                 product: null,
+                location: null,
                 invoice: null,
                 quantity: 0,
+                currency: "TZS",
                 unit_cost: 0,
                 total_cost: 0,
                 additional_info: null

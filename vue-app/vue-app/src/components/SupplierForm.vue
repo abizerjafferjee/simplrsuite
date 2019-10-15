@@ -30,17 +30,21 @@
                         <input class="input" ref="contact_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.contact_person" type="text" placeholder="e.g. John Doe"/>
 
                         <label class="label">* Phone Number</label>
-                        <div class="field is-horizontal">
-                            <div class="field-body">
-                                <div class="field is-expanded">
-                                <div class="field has-addons">
-                                    <p class="control"><a class="button is-static">+255</a></p>
-                                    <p class="control is-expanded">
-                                    <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
-                                    </p>
-                                </div>
-                                </div>
-                            </div>
+                        <div class="field has-addons">
+                        <p class="control">
+                            <span class="select">
+                            <select class="button is-light" ref="phone_code" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone_code" type="text">
+                                <option>+255</option>
+                                <option>+254</option>
+                                <option>+86</option>
+                                <option>+971</option>
+                                <option>+1</option>
+                            </select>
+                            </span>
+                        </p>
+                        <p class="control is-expanded">
+                            <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
+                        </p>
                         </div>
 
                         <label class="label">* Email</label>
@@ -91,6 +95,7 @@ export default {
                business_name: null,
                contact_person: null,
                phone: null,
+               phone_code: "+255",
                email: null,
                plus_code: null,
                address: null,

@@ -36,8 +36,11 @@ def add():
         product = Product(
             category = category,
             description = body['description'],
+            product_type = body['product_type'],
             code = body['code'],
+            packing_type = body['packing_type'],
             packing = body['packing'],
+            currency = body['currency'],
             price = float(body['price']),
             image_path = filepath
         )
@@ -143,7 +146,7 @@ def get_names():
     """
     try:
         products = Product.query.all()
-        product_names = [{'value': p.id, 'text': p.description} for p in products]
+        product_names = [{'value': p.id, 'text': p.description, 'packing_type': p.packing_type} for p in products]
         return make_response(jsonify({'success': True, 'products': product_names}, 200))
     except Exception as e:
         print(e)

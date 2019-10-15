@@ -15,10 +15,13 @@
                 <!-- <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal> -->
 
 
-                <p v-if="suppliers.length < 1" class="empty-table">No Suppliers</p>
+                <!-- <p v-if="suppliers.length < 1" class="empty-table">No Suppliers</p> -->
+                <div v-if="suppliers && suppliers.length < 1" class="notification">
+                    You have no suppliers. Click Add Supplier to add your first supplier.
+                </div>
 
                 <div class="content" v-else>
-                    <div class="field is-grouped">
+                    <div class="field is-grouped notification">
                         <p class="control is-expanded">
                             <input v-model="search.text" class="input" type="text" placeholder="Search Suppliers">
                         </p>
@@ -43,7 +46,7 @@
                                             <button class="button is-small is-success">Payments</button>
                                         </a>
                                         <a class="level-item" aria-label="transactions">
-                                            <button class="button is-small is-success">Transactions</button>
+                                            <button class="button is-small is-success">Procurements</button>
                                         </a>
                                         <a class="level-item" aria-label="edit">
                                             <button class="button is-small is-primary"><router-link :to="{ path: '/add-supplier', query: {editSupplier: supplier.id}}">Edit</router-link></button>

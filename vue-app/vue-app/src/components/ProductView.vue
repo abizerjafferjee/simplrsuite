@@ -16,22 +16,26 @@
                 <!-- <p class="title">All Product</p> -->
                 <!-- <p class="subtitle">View products, costs, quantities and prices.</p> -->
 
-                <p v-if="products.length < 1" class="empty-table">No Products</p>
+                <div v-if="products && products.length < 1" class="notification">
+                    You have no products in your catalog. Click Add Products to add your first product.
+                </div>
+
+                <!-- <p v-if="products && products.length < 1" class="empty-table">No Products</p> -->
                 <div class="content" v-else>
-                    <div class="field is-grouped">
+                    <div class="field is-grouped notification">
                         <p class="control is-expanded">
                             <input v-model="search.text" class="input" type="text" placeholder="Search Products">
+                        </p>
+                        <p class="control">
+                            <select @change="getProducts(1)" v-model="search.category" class="input" placeholder="Category">
+                                <!-- <option selected>Category</option> -->
+                                <option v-for="category in categories" v-bind:key="category.id">{{ category.name }}</option>
+                            </select>
                         </p>
                         <p class="control">
                             <a @click="getProducts(1)" class="button is-info">
                             Search
                             </a>
-                        </p>
-                        <p class="control">
-                            <select @change="getProducts(1)" v-model="search.category" class="input">
-                                <option disabled selected>Category</option>
-                                <option v-for="category in categories" v-bind:key="category.id">{{ category.name }}</option>
-                            </select>
                         </p>
                     </div>
 
@@ -63,50 +67,6 @@
                         <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getProducts(pages.page-1)">Previous</a>
                         <a class="button pagination-next" :disabled="pages.next==false" @click="getProducts(pages.page+1)">Next page</a>
                     </nav>
-
-
-                    <!-- <table class="table" v-else>
-                        <thead>
-                            <tr>
-                            <th>Category</th>
-                            <th>Description</th>
-                            <th>Code</th>
-                            <th>Packing</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Cost</th>
-                            <th>Created At</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="product in products" :key="product.id">
-                            <td v-if="editing === product.id"><input type="text" v-model="product.category"></td>
-                            <td v-else>{{ product.category }}</td>
-                            <td v-if="editing === product.id"><input type="text" v-model="product.description"></td>
-                            <td v-else>{{ product.description }}</td>
-                            <td v-if="editing === product.id"><input type="text" v-model="product.code"></td>
-                            <td v-else>{{ product.code }}</td>
-                            <td v-if="editing === product.id"><input type="text" v-model="product.packing"></td>
-                            <td v-else>{{ product.packing }}</td>
-                            <td v-if="editing === product.id"><input type="text" v-model="product.price"></td>
-                            <td v-else>{{ product.price }}</td>
-                            <td v-if="editing === product.id"><input type="text" v-model="product.quantity"></td>
-                            <td v-else>{{ product.quantity }}</td>
-                            <td v-if="editing === product.id"><input type="text" v-model="product.cost"></td>
-                            <td v-else>{{ product.cost }}</td>
-                            <td v-if="editing === product.id"><input type="text" v-model="product.created"></td>
-                            <td v-else>{{ product.created }}</td>
-                            <td v-if="editing == product.id">
-                                <button class="button is-small is-success" @click="editProduct(product)">save</button>
-                                <button class="button is-small muted-button" @click="cancelEdit(product)">cancel</button>
-                            </td>
-                            <td v-else>
-                                <button class="button is-small is-primary" @click="editMode(product)">edit</button>
-                                <button class="button is-small is-danger" @click="deleteProduct(product.id)">delete</button>
-                            </td>
-                            </tr>
-                        </tbody>
-                    </table> -->
                 </div>
             </article>
         </div>
@@ -124,7 +84,7 @@ export default {
                 next: null,
                 prev: null
             },
-            categories: [],
+            categories: [{'id':0, 'name':''}],
             search: {
                 text: '',
                 category: ''
@@ -194,7 +154,7 @@ export default {
         getCategories() {
             this.axios.get('http://localhost:5000/categories')
             .then(response => {
-                this.categories = response.data[0]['categories']
+                this.categories = this.categories.concat(response.data[0]['categories'])
             })
             .catch(error => {
                 this.response = error
