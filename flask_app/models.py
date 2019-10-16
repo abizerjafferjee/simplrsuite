@@ -35,12 +35,12 @@ class Procurement(db.Model):
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
-def generateSKU(context):
-    params = context.get_current_paramters()
-    product = params['description']
-    category_id = params['category_id']
-    id = params['id']
-    return product + str(category_id) + "00" + str(id)
+# def generateSKU(context):
+#     params = context.get_current_parameters()
+#     product = params['description']
+#     category_id = params['category_id']
+#     id = params['id']
+#     return product + str(category_id) + "00" + str(id)
 
 class Product(db.Model):
     __tablename__ = 'product'
@@ -48,7 +48,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     description = db.Column(db.String())
-    sku = db.Column(db.String(), default=generateSKU)
+    sku = db.Column(db.String())
     code = db.Column(db.String())
     product_type = db.Column(db.String())
     packing_type = db.Column(db.String())

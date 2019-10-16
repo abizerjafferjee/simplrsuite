@@ -151,7 +151,7 @@ export default {
             productNames: [],
             supplierNames: [],
             checked: false,
-            errors: []
+            errors: [],
         }
     },
     created: function() {
@@ -159,6 +159,9 @@ export default {
         this.getSupplierNames()
     },
     computed: {
+        // packingUnit() {
+        //     return this.getPackingUnit()
+        // }
     },
     methods: {
         handleSubmit() {
@@ -214,10 +217,13 @@ export default {
             this.procurement = {
                 supplier: null,
                 product: null,
+                location: null,
                 invoice: null,
                 quantity: 0,
+                currency: "TZS",
                 unit_cost: 0,
-                total_cost: 0
+                total_cost: 0,
+                additional_info: null
             }
         },
         checkbox () {
@@ -268,7 +274,7 @@ export default {
                 this.errors.push({'id':2, 'e':'!Supplier Name is required.'})
                 return true
             }
-        }
+        },
     }
 }
 </script>

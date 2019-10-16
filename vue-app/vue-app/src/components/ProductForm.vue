@@ -17,11 +17,16 @@
                 <p class="title">Add Product</p>
                 <p class="subtitle">Add products, costs, quantities and prices. This will be added to your catalog.</p>
                 <div class="content">
-                    <p v-if="error && submitting" class="error-message">!Please fill out all fields with an asterisk (*).</p>
+
+                    <div v-if="error && submitting">
+                        <p class="error-message" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+                    </div>
+                    <!-- <p v-if="error && submitting" class="error-message">!Please fill out all fields with an asterisk (*).</p> -->
                     <p v-if="success" class="success-message">Product successfully added</p>
+
                     <form @submit.prevent="handleSubmit">
 
-                        <label class="label">Category</label>
+                        <label class="label">* Category</label>
                         <div class="field is-grouped">
                             <div class="control is-expanded">
                                 <select class="input" ref="category" @focus="clearStatus" @keypress="clearStatus" v-model="product.category" type="text">
@@ -75,6 +80,7 @@
                                 <option>Carton</option>
                                 <option>Pack</option>
                                 <option>Pallet</option>
+                                <option>Custom</option>
                             </select>
                             </span>
                         </p>
@@ -140,21 +146,22 @@ export default {
            product_file: null,
            categories: [],
            response: null,
-           enterCode: true
+           enterCode: true,
+           errors: []
        }
    },
    created: function() {
        this.getCategories()
    },
    computed: {
-        invalidProduct() {
-           return this.product.description === null
-        }
+        // invalidProduct() {
+        //    return this.product.description === null
+        // }
    },
    methods: {
         handleSubmit() {
             this.submitting = true
-            if (this.invalidProduct) {
+            if (this.invalidProduct() || this.invalidCategory()) {
                 this.showError()
                 return
             }
@@ -164,6 +171,7 @@ export default {
         clearStatus() {
             this.error = false
             this.success = false
+            this.errors = []
         },
         showError() {
             this.error = true
@@ -244,6 +252,23 @@ export default {
             } catch (error) {
                 this.response = error
             }
+        },
+        invalidProduct() {
+            if (this.product.description === null) {
+                this.errors.push({'id':1, 'e':'!Product title is empty.'})
+                return true
+            } else if (this.product.description.length < 3) {
+                this.errors.push({'id': 2, 'e':'!Product title should be at least 3 characters long.'})
+                return true
+            }
+            return false
+        },
+        invalidCategory() {
+            if (this.product.category === null) {
+                this.errors.push({'id':3, 'e':'!Product category is empty.'})
+                return true
+            }
+            return false
         },
     }
 }

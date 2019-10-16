@@ -17,7 +17,9 @@ def add_inventory():
         quantity = float(body['quantity'])
         unit_cost = float(body['unit_cost'])
         total_cost = float(body['total_cost'])
+        currency = body['currency']
         invoice = body['invoice']
+        location = body['location']
         additional_info = body['additional_info']
 
         inventory = Inventory.query.filter_by(product_id = body['product']).first()
@@ -37,9 +39,11 @@ def add_inventory():
             product = product,
             supplier = supplier,
             quantity = quantity,
+            currency = currency,
             unit_cost = unit_cost,
             total_cost = total_cost,
             invoice = invoice,
+            location = location,
             additional_info = additional_info
         )
 

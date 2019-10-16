@@ -3,6 +3,9 @@ import json
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os, sys
+import string
+import random
+import re
 
 # from flask_app.database.product import Product, ProductSchema
 from flask_app.models import db, Product, Category, Procurement, Inventory, ProductSchema
@@ -10,9 +13,24 @@ from flask_app.models import db, Product, Category, Procurement, Inventory, Prod
 ProductRoutes = Blueprint('ProductRoutes', __name__)
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-def allowed_file(filename):  
+def allowed_file(filename):
+    """
+    Return true if the filename has an extension which is allowed
+    """
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def generateSKU(id, category_id, product):
+    """
+    Return a unique SKU based on id, category_id, product
+    *This function needs a modification. This SKU is unique even when the
+    product is the same. Therefore, there is no way to compare products and
+    figure out whether a product has already been added using the SKU
+    """
+    product = product[:3].upper()
+    if not re.match('^[A-Z]{3}$', product):
+        product = re.sub('[^A-Z]+', random.choice(string.ascii_letters), product)
+    return "{}{}00{}".format(product[:3].upper(), str(category_id), str(id))
 
 @ProductRoutes.route('/products', methods=['POST'])
 def add():
@@ -41,11 +59,13 @@ def add():
             packing_type = body['packing_type'],
             packing = body['packing'],
             currency = body['currency'],
-            price = float(body['price']),
+            price = float(body['price']) if body['price'] else None,
             image_path = filepath
         )
-        
+
         db.session.add(product)
+        db.session.flush()
+        product.sku = generateSKU(product.id, product.category_id, product.description)
         db.session.commit()
 
         product_schema = ProductSchema()
