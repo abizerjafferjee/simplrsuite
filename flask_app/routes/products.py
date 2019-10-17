@@ -1,3 +1,4 @@
+from flask_app.app import app
 from flask import Flask, Blueprint, render_template, abort, jsonify, request, session, make_response
 import json
 from datetime import datetime
@@ -45,7 +46,8 @@ def add():
         filepath = None
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            filepath = app.config['UPLOAD_FOLDER']+'/'+filename
             file.save(filepath)
 
         body = json.loads(request.form['body'])

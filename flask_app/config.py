@@ -7,5 +7,5 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'this-really-needs-to-be-changed'
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Qsaxzop15@localhost/thumbtack'
-    UPLOAD_FOLDER = 'uploads'
+    UPLOAD_FOLDER = '../vue-app/vue-app/src/assets/uploads'
 

@@ -2,11 +2,13 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import ProductForm from '@/components/ProductForm.vue'
 import ProductView from '@/components/ProductView'
+import ProductDetailView from '@/components/ProductDetailView'
 import MailListForm from '@/components/MailListForm'
 import ProcurementForm from '@/components/ProcurementForm'
 import ProcurementView from '@/components/ProcurementView'
 import SupplierForm from '@/components/SupplierForm'
 import SupplierView from '@/components/SupplierView'
+import SupplierDetailView from '@/components/SupplierDetailView'
 import Dashboard from '@/components/Dashboard'
 
 Vue.use(VueRouter)
@@ -26,6 +28,11 @@ const routes = [
         path: '/products',
         name: 'ProductView',
         component: ProductView
+    },
+    {
+        path: '/product-detail',
+        name: 'ProductDetailView',
+        component: ProductDetailView
     },
     {
         path: '/add-contact',
@@ -52,6 +59,11 @@ const routes = [
         name: 'SupplierForm',
         component: SupplierForm,
         props: true
+    },
+    {
+        path: '/supplier-detail',
+        name: 'SupplierDetailView',
+        component: SupplierDetailView
     },
 ];
 

@@ -37,7 +37,10 @@
                             <article class="media">
                                 <div class="media-content">
                                     <div class="content">
-                                        <p class="title is-4">{{ supplier.business_name }} <small>@{{ supplier.contact_person }}</small></p>
+                                        <p class="title is-4">
+                                            <router-link :to="{ path: '/supplier-detail', query: {supplierId: supplier.id}}">{{ supplier.business_name }}</router-link> 
+                                            <small>@{{ supplier.contact_person }}</small>
+                                        </p>
                                         <p class="subtitle is-6">{{ supplier.email }} {{ supplier.phone }}</p>
                                     </div>
                                     <nav class="level is-mobile">

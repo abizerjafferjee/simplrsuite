@@ -44,12 +44,13 @@
                             <div class="card">
                                 <div class="card-image">
                                     <!-- <figure class="image is-square"> -->
+                                    <!-- <img heigth=300 :src="product.image_path" alt="Placeholder image"> -->
                                     <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image">
                                     <!-- </figure> -->
                                 </div>
                                 <div class="card-content">
                                     <div class="content">
-                                            <p class="title is-6">{{ product.description }}</p>
+                                            <p class="title is-6"><router-link :to="{ path: '/product-detail', query: {productId: product.id}}">{{ product.description }}</router-link></p>
                                             <p class="subtitle is-6">{{ product.category.name }}</p>
                                             <p class="is-6">TZS {{ product.price }}</p>
                                     </div>

@@ -13,7 +13,7 @@
                 </nav>
 
                 <div v-if="procurements && procurements.length < 1" class="notification">
-                    You have no suppliers. Click Add Supplier to add your first supplier.
+                    You have no Inventory or associated Procurement record. Click Add Inventory to add your first inventory.
                 </div>
 
                 <div class="content" v-else>
