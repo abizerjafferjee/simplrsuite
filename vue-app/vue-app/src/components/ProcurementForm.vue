@@ -85,7 +85,6 @@
                             </p>
                         </div>
 
-
                         <label class="label">* Total Cost</label>
                         <div class="field has-addons">
                             <p class="control">
@@ -105,6 +104,14 @@
                             <p class="control">
                                 <label class="checkbox"><input type="checkbox" @click="checkbox()">Unit Cost * Quantity</label>
                             </p>
+                        </div>
+
+                        <label class="label">* Paid</label>
+                        <div class="field is-horizontal">
+                            <select class="input" ref="paid" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.paid" type="text">
+                                <option>Paid</option>
+                                <option>Unpaid</option>
+                            </select>
                         </div>
 
                         <label class="label">Additional Info</label>
@@ -145,6 +152,7 @@ export default {
                 currency: "TZS",
                 unit_cost: 0,
                 total_cost: 0,
+                paid: 'Paid',
                 additional_info: null
             },
             response: null,
@@ -223,6 +231,7 @@ export default {
                 currency: "TZS",
                 unit_cost: 0,
                 total_cost: 0,
+                paid: 'Paid',
                 additional_info: null
             }
         },

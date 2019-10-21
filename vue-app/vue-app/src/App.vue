@@ -25,7 +25,7 @@
             <!-- <li><router-link to="/add-supplier">Add Supplier</router-link></li> -->
             <li><router-link to="/inventory">Inventory</router-link></li>
             <!-- <li><router-link to="/add-inventory">Add Inventory</router-link></li> -->
-            <li><a>Payments</a></li>
+            <li><router-link to="/payments">Payments</router-link></li>
             <!-- <li><router-link to="/add-inventory">Stocking Note</router-link></li> -->
           </ul>
           <!-- <p class="menu-label">

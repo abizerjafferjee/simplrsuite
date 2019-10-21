@@ -28,8 +28,7 @@ def get(id):
 @SupplierRoutes.route('/suppliers', methods=['POST'])
 def add():
     """
-    Handles get request for getting a supplier by id, post request for adding
-    new supplier and put request for editing a supplier's information.
+    Handles post request for adding new supplier.
     """
     try:
         req = json.loads(request.data)
@@ -101,7 +100,6 @@ def delete():
 @SupplierRoutes.route('/suppliers', methods=['GET'])
 def search():
     try:
-        # page = request.args.get('page', type=int)
         per_page = 6
         page = request.args.get('page', type=int)
         search = request.args.get('search', type=str)

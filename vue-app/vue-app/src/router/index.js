@@ -10,6 +10,8 @@ import SupplierForm from '@/components/SupplierForm'
 import SupplierView from '@/components/SupplierView'
 import SupplierDetailView from '@/components/SupplierDetailView'
 import Dashboard from '@/components/Dashboard'
+import PaymentsView from '@/components/PaymentsView'
+import PaymentsForm from '@/components/PaymentsForm'
 
 Vue.use(VueRouter)
 
@@ -18,6 +20,16 @@ const routes = [
         path: '/dashboard',
         name: 'Dashboard',
         component: Dashboard
+    },
+    {
+        path: '/payments',
+        name: 'PaymentsView',
+        component: PaymentsView
+    },
+    {
+        path: '/record-payment',
+        name: 'PaymentsForm',
+        component: PaymentsForm
     },
     {
         path: '/add-product',

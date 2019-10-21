@@ -18,6 +18,7 @@ def add_inventory():
         unit_cost = float(body['unit_cost'])
         total_cost = float(body['total_cost'])
         currency = body['currency']
+        paid = body['paid']
         invoice = body['invoice']
         location = body['location']
         additional_info = body['additional_info']
@@ -42,6 +43,7 @@ def add_inventory():
             currency = currency,
             unit_cost = unit_cost,
             total_cost = total_cost,
+            paid = paid,
             invoice = invoice,
             location = location,
             additional_info = additional_info
@@ -55,6 +57,18 @@ def add_inventory():
         print(e)
         return make_response(jsonify({'success': False}, 400))
 
+@InventoryRoutes.route('/inventory', methods=['PUT'])
+def edit_inventory():
+    return make_response(jsonify({'success': True}, 200))
+
+@InventoryRoutes.route('/inventory', methods=['DELETE'])
+def delete_inventory():
+    return make_response(jsonify({'success': True}, 200))
+
+
+#######################################################
+# Procurements
+#######################################################
 @InventoryRoutes.route('/procurement', methods=['GET'])
 def get_procurement():
     """

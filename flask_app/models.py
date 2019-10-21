@@ -3,6 +3,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 from sqlalchemy.orm import relationship
 from datetime import datetime
+import marshmallow
 
 
 
@@ -28,8 +29,23 @@ class Procurement(db.Model):
     total_cost = db.Column(db.Float())
     currency = db.Column(db.String())
     invoice = db.Column(db.String())
+    paid = db.Column(db.String())
     additional_info = db.Column(db.String())
     location = db.Column(db.String())
+    created = db.Column(db.DateTime(), default=datetime.now())
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+class Payment(db.Model):
+    __tablename__ = 'payment'
+
+    id = db.Column(db.Integer, primary_key=True)
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
+    amount = db.Column(db.Float())
+    currency = db.Column(db.String())
+    invoices = db.Column(db.String())
+    additional_info = db.Column(db.String())
     created = db.Column(db.DateTime(), default=datetime.now())
 
     def __repr__(self):
@@ -134,3 +150,13 @@ class ProcurementSchema(ma.ModelSchema):
 class MailListSchema(ma.ModelSchema):
     class Meta:
         model = MailList
+
+class PaymentSchema(ma.ModelSchema):
+    class Meta:
+        model = Payment
+
+class OutstandingPaymentsSchema(ma.Schema):
+    supplier_id = marshmallow.fields.Integer()
+    total_cost = marshmallow.fields.Number()
+    invoices = marshmallow.fields.List(marshmallow.fields.String())
+    business_name = marshmallow.fields.String()
