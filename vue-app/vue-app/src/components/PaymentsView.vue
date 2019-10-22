@@ -66,7 +66,7 @@
                                                     <td>{{ payment.business_name }} ({{ payment.supplier_id }})</td>
                                                     <td>TZS {{ payment.total_cost | currency }}</td>
                                                     <td>{{ payment.invoices.length }} Invoices</td>
-                                                    <td><a class="button is-small is-primary" href="#">Action</a></td>
+                                                    <td><a class="button is-small is-primary" href="#">Record Payment</a></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -74,7 +74,7 @@
                                 </div>
                                 <footer class="card-footer level">
                                     <a class="pagination-previous level-left" title="This is the first page" :disabled="pagesOutstanding.prev==false" @click="getOutstandingPayments(pagesOutstanding.page-1)">Previous</a>
-                                    <a class="pagination-next level-right" :disabled="pagesOutstanding.next==false" @click="getSuppliers(pagesOutstanding.page+1)">Next page</a>
+                                    <a class="pagination-next level-right" :disabled="pagesOutstanding.next==false" @click="getOutstandingPayments(pagesOutstanding.page+1)">Next page</a>
                                 </footer>
                             </div>
                         </div>
@@ -90,20 +90,21 @@
                                     <div class="content">
                                         <table class="table is-fullwidth is-striped">
                                             <tbody>
-                                                <tr v-for="(payment, index) in outstandingPayments" v-bind:key="index">
+                                                <tr v-for="(payment, index) in paymentsMade" v-bind:key="index">
                                                     <td width="5%"><i class="fa fa-bell-o"></i></td>
-                                                    <td>{{ payment.business_name }} ({{ payment.supplier_id }})</td>
-                                                    <td>TZS {{ payment.total_cost | currency }}</td>
-                                                    <td>{{ payment.invoices.length }} Invoices</td>
-                                                    <td><a class="button is-small is-primary" href="#">Action</a></td>
+                                                    <td>Payment ID {{ payment.id }}</td>
+                                                    <td>Supplier</td>
+                                                    <td>TZS {{ payment.amount | currency }}</td>
+                                                    <td>{{ payment.created }}</td>
+                                                    <!-- <td><a class="button is-small is-primary" href="#">Action</a></td> -->
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                                 <footer class="card-footer level">
-                                    <a class="pagination-previous level-left" title="This is the first page" :disabled="pagesOutstanding.prev==false" @click="getOutstandingPayments(pagesOutstanding.page-1)">Previous</a>
-                                    <a class="pagination-next level-right" :disabled="pagesOutstanding.next==false" @click="getSuppliers(pagesOutstanding.page+1)">Next page</a>
+                                    <a class="pagination-previous level-left" title="This is the first page" :disabled="pagesPayment.prev==false" @click="getPaymentsMade(pagesPayment.page-1)">Previous</a>
+                                    <a class="pagination-next level-right" :disabled="pagesPayment.next==false" @click="getPaymentsMade(pagesPayment.page+1)">Next page</a>
                                 </footer>
                             </div>
                         </div>
@@ -135,6 +136,12 @@ export default {
                 next: null,
                 prev: null
             },
+            paymentsMade: [],
+            pagesPayment: {
+                page: null,
+                next: null,
+                prev: null
+            },
         }
     },
     filters: {
@@ -144,6 +151,7 @@ export default {
     },
     mounted() {
         this.getOutstandingPayments(1)
+        this.getPaymentsMade(1)
     },
     methods: {
         getOutstandingPayments(page) {
@@ -154,6 +162,22 @@ export default {
                     this.pagesOutstanding.page = response.data[0].page
                     this.pagesOutstanding.next = response.data[0].next
                     this.pagesOutstanding.prev = response.data[0].prev
+                })
+                .catch(e => {
+                    this.response = e
+                })
+            } catch (error) {
+                this.response = error
+            }
+        },
+        getPaymentsMade(page) {
+            try {
+                this.axios.get('http://localhost:5000/payments/made?page='+page)
+                .then(response => {
+                    this.paymentsMade = response.data[0].body
+                    this.pagesPayment.page = response.data[0].page
+                    this.pagesPayment.next = response.data[0].next
+                    this.pagesPayment.prev = response.data[0].prev
                 })
                 .catch(e => {
                     this.response = e

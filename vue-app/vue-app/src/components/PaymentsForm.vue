@@ -46,18 +46,25 @@
                                 </span>
                             </p>
                             <p class="control is-expanded">
-                                <input ref="amount" @focus="clearStatus" @keypress="clearStatus" v-model="payment.amount" class="input" type="number" placeholder="5000">
+                                <input ref="amount" @focus="clearStatus" @keypress="clearStatus" v-model="payment.amount" class="input" type="number" placeholder=5000>
                             </p>
                         </div>
 
                         <label class="label">Invoices</label>
-                        <!-- <div class="field"><textarea class="textarea" ref="invoices" @focus="clearStatus" @keypress="clearStatus" v-model="payment.invoices" placeholder="add comma-separated invoices"></textarea></div> -->
-                        <div class="field is-grouped">
-                            <div class="control" v-for="(invoice, index) in outStandingInvoices" v-bind:key="index">
-                                <input :id="invoice" :value="invoice" name="invoice" type="checkbox" v-model="payment.invoices" />
-                                <label class="label">{{ invoice }}</label>
-                            </div>
-                        </div>
+                        <p v-if="payment.supplier_id === null">Select a supplier to show outstanding invoices</p>
+                        <table class="table" v-else>
+                            <tbody>
+                                <tr v-for="(invoice, index) in outStandingInvoices" v-bind:key="index">
+                                    <td>{{ invoice.invoice }}</td>
+                                    <td>{{ invoice.total_cost }}</td>
+                                    <td>{{ invoice.created }}</td>
+                                    <td><input :id="invoice.invoice" :value="invoice.invoice" name="invoice" type="checkbox" v-model="payment.invoices" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p v-if="payment_caution_flag" class="error-message">!Caution: Total sum of invoices does not match total amount.
+                             If you submit the unmatched amount, selected invoices will still be recorded as paid.</p>
 
                         <label class="label">Additional Info</label>
                         <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="payment.additional_info" placeholder="e.g. Product description, dimensions, weight and colors."></textarea></div>
@@ -86,6 +93,7 @@ export default {
            success: false,
            response: null,
            errors: [],
+           payment_caution_flag: false,
            payment: {
                supplier_id: null,
                amount: 0,
@@ -103,6 +111,14 @@ export default {
    watch: {
        'payment.supplier_id': function() {
            this.getOutStandingInvoices()
+       },
+       'payment.amount': function() {
+           if (this.payment.invoices.length > 0) {
+               this.invalidAmount()
+           }    
+       },
+       'payment.invoices': function() {
+           this.invalidAmount()
        }
    },
    methods: {
@@ -151,7 +167,7 @@ export default {
            this.payment = {
                supplier_id: null,
                amount: 0,
-               invoices: null,
+               invoices: [],
                currency: "TZS",
                additional_info: null,
            }
@@ -190,6 +206,20 @@ export default {
                 return true
             }
             return false
+        },
+        invalidAmount() {
+           var sum = 0
+           for (var i=0; i < this.outStandingInvoices.length; i++) {
+               if (this.payment.invoices.includes(this.outStandingInvoices[i]['invoice'])) {
+                   sum += this.outStandingInvoices[i]['total_cost']
+               }
+           }
+
+           if (sum !== Number(this.payment.amount)) {
+               this.payment_caution_flag = true
+           } else {
+               this.payment_caution_flag = false
+           }
         },
     }
 }

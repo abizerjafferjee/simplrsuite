@@ -160,3 +160,9 @@ class OutstandingPaymentsSchema(ma.Schema):
     total_cost = marshmallow.fields.Number()
     invoices = marshmallow.fields.List(marshmallow.fields.String())
     business_name = marshmallow.fields.String()
+
+class OutstandingPaymentsSupplierSchema(ma.Schema):
+    # supplier_id = marshmallow.fields.Integer()
+    total_cost = marshmallow.fields.Number()
+    invoice = marshmallow.fields.String()
+    created = marshmallow.fields.Date()

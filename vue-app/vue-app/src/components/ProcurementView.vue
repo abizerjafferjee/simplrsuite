@@ -47,7 +47,7 @@
                             <td v-if="editing === procurement.id"><input type="number" v-model="procurement.total_cost"></td>
                             <td v-else>{{ procurement.total_cost }}</td>
                             <td>{{ procurement.created }}</td>
-                            <td>{{ procurement.paid }}</td>
+                            <td><span class="tag is-info">{{ procurement.paid }}</span></td>
                             <td v-if="editing == procurement.id">
                                 <button class="button is-small is-success" @click="editProcurement(procurement)">save</button>
                                 <button class="button is-small muted-button" @click="cancelEdit(procurement)">cancel</button>
