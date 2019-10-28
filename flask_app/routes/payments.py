@@ -155,7 +155,6 @@ def get_uninvoiced_due():
 
     schema = ProcurementSchema(many=True)
     output = schema.dump(outstanding_by_procurement.items)
-    print(output)
     return make_response(jsonify({'success': True, 'body': output,
                                   'page': outstanding_by_procurement.page, 'prev': outstanding_by_procurement.has_prev,
                                   'next': outstanding_by_procurement.has_next}, 200))
