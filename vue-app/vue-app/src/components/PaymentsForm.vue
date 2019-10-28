@@ -149,7 +149,7 @@ export default {
         },
         recordPayment() { 
             try {
-                this.axios.post('http://localhost:5000/payments', {'body': this.payment})
+                this.axios.post('http://localhost:5000/payments', {'body': this.payment, 'from': 'form'})
                 .then(response => {
                     this.response = response
                     this.showSuccess()

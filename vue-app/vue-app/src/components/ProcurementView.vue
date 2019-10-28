@@ -111,7 +111,7 @@ export default {
                 this.axios.put('http://localhost:5000/procurement?id='+updatedProcurement.id, {'body': updatedProcurement}, {'Content-Type': 'application/json'})
                 .then(response => {
                     this.response = response
-                    this.procurements = this.procurements.map(procurements => procurement.id === updatedProduct.id ? product: updatedProduct)
+                    this.procurements = this.procurements.map(procurements => procurements.id === updatedProcurement.id ? procurements: updatedProcurement)
                     this.editing = null
                 })
                 .catch(error => {

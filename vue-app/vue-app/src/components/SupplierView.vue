@@ -76,12 +76,10 @@
 </template>
 
 <script>
-import SupplierForm from '@/components/SupplierForm.vue'
 
 export default {
     name: 'supplier-view',
     components: {
-       SupplierForm
     },
     data() {
         return {

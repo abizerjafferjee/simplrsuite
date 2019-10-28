@@ -127,15 +127,13 @@
 </template>
 
 <script>
-import ProductForm from '@/components/ProductForm.vue'
-import SupplierForm from '@/components/SupplierForm.vue'
 import { ModelSelect } from 'vue-search-select'
 
 export default {
     name: 'procurement-form',
     components: {
-        ProductForm,
-        SupplierForm,
+        // ProductForm,
+        // SupplierForm,
         ModelSelect
     },
     data() {

@@ -94,7 +94,8 @@ class Supplier(db.Model):
     additional_info = db.Column(db.String())
     created = db.Column(db.DateTime(), default=datetime.now())
 
-    procurements = relationship("Procurement", backref='supplier') 
+    procurements = relationship("Procurement", backref='supplier')
+    payments = relationship("Payment", backref='supplier') 
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -154,6 +155,8 @@ class MailListSchema(ma.ModelSchema):
 class PaymentSchema(ma.ModelSchema):
     class Meta:
         model = Payment
+
+    supplier = ma.Nested(SupplierSchema)
 
 class OutstandingPaymentsSchema(ma.Schema):
     supplier_id = marshmallow.fields.Integer()

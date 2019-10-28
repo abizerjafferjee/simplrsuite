@@ -4,6 +4,7 @@
       <div class="navbar-brand">
         <!-- <a class="navbar-item" href="https://bulma.io"> -->
           <img src="./assets/logo_2.jpg" width="150" height="150">
+          <!-- Simplr Suite</a> -->
         <!-- </a> -->
       </div>
     </nav>
