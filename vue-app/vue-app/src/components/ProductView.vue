@@ -3,18 +3,20 @@
         <div class="tile is-parent">
             <article class="tile is-child">
 
-                <nav class="level">
-                    <div class="level-left">
-                        <p class="title">All Products</p>
+                <section class="hero is-light welcome is-small">
+                    <div class="hero-body">
+                        <div class="container level">
+                            <h1 class="title level-left">
+                                All Products
+                            </h1>
+                            <div class="level-right">
+                                <p class="level-item"><router-link to="/add-product" class="button">Add Product</router-link></p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="level-right">
-                        <!-- <p class="level-item"><a class="button" @click="show">Add Supplier</a></p> -->
-                        <p class="level-item"><router-link to="/add-product" class="button">Add Product</router-link></p>
-                    </div>
-                </nav>
+                </section>
 
-                <!-- <p class="title">All Product</p> -->
-                <!-- <p class="subtitle">View products, costs, quantities and prices.</p> -->
+                <br>
 
                 <div v-if="products && products.length < 1" class="notification">
                     You have no products in your catalog. Click Add Products to add your first product.

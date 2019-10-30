@@ -12,24 +12,122 @@
                 </ul>
                 </nav>
 
-                <nav class="level">
-                    <div class="level-left">
-                        <p class="title">{{ product.description }}</p>
+                <section class="hero is-light welcome is-small">
+                    <div class="hero-body">
+                        <div class="container level">
+                            <h1 v-if="product" class="title level-left">
+                                {{ product.description }}
+                            </h1>
+                            <h3 v-else>Product Loading...</h3>
+                        </div>
                     </div>
-                    <div class="level-right">
-                    </div>
-                </nav>
+                </section>
+                <br>
 
-                <div class="content">
-                    <a class="button is-small">Edit Product</a>
-                    <a class="button is-small">Delete Product</a>
-                    <a class="button is-small">Remove Inventory</a>
-                    <a class="button is-small">Remove All Inventory</a>
-                    <p>Who are the suppliers of this product? (last 10 suppliers)</p>
-                    <p>What is the total payment due for this product?</p>
-                    <p>What is the total cost of inventory for this product?</p>
-                    <p>What is the total expected revenue from this product?</p>
-                    <p>What is the frequency of procurement for this product?</p>
+                <div class="columns">
+                    <div class="column">
+                        <!-- <article class="tile is-child"> -->
+                        <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image">
+                        <!-- </article> -->
+                    </div>
+                    <div class="column is-8">
+                        <div class="card events-card">
+                            <header class="card-header level">
+                                <div class="card-header-title level-left level-item">Product Details</div>
+                                <div class="level-right">
+                                    <button v-if="editProduct" class="button is-small is-success level-item" @click="saveProduct()">save</button>
+                                    <button v-if="editProduct" class="button is-small is-white level-item" @click="cancelEdit('product')">cancel</button>
+                                    <button class="button is-small is-link level-item" @click="editMode('product')" v-else>edit product</button>
+                                </div>
+                            </header>
+                            <div class="card-table" v-if="product">
+                                <table class="table is-fullwidth is-striped">
+                                    <tbody>
+                                        <tr>                                             
+                                            <th>Product Name:</th>
+                                            <td v-if="editProduct"><input class="input" type="text" v-model="product.description"></td>
+                                            <td v-else>{{ product.description }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Product Type:</th>
+                                            <td v-if="editProduct"><input class="input" type="text" v-model="product.product_type"></td>
+                                            <td v-else>{{ product.product_type }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Category:</th>
+                                            <td>{{ product.category.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Product SKU</th>
+                                            <td>{{ product.sku }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Packing:</th>
+                                            <td>{{ product.packing_type }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Addition Packing:</th>
+                                            <td v-if="editProduct"><input class="input" type="text" v-model="product.packing"></td>
+                                            <td v-else>{{ product.packing }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Created:</th>
+                                            <td>{{ product.created }}</td>
+                                        </tr>
+                                        <tr v-if="inventory">
+                                            <th>Quantity in Stock:</th>
+                                            <div class="level">
+                                                <td v-if="editInventory" class="level-left level-item"><input class="input" type="number" v-model="inventory.quantity"></td>
+                                                <td v-else class="level-left level-item">{{ inventory.quantity }}</td>
+                                                <td v-if="editInventory" class="level-right level-item">
+                                                    <button class="button is-small is-success" @click="saveInventory()">save</button>
+                                                    <button class="button is-small is-white" @click="cancelEdit('inventory')">cancel</button>
+                                                </td>
+                                                <td v-else class="level-right level-item">
+                                                    <button class="button is-small is-link level-item" @click="editMode('inventory')">change</button>
+                                                </td>   
+                                            </div> 
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="content" v-else><p class="notification">Product Information failed to load.</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column">
+                        <div class="card events-card">
+                            <header class="card-header"><p class="card-header-title">Procurements</p></header>
+                            <div class="card-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Supplier</th>
+                                            <th>Invoice</th>
+                                            <th>Quantity</th>
+                                            <th>Unit Cost</th>
+                                            <th>Total Cost</th>
+                                            <th>Date</th>
+                                            <th>Paid</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="p in procurement" :key="p.id">
+                                        <td>{{ p.supplier }}</td>
+                                        <td>{{ p.invoice }}</td>
+                                        <td>{{ p.quantity }}</td>
+                                        <td>{{ p.unit_cost }}</td>
+                                        <td>{{ p.total_cost }}</td>
+                                        <td>{{ p.created }}</td>
+                                        <td><span class="tag is-info">{{ p.paid }}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </article>
@@ -42,9 +140,14 @@ export default {
     name: 'product-detail',
     data() {
         return {
+            response: null,
             productId: null,
             product: null,
-            response: null
+            inventoryId: null,
+            inventory: null,
+            editProduct: false,
+            editInventory: false,
+            procurement: null
         }
     },
     mounted() {
@@ -54,11 +157,91 @@ export default {
         }
     },
     methods: {
+        editMode(info) {
+            if (info === 'inventory') {
+                this.editInventory = true
+                this.cachedInventory = Object.assign({}, this.inventory);
+            } else if (info === 'product') {
+                this.editProduct = true
+                this.cachedProduct = Object.assign({}, this.product);
+            }
+        },
+        cancelEdit(info) {
+            if (info === 'inventory') {
+                this.editInventory = false
+                Object.assign(this.inventory, this.cachedInventory)
+            } else if (info === 'product') {
+                this.editProduct = false
+                Object.assign(this.product, this.cachedProduct)
+            }
+        },
         getProduct() {
             try {
                 this.axios.get('http://localhost:5000/products/'+this.productId)
                 .then(response => {
                     this.product = response.data[0].body
+                    console.log(this.product)
+                    this.inventoryId = this.product['inventory'][0]
+                    if (this.inventoryId) {
+                        this.getInventory()
+                    }
+                    this.getProcurement()
+                })
+                .catch(e => {
+                    this.response = e
+                })
+            } catch (error) {
+                this.response = error
+            }
+        },
+        getInventory() {
+            try {
+                this.axios.get('http://localhost:5000/inventory/'+this.inventoryId)
+                .then(response => {
+                    this.inventory = response.data[0].body
+                })
+                .catch(e => {
+                    this.response = e
+                })
+            } catch (error) {
+                this.response = error
+            }
+        },
+        saveProduct() {
+            try {
+                this.axios.put('http://localhost:5000/products?id='+this.product.id, {'body': this.product}, {'Content-Type': 'application/json'})
+                .then(response => {
+                    this.response = response
+                    this.cachedProduct = Object.assign({}, this.product);
+                    this.cancelEdit('product')
+                })
+                .catch(error => {
+                    this.response = error
+                })
+            } catch(error) {
+                this.response = error
+            }
+        },
+        saveInventory() {
+            try {
+                this.axios.put('http://localhost:5000/inventory?id='+this.inventory.id, {'body': this.inventory}, {'Content-Type': 'application/json'})
+                .then(response => {
+                    this.response = response
+                    this.cachedInventory = Object.assign({}, this.inventory);
+                    this.cancelEdit('inventory')
+                })
+                .catch(error => {
+                    this.response = error
+                })
+            } catch(error) {
+                this.response = error
+            }
+        },
+        getProcurement() {
+            try {
+                this.axios.get('http://localhost:5000/procurement/product/'+this.product.id)
+                .then(response => {
+                    this.procurement = response.data[0].body
                 })
                 .catch(e => {
                     this.response = e

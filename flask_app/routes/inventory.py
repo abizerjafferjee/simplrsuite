@@ -34,7 +34,6 @@ def add_inventory():
                 quantity = quantity
             )
             db.session.add(inventory)
-            # db.session.commit()
 
         procurement = Procurement(
             product = product,
@@ -57,12 +56,34 @@ def add_inventory():
         print(e)
         return make_response(jsonify({'success': False}, 400))
 
+@InventoryRoutes.route('/inventory/<int:id>', methods=['GET'])
+def get_inventory(id):
+    """
+    Get inventory from db by id
+    """
+    try:
+        inventory = Inventory.query.get(id)
+        schema = InventorySchema()
+        output = schema.dump(inventory)
+        
+        return make_response(jsonify({'success':True, 'body':output}, 200))
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'success':False}, 400))
+
 @InventoryRoutes.route('/inventory', methods=['PUT'])
 def edit_inventory():
+    id = request.args.get('id', type=int)
+    updatedInventory = json.loads(request.data)['body']
+    d = Inventory.query.get(id)
+    d.quantity = float(updatedInventory['quantity'])
+    db.session.commit()
     return make_response(jsonify({'success': True}, 200))
 
-@InventoryRoutes.route('/inventory', methods=['DELETE'])
-def delete_inventory():
+@InventoryRoutes.route('/inventory/<int:id>', methods=['DELETE'])
+def delete_inventory(id):
+    inventory = Inventory.query.filter_by(product_id = id).delete()
+    db.session.commit()
     return make_response(jsonify({'success': True}, 200))
 
 
@@ -82,6 +103,21 @@ def get_procurement():
         return make_response(jsonify({'success': True, 'body':output}, 200))
     except Exception as e:
         print(e)
+
+@InventoryRoutes.route('/procurement/product/<int:id>', methods=['GET'])
+def get_procurement_by_product(id):
+    """
+    Get procurement from db by product id
+    """
+    try:
+        inventory = Procurement.query.filter(Procurement.product_id == id)
+        schema = ProcurementSchema(many=True)
+        output = schema.dump(inventory)
+        
+        return make_response(jsonify({'success':True, 'body':output}, 200))
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'success':False}, 400))
 
 @InventoryRoutes.route('/procurement', methods=['PUT'])
 def edit_procurement():

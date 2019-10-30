@@ -2,15 +2,21 @@
     <div id="product-table">
         <div class="tile is-parent">
             <article class="tile is-child">
-                <nav class="level">
-                    <div class="level-left">
-                        <p class="title">Procurement</p>
+
+                <section class="hero is-light welcome is-small">
+                    <div class="hero-body">
+                        <div class="container level">
+                            <h1 class="title level-left">
+                                Procurements
+                            </h1>
+                            <div class="level-right">
+                                <p class="level-item"><router-link to="/add-inventory" class="button">Add Inventory</router-link></p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="level-right">
-                        <!-- <p class="level-item"><a class="button" @click="show">Add Supplier</a></p> -->
-                        <p class="level-item"><router-link to="/add-inventory" class="button">Add Inventory</router-link></p>
-                    </div>
-                </nav>
+                </section>
+
+                <br>
 
                 <div v-if="procurements && procurements.length < 1" class="notification">
                     You have no Inventory or associated Procurement record. Click Add Inventory to add your first inventory.

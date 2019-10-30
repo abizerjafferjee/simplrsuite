@@ -124,38 +124,32 @@ class MailList(db.Model):
     def __repr__(self):
         return '<id {}, name {}, business {}, email {}, phone {}>'.format(self.id, self.name, self.business, self.email, self.phone)
 
-class SupplierSchema(ma.ModelSchema):
-    class Meta:
-        model = Supplier
-
 class CategorySchema(ma.ModelSchema):
     class Meta:
         model = Category
+
+class InventorySchema(ma.ModelSchema):
+    class Meta:
+        model = Inventory
 
 class ProductSchema(ma.ModelSchema):
     class Meta:
         model = Product
     category = ma.Nested(CategorySchema)
 
-class InventorySchema(ma.ModelSchema):
-    class Meta:
-        model = Inventory
-
 class ProcurementSchema(ma.ModelSchema):
     class Meta:
         model = Procurement
-
     product = ma.Nested(ProductSchema)
-    supplier = ma.Nested(SupplierSchema)
 
-class MailListSchema(ma.ModelSchema):
+class SupplierSchema(ma.ModelSchema):
     class Meta:
-        model = MailList
+        model = Supplier
+    procurement = ma.Nested(ProcurementSchema)
 
 class PaymentSchema(ma.ModelSchema):
     class Meta:
         model = Payment
-
     supplier = ma.Nested(SupplierSchema)
 
 class OutstandingPaymentsSchema(ma.Schema):
@@ -165,7 +159,10 @@ class OutstandingPaymentsSchema(ma.Schema):
     business_name = marshmallow.fields.String()
 
 class OutstandingPaymentsSupplierSchema(ma.Schema):
-    # supplier_id = marshmallow.fields.Integer()
     total_cost = marshmallow.fields.Number()
     invoice = marshmallow.fields.String()
     created = marshmallow.fields.Date()
+
+class MailListSchema(ma.ModelSchema):
+    class Meta:
+        model = MailList

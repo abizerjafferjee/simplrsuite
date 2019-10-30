@@ -3,19 +3,21 @@
         <div class="tile is-parent">
             <article class="tile is-child">
 
-                <nav class="level">
-                    <div class="level-left">
-                        <p class="title">All Suppliers</p>
+                <section class="hero is-light welcome is-small">
+                    <div class="hero-body">
+                        <div class="container level">
+                            <h1 class="title level-left">
+                                All Suppliers
+                            </h1>
+                            <div class="level-right">
+                                <p class="level-item"><router-link to="/add-supplier" class="button">Add Supplier</router-link></p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="level-right">
-                        <!-- <p class="level-item"><a class="button" @click="show">Add Supplier</a></p> -->
-                        <p class="level-item"><router-link to="/add-supplier" class="button">Add Supplier</router-link></p>
-                    </div>
-                </nav>
-                <!-- <modal name="add-supplier" :width="800" :height="860" style="overflow-y:auto;"><supplier-form></supplier-form></modal> -->
+                </section>
 
-
-                <!-- <p v-if="suppliers.length < 1" class="empty-table">No Suppliers</p> -->
+                <br>
+                
                 <div v-if="suppliers && suppliers.length < 1" class="notification">
                     You have no suppliers. Click Add Supplier to add your first supplier.
                 </div>

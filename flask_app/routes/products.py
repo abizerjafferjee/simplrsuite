@@ -87,12 +87,11 @@ def put():
     # fix category update
     try:
         id = request.args.get('id', type=int)
-        updatedProduct = json.loads(request.data)['product']
+        updatedProduct = json.loads(request.data)['body']
         d = Product.query.filter_by(id=id).first()
-        for key, val in updatedProduct.items():
-            # if key == 'category':
-                # category = Category.query.filter_by(name = row['category']).first()
-            setattr(d, key, val)
+        d.description = updatedProduct['description']
+        d.product_type = updatedProduct['product_type']
+        d.packing = updatedProduct['packing']
         db.session.commit()
         return make_response(jsonify({'success': True}, 200))
     except Exception as e:
@@ -123,6 +122,7 @@ def get(id):
         product = Product.query.get(id)
         product_schema = ProductSchema()
         output = product_schema.dump(product)
+
         return make_response(jsonify({'success':True, 'body':output}, 200))
     except Exception as e:
         print(e)
