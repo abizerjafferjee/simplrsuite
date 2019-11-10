@@ -8,70 +8,80 @@
                 <ul>
                     <li><router-link to="/payments">Payments</router-link></li>
                     <li class="is-active">
-                        <a href="#" aria-current="page">Record Payment</a>
+                        <a aria-current="page">Record Payment</a>
                     </li>
                 </ul>
                 </nav>
 
-                <p class="title">Record Payment</p>
-                <p class="subtitle">Add products, costs, quantities and prices. This will be added to your catalog.</p>
-                <div class="content">
-
-                    <div v-if="error && submitting">
-                        <p class="error-message" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+                <section class="hero welcome is-small has-background-light">
+                    <div class="hero-body">
+                        <div class="container">
+                            <p class="title">Record Payment</p>
+                            <p class="subtitle">Select the invoices you want to record payment for and keep your outstanding amounts in check</p>
+                        </div>
                     </div>
-                    <p v-if="success" class="success-message">Payment recorded successfully.</p>
+                </section>
 
-                    <form @submit.prevent="handleSubmit">
+                <br>
 
-                        <label class="label">* Supplier</label>
-                        <div class="field is-grouped">
-                            <div class="control is-expanded">
-                                <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="payment.supplier_id" placeholder="select item"></model-select>
+                <section>
+                    <div class="content">
+                        <div v-if="error && submitting">
+                            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+                        </div>
+                        <p v-if="success" class="notification is-success">Payment recorded successfully.</p>
+
+                        <form @submit.prevent="handleSubmit">
+
+                            <label class="label">* Supplier</label>
+                            <div class="field is-grouped">
+                                <div class="control is-expanded">
+                                    <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="payment.supplier_id" placeholder="select item"></model-select>
+                                </div>
+                                <div class="control"><router-link to="/add-supplier" class="button">Add Supplier</router-link></div>
                             </div>
-                            <div class="control"><router-link to="/add-supplier" class="button">Add Supplier</router-link></div>
-                        </div>
 
-                        <label class="label">Total Amount</label>
-                        <div class="field has-addons">
-                            <p class="control">
-                                <span class="select">
-                                <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="payment.currency" type="text">
-                                    <option>TZS</option>
-                                    <option>KES</option>
-                                    <option>USD</option>
-                                    <option>RMB</option>
-                                    <option>AED</option>
-                                </select>
-                                </span>
-                            </p>
-                            <p class="control is-expanded">
-                                <input ref="amount" @focus="clearStatus" @keypress="clearStatus" v-model="payment.amount" class="input" type="number" placeholder=5000>
-                            </p>
-                        </div>
+                            <label class="label">Total Amount</label>
+                            <div class="field has-addons">
+                                <p class="control">
+                                    <span class="select">
+                                    <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="payment.currency" type="text">
+                                        <option>TZS</option>
+                                        <option>KES</option>
+                                        <option>USD</option>
+                                        <option>RMB</option>
+                                        <option>AED</option>
+                                    </select>
+                                    </span>
+                                </p>
+                                <p class="control is-expanded">
+                                    <input ref="amount" @focus="clearStatus" @keypress="clearStatus" v-model="payment.amount" class="input" type="number" placeholder=5000>
+                                </p>
+                            </div>
 
-                        <label class="label">Invoices</label>
-                        <p v-if="payment.supplier_id === null">Select a supplier to show outstanding invoices</p>
-                        <table class="table" v-else>
-                            <tbody>
-                                <tr v-for="(invoice, index) in outStandingInvoices" v-bind:key="index">
-                                    <td>{{ invoice.invoice }}</td>
-                                    <td>{{ invoice.total_cost }}</td>
-                                    <td>{{ invoice.created }}</td>
-                                    <td><input :id="invoice.invoice" :value="invoice.invoice" name="invoice" type="checkbox" v-model="payment.invoices" /></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <label class="label">Invoices</label>
+                            <p v-if="payment.supplier_id === null">Select a supplier to show outstanding invoices</p>
+                            <table class="table" v-else>
+                                <tbody>
+                                    <tr v-for="(invoice, index) in outStandingInvoices" v-bind:key="index">
+                                        <td>{{ invoice.invoice }}</td>
+                                        <td>{{ invoice.total_cost }}</td>
+                                        <td>{{ invoice.created }}</td>
+                                        <td><input :id="invoice.invoice" :value="invoice.invoice" name="invoice" type="checkbox" v-model="payment.invoices" /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
-                        <p v-if="payment_caution_flag" class="error-message">!Caution: Total sum of invoices does not match total amount.
-                             If you submit the unmatched amount, selected invoices will still be recorded as paid.</p>
+                            <p v-if="payment_caution_flag" class="error-message">!Caution: Total sum of invoices does not match total amount.
+                                If you submit the unmatched amount, selected invoices will still be recorded as paid.</p>
 
-                        <label class="label">Additional Info</label>
-                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="payment.additional_info" placeholder="e.g. Product description, dimensions, weight and colors."></textarea></div>
-                        
-                        <button id="submit" class="button is-primary">Record Payment</button>
-                    </form>
-                </div>
+                            <label class="label">Additional Info</label>
+                            <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="payment.additional_info" placeholder="e.g. Product description, dimensions, weight and colors."></textarea></div>
+                            
+                            <button id="submit" class="button is-primary">Record Payment</button>
+                        </form>
+                    </div>
+                </section>
             </article>
         </div>
 

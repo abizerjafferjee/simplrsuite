@@ -96,11 +96,15 @@ def get_procurement():
     get the 10 latest procurement records
     """
     try:
-        latest_records = 10
-        procurements = Procurement.query.order_by(Procurement.id.desc()).limit(latest_records).all()
+        page = request.args.get('page', type=int)
+        per_page = 10
+        procurements = Procurement.query.order_by(Procurement.id.desc())\
+            .paginate(page=page, per_page=per_page, error_out=False)
         procurement_schema = ProcurementSchema(many=True)
-        output = procurement_schema.dump(procurements)
-        return make_response(jsonify({'success': True, 'body':output}, 200))
+        output = procurement_schema.dump(procurements.items)
+        return make_response(jsonify({'success': True, 'body':output, 'page': procurements.page,
+                                      'prev': procurements.has_prev,
+                                      'next': procurements.has_next}, 200))
     except Exception as e:
         print(e)
 
@@ -110,11 +114,39 @@ def get_procurement_by_product(id):
     Get procurement from db by product id
     """
     try:
-        inventory = Procurement.query.filter(Procurement.product_id == id)
+        page = request.args.get('page', type=int)
+        per_page = 3
+        inventory = Procurement.query.filter(Procurement.product_id == id)\
+            .order_by(Procurement.created.desc())\
+            .paginate(page=page, per_page=per_page, error_out=False)
         schema = ProcurementSchema(many=True)
-        output = schema.dump(inventory)
+        output = schema.dump(inventory.items)
         
-        return make_response(jsonify({'success':True, 'body':output}, 200))
+        return make_response(jsonify({'success':True, 'body':output, 'page': inventory.page,
+                                      'prev': inventory.has_prev,
+                                      'next': inventory.has_next}, 200))
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'success':False}, 400))
+
+@InventoryRoutes.route('/procurement/supplier/<int:id>', methods=['GET'])
+def get_procurement_by_supplier(id):
+    """
+    Get procurement from db by supplier id
+    """
+    try:
+        page = request.args.get('page', type=int)
+        per_page = 10
+        inventory = Procurement.query.filter(Procurement.supplier_id == id)\
+            .order_by(Procurement.created.desc())\
+            .paginate(page=page, per_page=per_page, error_out=False)
+        schema = ProcurementSchema(many=True)
+        output = schema.dump(inventory.items)
+        
+        return make_response(jsonify({'success':True, 'body':output,
+                                      'page': inventory.page,
+                                      'prev': inventory.has_prev,
+                                      'next': inventory.has_next}, 200))
     except Exception as e:
         print(e)
         return make_response(jsonify({'success':False}, 400))

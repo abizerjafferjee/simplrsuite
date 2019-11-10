@@ -7,7 +7,7 @@
                     <div class="hero-body">
                         <div class="container level">
                             <h1 class="title level-left">
-                                Procurements
+                                Procurements & Inventory
                             </h1>
                             <div class="level-right">
                                 <p class="level-item"><router-link to="/add-inventory" class="button">Add Inventory</router-link></p>
@@ -30,9 +30,10 @@
                         <thead>
                             <tr>
                             <th>Product</th>
-                            <th>Supplier</th>
+                            <th>Supplier Id</th>
                             <th>Invoice</th>
                             <th>Quantity</th>
+                            <th>Currency</th>
                             <th>Unit Cost</th>
                             <th>Total Cost</th>
                             <th>Date</th>
@@ -42,18 +43,18 @@
                         <tbody>
                             <tr v-for="procurement in procurements" :key="procurement.id">
                             <td>{{ procurement.product.description }}</td>
-                            <td v-if="procurement.supplier">{{ procurement.supplier.business_name }}</td>
-                            <td v-else></td>
+                            <td>{{ procurement.supplier }}</td>
                             <td v-if="editing === procurement.id"><input type="text" v-model="procurement.invoice"></td>
                             <td v-else>{{ procurement.invoice }}</td>
                             <td v-if="editing === procurement.id"><input type="number" v-model="procurement.quantity"></td>
                             <td v-else>{{ procurement.quantity }}</td>
+                            <td>{{ procurement.currency }}</td>
                             <td v-if="editing === procurement.id"><input type="number" v-model="procurement.unit_cost"></td>
-                            <td v-else>{{ procurement.unit_cost }}</td>
+                            <td v-else>{{ procurement.unit_cost | currency }}</td>
                             <td v-if="editing === procurement.id"><input type="number" v-model="procurement.total_cost"></td>
-                            <td v-else>{{ procurement.total_cost }}</td>
-                            <td>{{ procurement.created }}</td>
-                            <td><span class="tag is-info">{{ procurement.paid }}</span></td>
+                            <td v-else>{{ procurement.total_cost | currency }}</td>
+                            <td>{{ procurement.created | date }}</td>
+                            <td><span v-bind:class="{'tag is-success': procurement.paid === 'Paid', 'tag is-danger': procurement.paid === 'Unpaid'}">{{ procurement.paid }}</span></td>
                             <td v-if="editing == procurement.id">
                                 <button class="button is-small is-success" @click="editProcurement(procurement)">save</button>
                                 <button class="button is-small muted-button" @click="cancelEdit(procurement)">cancel</button>
@@ -66,10 +67,10 @@
                         </tbody>
                     </table>
 
-                    <!-- <nav class="pagination" role="navigation" aria-label="pagination">
-                        <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getprocurements(pages.page-1)">Previous</a>
-                        <a class="button pagination-next" :disabled="pages.next==false" @click="getprocurements(pages.page+1)">Next page</a>
-                    </nav> -->
+                    <footer class="card-footer level">
+                        <a class="pagination-previous level-left" title="This is the first page" :disabled="procurementPages.prev==false" @click="getProcurements(procurementPages.page-1)">Previous</a>
+                        <a class="pagination-next level-right" :disabled="procurementPages.next==false" @click="getProcurements(procurementPages.page+1)">Next page</a>
+                    </footer>
                 </div>
             </article>
         </div>
@@ -77,25 +78,42 @@
 </template>
 
 <script>
+var numeral = require("numeral");
+import moment from 'moment'
 export default {
     name: 'procurement-table',
     data() {
         return {
             procurements: [],
+            procurementPages: {
+                page: null,
+                next: null,
+                prev: null
+            },
             editing: null,
             response: null,
         }
     },
+    filters: {
+        currency: function (value) {
+            return numeral(value).format("0,0")
+        },
+        date: function (value) {
+            return moment(String(value)).format('L')
+        }
+    },
     mounted() {
-        this.getProcurements()
+        this.getProcurements(1)
     },
     methods: {
-        getProcurements() {
+        getProcurements(page) {
             try {
-                this.axios.get('http://localhost:5000/procurement')
+                this.axios.get('http://localhost:5000/procurement?page='+page)
                 .then(response => {
                     this.procurements = response.data[0].body
-                    // console.log(this.procurements)
+                    this.procurementPages.page = response.data[0].page
+                    this.procurementPages.next = response.data[0].next
+                    this.procurementPages.prev = response.data[0].prev
                 })
                 .catch(e => {
                     this.response = e
@@ -133,7 +151,7 @@ export default {
                 .then(response => {
                     this.response = response
                     // this.procurements = this.procurements.filter(procurements => procurement.id !== id);
-                    this.getProcurements()
+                    this.getProcurements(this.procurementPages.page)
                 })
                 .catch(error => {
                     this.response = error

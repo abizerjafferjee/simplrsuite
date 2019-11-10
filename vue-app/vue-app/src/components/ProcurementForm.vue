@@ -7,119 +7,127 @@
                 <ul>
                     <li><router-link to="/inventory">Inventory</router-link></li>
                     <li class="is-active">
-                        <!-- <a v-if="this.editing" href="#" aria-current="page">Edit Supplier</a> -->
-                        <a href="#" aria-current="page">Add Inventory</a>
+                        <a aria-current="page">Add Inventory</a>
                     </li>
                 </ul>
                 </nav>
 
-                <p class="title">Add to your inventory and track total cost of stock</p>
-                <div class="content">
-                    <div v-if="error && submitting">
-                        <p class="error-message" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+                <section class="hero welcome is-small has-background-light">
+                    <div class="hero-body">
+                        <div class="container">
+                            <p class="title">Adds to your inventory, tracks invoices and payments</p>
+                        </div>
                     </div>
-                    <!-- <p v-if="error && submitting" class="error-message">!Please fill out all required fields</p> -->
-                    <p v-if="success" class="success-message">Successfully added to Inventory</p>
-                    <form @submit.prevent="handleSubmit">
+                </section>
 
-                        <p class="subtitle is-5">Add Inventory</p>
+                <br>
 
-                        <label class="label">* Product</label>
-                        <div class="field is-grouped">
-                            <div class="control is-expanded">
-                                <model-select class="input" ref="product" @focus="clearStatus" @keypress="clearStatus" :options="productNames" v-model="procurement.product" placeholder="select item"></model-select>
-                            </div>
-                            <!-- <div class="control"><a class="button" @click="show(2)">Add Product</a></div> -->
-                            <div class="control"><router-link to="/add-product" class="button">Add Product</router-link></div>
+                <section>
+                    <div class="content">
+                        <div v-if="error && submitting">
+                            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
                         </div>
-                        <!-- <modal name="add-product" :width="800" :height="600"><product-form></product-form></modal> -->
+                        <p v-if="success" class="notification is-success">Successfully added to Inventory</p>
+                        
+                        <br>
+                        <form @submit.prevent="handleSubmit">
 
-                        <label class="label">* Quantity</label>
-                        <div class="field is-horizontal">
-                            <div class="field-body">
-                                <div class="field is-expanded">
-                                <div class="field has-addons">
-                                    <p class="control"><a class="button is-light">Units</a></p>
-                                    <p class="control is-expanded">
-                                    <input class="input" ref="quantity" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.quantity" type="number" placeholder="e.g. 10"/>
-                                    </p>
+                            <p class="title is-size-4">Add Inventory</p>
+
+                            <label class="label">* Product</label>
+                            <div class="field is-grouped">
+                                <div class="control is-expanded">
+                                    <model-select class="input" ref="product" @focus="clearStatus" @keypress="clearStatus" :options="productNames" v-model="procurement.product" placeholder="select item"></model-select>
                                 </div>
+                                <div class="control"><router-link to="/add-product" class="button">Add Product</router-link></div>
+                            </div>
+
+                            <label class="label">* Quantity</label>
+                            <div class="field is-horizontal">
+                                <div class="field-body">
+                                    <div class="field is-expanded">
+                                    <div class="field has-addons">
+                                        <p class="control"><a class="button is-light">Units</a></p>
+                                        <p class="control is-expanded">
+                                        <input class="input" ref="quantity" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.quantity" type="number" placeholder="e.g. 10"/>
+                                        </p>
+                                    </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <p class="subtitle is-5">Record Procurement</p>
+                            <p class="title is-size-4">Record Procurement</p>
 
-                        <label class="label">* Supplier</label>
-                        <div class="field is-grouped">
-                            <div class="control is-expanded">
-                                <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="procurement.supplier" placeholder="select item"></model-select>
+                            <label class="label">* Supplier</label>
+                            <div class="field is-grouped">
+                                <div class="control is-expanded">
+                                    <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="procurement.supplier" placeholder="select item"></model-select>
+                                </div>
+                                <div class="control"><router-link to="/add-supplier" class="button">Add Supplier</router-link></div>
+                                
                             </div>
-                            <!-- <div class="control"><a class="button" @click="show(1)">Add Supplier</a></div> -->
-                            <div class="control"><router-link to="/add-supplier" class="button">Add Supplier</router-link></div>
                             
-                        </div>
-                        <!-- <modal name="add-supplier" :width="800" :height="860"><supplier-form></supplier-form></modal> -->
-                        
-                        <label class="label">Location</label>
-                        <input class="input" ref="location" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.location" type="text" placeholder="e.g. Shop or Warehouse"/>
+                            <label class="label">Location</label>
+                            <input class="input" ref="location" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.location" type="text" placeholder="e.g. Shop or Warehouse"/>
 
-                        <label class="label">Invoice Number</label>
-                        <input class="input" ref="invoice" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.invoice" type="text" placeholder=""/>
+                            <label class="label">Invoice Number</label>
+                            <input class="input" ref="invoice" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.invoice" type="text" placeholder=""/>
 
-                        <label class="label">* Unit Cost</label>
-                        <div class="field has-addons">
-                            <p class="control">
-                                <span class="select">
-                                <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.currency" type="text">
-                                    <option>TZS</option>
-                                    <option>KES</option>
-                                    <option>USD</option>
-                                    <option>RMB</option>
-                                    <option>AED</option>
+                            <label class="label">* Unit Cost</label>
+                            <div class="field has-addons">
+                                <p class="control">
+                                    <span class="select">
+                                    <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.currency" type="text">
+                                        <option>TZS</option>
+                                        <option>KES</option>
+                                        <option>USD</option>
+                                        <option>RMB</option>
+                                        <option>AED</option>
+                                    </select>
+                                    </span>
+                                </p>
+                                <p class="control is-expanded">
+                                    <input class="input" ref="unit_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.unit_cost" type="number" placeholder="e.g. 1000"/>
+                                </p>
+                            </div>
+
+                            <label class="label">* Total Cost</label>
+                            <div class="field has-addons">
+                                <p class="control">
+                                    <span class="select">
+                                    <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.currency" type="text">
+                                        <option>TZS</option>
+                                        <option>KES</option>
+                                        <option>USD</option>
+                                        <option>RMB</option>
+                                        <option>AED</option>
+                                    </select>
+                                    </span>
+                                </p>
+                                <p class="control is-expanded">
+                                    <input class="input" ref="total_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.total_cost" type="number" placeholder="e.g. 50000" />
+                                </p>
+                                <p class="control">
+                                    <label class="checkbox"><input type="checkbox" @click="checkbox()">Unit Cost * Quantity</label>
+                                </p>
+                            </div>
+
+                            <label class="label">* Paid</label>
+                            <div class="field is-horizontal">
+                                <select class="input" ref="paid" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.paid" type="text">
+                                    <option>Paid</option>
+                                    <option>Unpaid</option>
                                 </select>
-                                </span>
-                            </p>
-                            <p class="control is-expanded">
-                                <input class="input" ref="unit_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.unit_cost" type="number" placeholder="e.g. 1000"/>
-                            </p>
-                        </div>
+                            </div>
 
-                        <label class="label">* Total Cost</label>
-                        <div class="field has-addons">
-                            <p class="control">
-                                <span class="select">
-                                <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.currency" type="text">
-                                    <option>TZS</option>
-                                    <option>KES</option>
-                                    <option>USD</option>
-                                    <option>RMB</option>
-                                    <option>AED</option>
-                                </select>
-                                </span>
-                            </p>
-                            <p class="control is-expanded">
-                                <input class="input" ref="total_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.total_cost" type="number" placeholder="e.g. 50000" />
-                            </p>
-                            <p class="control">
-                                <label class="checkbox"><input type="checkbox" @click="checkbox()">Unit Cost * Quantity</label>
-                            </p>
-                        </div>
+                            <label class="label">Additional Info</label>
+                            <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.additional_info" placeholder="e.g. Delivery note number for reference, note of damage to goods etc"></textarea></div>
+                            
+                            <button id="submit" class="button is-primary">Add</button>
+                        </form>
+                    </div>
+                </section>
 
-                        <label class="label">* Paid</label>
-                        <div class="field is-horizontal">
-                            <select class="input" ref="paid" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.paid" type="text">
-                                <option>Paid</option>
-                                <option>Unpaid</option>
-                            </select>
-                        </div>
-
-                        <label class="label">Additional Info</label>
-                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.additional_info" placeholder="e.g. Delivery note number for reference, note of damage to goods etc"></textarea></div>
-                        
-                        <button id="submit" class="button is-primary">Add</button>
-                    </form>
-                </div>
             </article>
         </div>
 

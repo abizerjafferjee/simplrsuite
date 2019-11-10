@@ -7,74 +7,84 @@
                 <ul>
                     <li><router-link to="/suppliers">Suppliers</router-link></li>
                     <li class="is-active">
-                        <a v-if="this.editing" href="#" aria-current="page">Edit Supplier</a>
-                        <a href="#" aria-current="page" v-else>Add Supplier</a>
+                        <a aria-current="page">Add Supplier</a>
                     </li>
                 </ul>
                 </nav>
 
-                <p class="title">Add Supplier</p>
-                <p class="subtitle">Manage your supplier information. This will be helpful in inventory tracking.</p>
-                <div class="content">
-                    <div v-if="error && submitting">
-                        <p class="error-message" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+                <section class="hero welcome is-small has-background-light">
+                    <div class="hero-body">
+                        <div class="container">
+                            <p class="title">Add Supplier</p>
+                            <p class="subtitle">Manage your supplier information. This will be helpful in inventory tracking.</p>
+                        </div>
                     </div>
-                    <!-- <p v-if="error && submitting" class="error-message">!Please fill out all fields with an asterisk (*).</p> -->
-                    <p v-if="success" class="success-message">Supplier successfully added</p>
-                    <form @submit.prevent="handleSubmit">
+                </section>
 
-                        <label class="label">* Supplier Name</label>
-                        <input class="input" ref="business_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.business_name" type="text" placeholder="e.g. thumbtack"/>
+                <br>
 
-                        <label class="label">Contact Name</label>
-                        <input class="input" ref="contact_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.contact_person" type="text" placeholder="e.g. John Doe"/>
-
-                        <label class="label">* Phone Number</label>
-                        <div class="field has-addons">
-                        <p class="control">
-                            <span class="select">
-                            <select class="button is-light" ref="phone_code" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone_code" type="text">
-                                <option>+255</option>
-                                <option>+254</option>
-                                <option>+86</option>
-                                <option>+971</option>
-                                <option>+1</option>
-                            </select>
-                            </span>
-                        </p>
-                        <p class="control is-expanded">
-                            <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
-                        </p>
+                <section>
+                    <div class="content">
+                        <div v-if="error && submitting">
+                            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
                         </div>
+                        <p v-if="success" class="notification is-success">Supplier successfully added</p>
 
-                        <label class="label">* Email</label>
-                        <div class="field">
-                            <div class="control">
-                                <input ref="email" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.email" class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
+                        <form @submit.prevent="handleSubmit">
+
+                            <label class="label">* Supplier Name</label>
+                            <input class="input" ref="business_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.business_name" type="text" placeholder="e.g. thumbtack"/>
+
+                            <label class="label">Contact Name</label>
+                            <input class="input" ref="contact_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.contact_person" type="text" placeholder="e.g. John Doe"/>
+
+                            <label class="label">* Phone Number</label>
+                            <div class="field has-addons">
+                            <p class="control">
+                                <span class="select">
+                                <select class="button is-light" ref="phone_code" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone_code" type="text">
+                                    <option>+255</option>
+                                    <option>+254</option>
+                                    <option>+86</option>
+                                    <option>+971</option>
+                                    <option>+1</option>
+                                </select>
+                                </span>
+                            </p>
+                            <p class="control is-expanded">
+                                <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
+                            </p>
                             </div>
-                        </div>
 
-                        <label class="label">Plus Code</label>
-                        <div class="field">
-                            <div class="control">
-                                <input ref="plus_code" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.plus_code" class="input" type="text" placeholder="">
+                            <label class="label">* Email</label>
+                            <div class="field">
+                                <div class="control">
+                                    <input ref="email" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.email" class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
+                                </div>
                             </div>
-                        </div>
 
-                        <label class="label">Address</label>
-                        <div class="field">
-                            <div class="control">
-                                <input ref="address" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.address" class="input" type="text" placeholder="">
+                            <label class="label">Plus Code</label>
+                            <div class="field">
+                                <div class="control">
+                                    <input ref="plus_code" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.plus_code" class="input" type="text" placeholder="">
+                                </div>
                             </div>
-                        </div>
 
-                        <label class="label">Additional Info</label>
-                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.additional_info"></textarea></div>
+                            <label class="label">Address</label>
+                            <div class="field">
+                                <div class="control">
+                                    <input ref="address" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.address" class="input" type="text" placeholder="">
+                                </div>
+                            </div>
 
-                        <button id="submit" class="button is-primary" v-if="editing">Save</button>
-                        <button id="submit" class="button is-primary" v-else>Add Supplier</button>
-                    </form>
-                </div>
+                            <label class="label">Additional Info</label>
+                            <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.additional_info"></textarea></div>
+
+                            <button id="submit" class="button is-primary" v-if="editing">Save</button>
+                            <button id="submit" class="button is-primary" v-else>Add Supplier</button>
+                        </form>
+                    </div>
+                </section>
             </article>
         </div>
 
@@ -84,13 +94,13 @@
 <script>
 export default {
    name: 'supplier-form',
-   props: ['editSupplier'],
    data() {
        return {
            submitting: false,
            error: false,
            errors: [],
            success: false,
+           response: null,
            supplier: {
                business_name: null,
                contact_person: null,
@@ -101,18 +111,6 @@ export default {
                address: null,
                additional_info: null
            },
-           editing: false,
-           supplier_id: null,
-           response: null
-       }
-   },
-   mounted () {
-    //    eslint-disable-next-line
-    //    console.log(this.$route.query.editSupplier)
-       if (this.$route.query.editSupplier) {
-           this.editing = true
-           this.supplier_id = this.$route.query.editSupplier
-           this.editSupplierForm()
        }
    },
    methods: {
@@ -162,60 +160,23 @@ export default {
                 this.showError()
             }
         },
-        saveSupplier() {
-            try {
-                this.axios.put('http://localhost:5000/suppliers?id='+this.supplier_id, {'body': this.supplier})
-                .then(response => {
-                    this.response = response
-                    this.showSuccess()
-                })
-                .catch(e => {
-                    this.response = e
-                    this.showError()
-                })
-            } catch (error) {
-                this.response = error
-                this.showError()
-            }
-        },
-        editSupplierForm() {
-            try {
-                this.axios.get('http://localhost:5000/suppliers/'+this.supplier_id)
-                .then(response => {
-                    var body = response.data[0].body
-                    this.supplier.business_name = body['business_name']
-                    this.supplier.contact_person = body['contact_person']
-                    this.supplier.phone = body['phone']
-                    this.supplier.email = body['email']
-                    this.supplier.plus_code = body['plus_code']
-                    this.supplier.address = body['address']
-                    this.supplier.additional_info = body['additional_info']
-                    // eslint-disable-next-line
-                    // console.log(this.supplier)
-                })
-                .catch(error => {
-                    this.response = error
-                })
-            } catch (error) {
-                this.response = error
-            }
-        },
         clearForm() {
            this.supplier = {
                business_name: null,
                contact_person: null,
                phone: null,
+               phone_code: "+255",
                email: null,
                plus_code: null,
                address: null,
                additional_info: null
            }
         },
-        validEmail: function (email) {
+        validEmail(email) {
             var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
         },
-        validPhone: function (phone) {
+        validPhone(phone) {
             var re = /^\+?\d{9}$/;
             return re.test(phone);
         },

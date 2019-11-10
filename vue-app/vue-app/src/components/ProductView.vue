@@ -3,7 +3,7 @@
         <div class="tile is-parent">
             <article class="tile is-child">
 
-                <section class="hero is-light welcome is-small">
+                <section class="hero welcome is-small has-background-light">
                     <div class="hero-body">
                         <div class="container level">
                             <h1 class="title level-left">
@@ -22,7 +22,6 @@
                     You have no products in your catalog. Click Add Products to add your first product.
                 </div>
 
-                <!-- <p v-if="products && products.length < 1" class="empty-table">No Products</p> -->
                 <div class="content" v-else>
                     <div class="field is-grouped notification">
                         <p class="control is-expanded">
@@ -30,7 +29,6 @@
                         </p>
                         <p class="control">
                             <select @change="getProducts(1)" v-model="search.category" class="input" placeholder="Category">
-                                <!-- <option selected>Category</option> -->
                                 <option v-for="category in categories" v-bind:key="category.id">{{ category.name }}</option>
                             </select>
                         </p>
@@ -45,23 +43,15 @@
                         <div class="column is-3" v-for="product in products" :key="product.id">
                             <div class="card">
                                 <div class="card-image">
-                                    <!-- <figure class="image is-square"> -->
-                                    <!-- <img heigth=300 :src="product.image_path" alt="Placeholder image"> -->
                                     <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image">
-                                    <!-- </figure> -->
                                 </div>
-                                <div class="card-content">
+                                <div class="card-content is-size-6 has-text-grey">
                                     <div class="content">
-                                            <p class="title is-6"><router-link :to="{ path: '/product-detail', query: {productId: product.id}}">{{ product.description }}</router-link></p>
-                                            <p class="subtitle is-6">{{ product.category.name }}</p>
-                                            <p class="is-6">TZS {{ product.price }}</p>
+                                            <p class="subtitle"><router-link :to="{ path: '/product-detail', query: {productId: product.id}}">{{ product.description }}</router-link></p>
+                                            <p>{{ product.category.name }}</p>
+                                            <p>{{ product.currency }} {{ product.price | currency }}</p>
                                     </div>
                                 </div>
-                                <!-- <footer class="card-footer">
-                                    <a href="#" class="card-footer-item">Add to Online Catalog</a>
-                                    <a href="#" class="card-footer-item">Add Inventory</a>
-                                    <a href="#" class="card-footer-item">Delete</a>
-                                </footer> -->
                             </div>
                         </div>
                     </div>
@@ -77,6 +67,8 @@
 </template>
 
 <script>
+var numeral = require("numeral");
+import moment from 'moment'
 export default {
     name: 'product-table',
     data() {
@@ -94,6 +86,14 @@ export default {
             },
             editing: null,
             response: null,
+        }
+    },
+    filters: {
+        currency: function (value) {
+            return numeral(value).format("0,0")
+        },
+        date: function (value) {
+            return moment(String(value)).format('L')
         }
     },
     created() {

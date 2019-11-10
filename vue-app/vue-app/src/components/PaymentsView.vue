@@ -40,7 +40,8 @@
                             </div>
                             <div class="tile is-parent">
                                 <article class="tile is-child box">
-                                    <p class="title">{{ stats.latest_payment.created | date }}</p>
+                                    <p class="title" v-if="stats.latest_payment.created">{{ stats.latest_payment.created | date }}</p>
+                                    <p class="title" v-else>No Payments</p>
                                     <p class="subtitle">Last Payment</p>
                                 </article>
                             </div>
@@ -58,17 +59,26 @@
                                     </p>
                                 </header>
                                 <div class="card-table" style="height:500px">
-                                    <div class="content">
+                                    <div class="content" v-if="outstandingPayments.length > 0">
                                         <table class="table is-fullwidth is-striped">
                                             <tbody>
+                                                <tr>
+                                                    <th>Supplier (Id)</th>
+                                                    <th>Amount</th>
+                                                    <th>Number of Invoices</th>
+                                                    <th>Record as Paid</th>
+                                                </tr>
                                                 <tr v-for="(payment, index) in outstandingPayments" v-bind:key="index">
                                                     <td>{{ payment.business_name }} ({{ payment.supplier_id }})</td>
                                                     <td>TZS {{ payment.total_cost | currency }}</td>
                                                     <td>{{ payment.invoices.length }} Invoices</td>
-                                                    <td><a class="button is-small is-primary" @click="recordInvoicedPayment(index)">Record as Paid</a></td>
+                                                    <td><a class="button is-primary" @click="recordInvoicedPayment(index)"><font-awesome-icon class="icon has-text-white" icon="check" size="sm" /></a></td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <div class="content is-vcentered notification" v-else>
+                                        <p class="is-centered">No outstanding invoice amounts to show</p>
                                     </div>
                                 </div>
                                 <footer class="card-footer level">
@@ -86,18 +96,28 @@
                                     </p>
                                 </header>
                                 <div class="card-table" style="height:500px">
-                                    <div class="content">
+                                    <div class="content" v-if="paymentsMade.length > 0">
                                         <table class="table is-fullwidth is-striped">
                                             <tbody>
+                                                <tr>          
+                                                    <th>Payment Id</th>                              
+                                                    <th>Supplier (Id)</th>
+                                                    <th>Amount</th>
+                                                    <th>Date</th>
+                                                    <th>Reverse Payment</th>
+                                                </tr>
                                                 <tr v-for="(payment, index) in paymentsMade" v-bind:key="index">
                                                     <td>{{ payment.id }}</td>
                                                     <td>{{ payment.supplier.business_name }}</td>
                                                     <td>TZS {{ payment.amount | currency }}</td>
                                                     <td>{{ payment.created | date }}</td>
-                                                    <td><a class="button is-small is-danger">Revert</a></td>
+                                                    <td><a class="button is-danger" @click="deletePayment(payment.id)"><font-awesome-icon class="icon has-text-white" icon="times" size="sm"/></a></td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <div class="content is-vcentered notification" v-else>
+                                        <p class="is-centered">No payments to show</p>
                                     </div>
                                 </div>
                                 <footer class="card-footer level">
@@ -118,20 +138,32 @@
                                     </p>
                                 </header>
                                 <div class="card-table" style="height:500px">
-                                    <div class="content">
+                                    <div class="content" v-if="outstandingUninvoiced.length> 0">
                                         <table class="table is-fullwidth is-striped">
                                             <tbody>
+                                                <tr>
+                                                    <th>Procurement Id</th>
+                                                    <th>Product</th>
+                                                    <th>Supplier Id</th>
+                                                    <th>Quantity</th>
+                                                    <th>Total Cost</th>
+                                                    <th>Date</th>
+                                                    <th>Record as Paid</th>
+                                                </tr>
                                                 <tr v-for="(payment, index) in outstandingUninvoiced" v-bind:key="index">
                                                     <td>{{ payment.id }}
-                                                    <td>{{ payment.description }} ({{ payment.product.sku }})</td>
-                                                    <td>{{ payment.supplier.business_name }} ({{ payment.supplier_id }})</td>
+                                                    <td>{{ payment.product.description }} ({{ payment.product.sku }})</td>
+                                                    <td>{{ payment.supplier }}</td>
                                                     <td>{{ payment.quantity }}
                                                     <td>TZS {{ payment.total_cost | currency }}</td>
                                                     <td>{{ payment.created | date }}
-                                                    <td><a class="button is-small is-primary" @click="recordUninvoicedPayment(index)">Record as Paid</a></td>
+                                                    <td><a class="button is-primary" @click="recordUninvoicedPayment(index)"><font-awesome-icon class="icon has-text-white" icon="check" size="sm" /></a></td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <div class="content is-vcentered notification" v-else>
+                                        <p class="is-centered">No uninvoiced procurements to show</p>
                                     </div>
                                 </div>
                                 <footer class="card-footer level">
@@ -205,6 +237,8 @@ export default {
                 this.axios.get('http://localhost:5000/payments/due?page='+page)
                 .then(response => {
                     this.outstandingPayments = response.data[0].body
+                    this.outstandingPayments = this.filterUniqueInvoices(this.outstandingPayments)
+                    console.log(this.outstandingPayments)
                     this.pagesOutstanding.page = response.data[0].page
                     this.pagesOutstanding.next = response.data[0].next
                     this.pagesOutstanding.prev = response.data[0].prev
@@ -215,6 +249,19 @@ export default {
             } catch (error) {
                 this.response = error
             }
+        },
+        filterUniqueInvoices(outstandingPayments) {
+            for (var i=0; i < outstandingPayments.length; i++) {
+                var all_invoices = outstandingPayments[i]['invoices']
+                var unique_invoices = []
+                for (var j=0; j < all_invoices.length; j++) {
+                    if (!unique_invoices.includes(all_invoices[j])) {
+                        unique_invoices.push(all_invoices[j])
+                    }
+                }
+                outstandingPayments[i]['invoices'] = unique_invoices
+            }
+            return outstandingPayments
         },
         getOutstandingUninvoiced(page) {
             try {
@@ -253,6 +300,7 @@ export default {
                 this.axios.get('http://localhost:5000/payments/stats')
                 .then(response => {
                     this.stats = response.data[0].body
+                    console.log(this.stats.latest_payment)
                 })
                 .catch(e => {
                     this.response = e
@@ -291,6 +339,20 @@ export default {
                 this.response = error
             }
         },
+        deletePayment(id) {
+            try {
+                this.axios.delete('http://localhost:5000/payment/'+id)
+                .then(response => {
+                    this.response = response
+                    this.handleSubmit()
+                })
+                .catch(error => {
+                    this.response = error
+                })
+            } catch (error) {
+                this.response = error
+            }
+        },
     }
 }
 </script>
@@ -299,5 +361,8 @@ export default {
 <style scoped>
 button {
     margin: 0 0.5 rem 0;
+}
+.font-margin {
+    margin: 0px 5px 0px 0px;
 }
 </style>

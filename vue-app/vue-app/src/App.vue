@@ -11,46 +11,25 @@
 
     <div class="columns">
       <div class="column is-one-fifth">
-        <aside class="menu">
+        <aside class="menu is-size-5">
           <ul class="menu-list">
-            <li><router-link to="/dashboard">Dashboard</router-link></li>
-            <li><router-link to="/add-contact">Mailing List</router-link></li>
+            <li><router-link to="/dashboard"><font-awesome-icon class="icon has-text-info font-margin" icon="chart-line" size="lg" />Dashboard</router-link></li>
+            <li><router-link to="/add-contact"><font-awesome-icon class="font-margin" icon="at" size="lg" />Mailing List</router-link></li>
           </ul>
           <p class="menu-label">
             Procurement
           </p>
           <ul class="menu-list">
-            <li><router-link to="/products">Products</router-link></li>
-            <!-- <li><router-link to="/add-product">Add Product</router-link></li> -->
-            <li><router-link to="/suppliers">Suppliers</router-link></li>
-            <!-- <li><router-link to="/add-supplier">Add Supplier</router-link></li> -->
-            <li><router-link to="/inventory">Inventory</router-link></li>
-            <!-- <li><router-link to="/add-inventory">Add Inventory</router-link></li> -->
-            <li><router-link to="/payments">Payments</router-link></li>
-            <!-- <li><router-link to="/add-inventory">Stocking Note</router-link></li> -->
+            <li><router-link to="/products"><font-awesome-icon class="icon has-text-info font-margin" icon="store" size="lg" />Products</router-link></li>
+            <li><router-link to="/suppliers"><font-awesome-icon class="icon has-text-danger font-margin" icon="truck" size="lg" />Suppliers</router-link></li>
+            <li><router-link to="/inventory"><font-awesome-icon class="font-margin" icon="warehouse" size="lg" />Inventory</router-link></li>
+            <li><router-link to="/payments"><font-awesome-icon class="icon has-text-success font-margin" icon="money-check-alt" size="lg" />Payments</router-link></li>
           </ul>
-          <!-- <p class="menu-label">
-            Sales
-          </p>
-          <ul class="menu-list">
-            <li><a>Customers</a></li>
-            <li><a>Orders</a></li>
-            <li><a>Credit Note</a></li>
-          </ul>
-          <p class="menu-label">
-            Resources
-          </p>
-          <ul class="menu-list">
-            <li><a>Employees</a></li>
-          </ul> -->
         </aside>
       </div>
 
-      <div class="column">
+      <div class="column is-size-5">
         <router-view></router-view>
-        <!-- <h1>Add Products</h1> -->
-        <!-- <product-form @add:product="addProduct" /> -->
-        <!-- <product-table v-bind:products="products" @delete:product="deleteProduct" @edit:product="editProduct" /> -->
       </div>
     </div>
   </div>
@@ -65,4 +44,10 @@ export default {
 
 <style>
 @import "~bulma/css/bulma.css";
+#app {
+  min-width: 75%;
+}
+.font-margin {
+    margin: 0px 5px 0px 0px;
+}
 </style>

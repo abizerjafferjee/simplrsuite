@@ -45,6 +45,8 @@ class Payment(db.Model):
     amount = db.Column(db.Float())
     currency = db.Column(db.String())
     invoices = db.Column(db.String())
+    procurements = db.Column(db.String())
+    invoiced = db.Column(db.Boolean, default=True)
     additional_info = db.Column(db.String())
     created = db.Column(db.DateTime(), default=datetime.now())
 
@@ -73,6 +75,7 @@ class Product(db.Model):
     price = db.Column(db.Float())
     image_path = db.Column(db.String())
     created = db.Column(db.DateTime(), default=datetime.now())
+    additional_info = db.Column(db.String())
 
     procurements = relationship("Procurement", backref='product')
     inventory = relationship("Inventory", backref='product')

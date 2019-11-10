@@ -62,7 +62,8 @@ def add():
             packing = body['packing'],
             currency = body['currency'],
             price = float(body['price']) if body['price'] else None,
-            image_path = filepath
+            image_path = filepath,
+            additional_info = body['additional_info']
         )
 
         db.session.add(product)

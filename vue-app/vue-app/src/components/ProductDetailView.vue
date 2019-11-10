@@ -26,35 +26,34 @@
 
                 <div class="columns">
                     <div class="column">
-                        <!-- <article class="tile is-child"> -->
                         <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image">
-                        <!-- </article> -->
                     </div>
                     <div class="column is-8">
                         <div class="card events-card">
                             <header class="card-header level">
                                 <div class="card-header-title level-left level-item">Product Details</div>
                                 <div class="level-right">
-                                    <button v-if="editProduct" class="button is-small is-success level-item" @click="saveProduct()">save</button>
+                                    <button v-if="editProduct" class="button is-small is-success level-item" @click="saveProduct()"><font-awesome-icon class="font-margin" icon="save" size="lg" />save</button>
                                     <button v-if="editProduct" class="button is-small is-white level-item" @click="cancelEdit('product')">cancel</button>
-                                    <button class="button is-small is-link level-item" @click="editMode('product')" v-else>edit product</button>
+                                    <button class="button is-small is-link level-item" @click="editMode('product')" v-else><font-awesome-icon class="font-margin" icon="pen-square" size="lg" />edit</button>
+                                    <div></div>
                                 </div>
                             </header>
                             <div class="card-table" v-if="product">
                                 <table class="table is-fullwidth is-striped">
                                     <tbody>
                                         <tr>                                             
-                                            <th>Product Name:</th>
+                                            <th>Product Name</th>
                                             <td v-if="editProduct"><input class="input" type="text" v-model="product.description"></td>
                                             <td v-else>{{ product.description }}</td>
                                         </tr>
                                         <tr>
-                                            <th>Product Type:</th>
+                                            <th>Product Type</th>
                                             <td v-if="editProduct"><input class="input" type="text" v-model="product.product_type"></td>
                                             <td v-else>{{ product.product_type }}</td>
                                         </tr>
                                         <tr>
-                                            <th>Category:</th>
+                                            <th>Category</th>
                                             <td>{{ product.category.name }}</td>
                                         </tr>
                                         <tr>
@@ -62,29 +61,34 @@
                                             <td>{{ product.sku }}</td>
                                         </tr>
                                         <tr>
-                                            <th>Packing:</th>
+                                            <th>Packing</th>
                                             <td>{{ product.packing_type }}</td>
                                         </tr>
                                         <tr>
-                                            <th>Addition Packing:</th>
+                                            <th>Additional Packing</th>
                                             <td v-if="editProduct"><input class="input" type="text" v-model="product.packing"></td>
                                             <td v-else>{{ product.packing }}</td>
                                         </tr>
                                         <tr>
-                                            <th>Created:</th>
-                                            <td>{{ product.created }}</td>
+                                        <th>Additional Information</th>
+                                            <td v-if="editProduct"><textarea class="textarea" type="text" v-model="product.additional_info"></textarea></td>
+                                            <td v-else>{{ product.additional_info }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Created</th>
+                                            <td>{{ product.created | date }}</td>
                                         </tr>
                                         <tr v-if="inventory">
-                                            <th>Quantity in Stock:</th>
+                                            <th>Quantity in Stock</th>
                                             <div class="level">
                                                 <td v-if="editInventory" class="level-left level-item"><input class="input" type="number" v-model="inventory.quantity"></td>
                                                 <td v-else class="level-left level-item">{{ inventory.quantity }}</td>
                                                 <td v-if="editInventory" class="level-right level-item">
-                                                    <button class="button is-small is-success" @click="saveInventory()">save</button>
+                                                    <button class="button is-small is-success" @click="saveInventory()"><font-awesome-icon class="font-margin" icon="save" size="lg" />save</button>
                                                     <button class="button is-small is-white" @click="cancelEdit('inventory')">cancel</button>
                                                 </td>
                                                 <td v-else class="level-right level-item">
-                                                    <button class="button is-small is-link level-item" @click="editMode('inventory')">change</button>
+                                                    <button class="button is-small is-link level-item" @click="editMode('inventory')"><font-awesome-icon class="font-margin" icon="pen-square" size="lg" />edit</button>
                                                 </td>   
                                             </div> 
                                         </tr>
@@ -107,6 +111,7 @@
                                             <th>Supplier</th>
                                             <th>Invoice</th>
                                             <th>Quantity</th>
+                                            <th>Currency</th>
                                             <th>Unit Cost</th>
                                             <th>Total Cost</th>
                                             <th>Date</th>
@@ -118,13 +123,18 @@
                                         <td>{{ p.supplier }}</td>
                                         <td>{{ p.invoice }}</td>
                                         <td>{{ p.quantity }}</td>
-                                        <td>{{ p.unit_cost }}</td>
-                                        <td>{{ p.total_cost }}</td>
-                                        <td>{{ p.created }}</td>
-                                        <td><span class="tag is-info">{{ p.paid }}</span></td>
+                                        <td>{{ p.currency }}</td>
+                                        <td>{{ p.unit_cost | currency }}</td>
+                                        <td>{{ p.total_cost | currency }}</td>
+                                        <td>{{ p.created | date }}</td>
+                                        <td><span v-bind:class="{'tag is-success': p.paid === 'Paid', 'tag is-danger': p.paid === 'Unpaid'}">{{ p.paid }}</span></td>
                                         </tr>
                                     </tbody>
                                 </table>
+                                <footer class="card-footer level">
+                                    <a class="pagination-previous level-left" title="This is the first page" :disabled="procurementPages.prev==false" @click="getProcurement(procurementPages.page-1)">Previous</a>
+                                    <a class="pagination-next level-right" :disabled="procurementPages.next==false" @click="getProcurement(procurementPages.page+1)">Next page</a>
+                                </footer>
                             </div>
                         </div>
                     </div>
@@ -136,6 +146,9 @@
 </template>
 
 <script>
+var numeral = require("numeral");
+import moment from 'moment'
+
 export default {
     name: 'product-detail',
     data() {
@@ -147,7 +160,20 @@ export default {
             inventory: null,
             editProduct: false,
             editInventory: false,
-            procurement: null
+            procurement: null,
+            procurementPages: {
+                page: null,
+                next: null,
+                prev: null
+            },
+        }
+    },
+    filters: {
+        currency: function (value) {
+            return numeral(value).format("0,0")
+        },
+        date: function (value) {
+            return moment(String(value)).format('L')
         }
     },
     mounted() {
@@ -180,12 +206,11 @@ export default {
                 this.axios.get('http://localhost:5000/products/'+this.productId)
                 .then(response => {
                     this.product = response.data[0].body
-                    console.log(this.product)
                     this.inventoryId = this.product['inventory'][0]
                     if (this.inventoryId) {
                         this.getInventory()
                     }
-                    this.getProcurement()
+                    this.getProcurement(1)
                 })
                 .catch(e => {
                     this.response = e
@@ -237,11 +262,14 @@ export default {
                 this.response = error
             }
         },
-        getProcurement() {
+        getProcurement(page) {
             try {
-                this.axios.get('http://localhost:5000/procurement/product/'+this.product.id)
+                this.axios.get('http://localhost:5000/procurement/product/'+this.product.id+'?page='+page)
                 .then(response => {
                     this.procurement = response.data[0].body
+                    this.procurementPages.page = response.data[0].page
+                    this.procurementPages.next = response.data[0].next
+                    this.procurementPages.prev = response.data[0].prev
                 })
                 .catch(e => {
                     this.response = e
@@ -258,5 +286,8 @@ export default {
 <style scoped>
 button {
     margin: 0 0.5 rem 0;
+}
+.font-margin {
+    margin: 0px 5px 0px 0px;
 }
 </style>

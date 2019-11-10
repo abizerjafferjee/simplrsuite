@@ -39,28 +39,30 @@
                             <article class="media">
                                 <div class="media-content">
                                     <div class="content">
-                                        <p class="title is-4">
-                                            <router-link :to="{ path: '/supplier-detail', query: {supplierId: supplier.id}}">{{ supplier.business_name }}</router-link> 
-                                            <small>@{{ supplier.contact_person }}</small>
+                                        <p class="title is-3">
+                                            <router-link :to="{ path: '/supplier-detail', query: {supplierId: supplier.id}}">{{ supplier.business_name }}</router-link>
                                         </p>
-                                        <p class="subtitle is-6">{{ supplier.email }} {{ supplier.phone }}</p>
                                     </div>
-                                    <nav class="level is-mobile">
-                                        <div class="level-left">
-                                        <a class="level-item" aria-label="transactions">
-                                            <button class="button is-small is-success">Payments</button>
-                                        </a>
-                                        <a class="level-item" aria-label="transactions">
-                                            <button class="button is-small is-success">Procurements</button>
-                                        </a>
-                                        <a class="level-item" aria-label="edit">
-                                            <button class="button is-small is-primary"><router-link :to="{ path: '/add-supplier', query: {editSupplier: supplier.id}}">Edit</router-link></button>
-                                        </a>
-                                        <a class="level-item" aria-label="delete">
-                                            <button class="button is-small is-danger">Delete</button>
-                                        </a>
+                                    <div class="level is-mobile">
+                                        <div class="level-left is-size-5 has-text-grey">
+                                            <p class="level-item" aria-label="transactions" v-if="supplier.contact_person">
+                                               <font-awesome-icon class="font-margin" icon="at" size="lg" /> {{ supplier.contact_person }}
+                                            </p>
+                                            <p class="level-item" aria-label="transactions" v-if="supplier.email">
+                                                <font-awesome-icon class="font-margin" icon="envelope-square" size="lg" /> <a>{{ supplier.email }}</a>
+                                            </p>
+                                            <p class="level-item" aria-label="transactions" v-if="supplier.phone">
+                                                <font-awesome-icon class="font-margin" icon="phone-square-alt" size="lg" />  +255-{{ supplier.phone }}
+                                            </p>
                                         </div>
-                                    </nav>
+                                    </div>
+                                    <div class="level is-mobile">
+                                        <div class="level-left is-size-5 has-text-grey">
+                                            <p class="level-item" aria-label="transactions" v-if="supplier.address">
+                                                <font-awesome-icon class="font-margin" icon="map-marker-alt" size="lg" />{{ supplier.address }}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </article>
                         </div>
@@ -118,45 +120,6 @@ export default {
                 this.response = error
             }
         },
-        show () {
-           this.$modal.show('add-supplier');
-        },
-        editMode(product) {
-            this.cachedProduct = Object.assign({}, product);
-            this.editing = product.id
-        },
-        cancelEdit(product) {
-            Object.assign(product, this.cachedProduct)
-            this.editing = null
-        },
-        editProduct(updatedProduct) {
-            try {
-                this.axios.put('http://localhost:5000/products/edit?id='+updatedProduct.id, {'product': updatedProduct}, {'Content-Type': 'application/json'})
-                .then(response => {
-                    this.response = response
-                    this.products = this.products.map(product => product.id === updatedProduct.id ? product: updatedProduct)
-                })
-                .catch(error => {
-                    this.response = error
-                })
-            } catch(error) {
-                this.response = error
-            }
-        },
-        deleteProduct(id) {
-            try {
-                this.axios.delete('http://localhost:5000/products/delete?id='+id)
-                .then(response => {
-                    this.response = response
-                    this.products = this.products.filter(product => product.id !== id);
-                })
-                .catch(error => {
-                    this.response = error
-                })
-            } catch (error) {
-                this.response = error
-            }
-        },
     }
 }
 </script>
@@ -165,5 +128,8 @@ export default {
 <style scoped>
 button {
     margin: 0 0.5 rem 0;
+}
+.font-margin {
+    margin: 0px 5px 0px 0px;
 }
 </style>
