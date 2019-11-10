@@ -7,6 +7,18 @@
           <!-- Simplr Suite</a> -->
         <!-- </a> -->
       </div>
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            <router-link to="/signup" class="button is-primary">
+              <strong>Sign Up</strong>
+            </router-link>
+            <router-link to="/signin" class="button is-light">
+              Log in
+            </router-link>
+          </div>
+        </div>
+      </div>
     </nav>
 
     <div class="columns">

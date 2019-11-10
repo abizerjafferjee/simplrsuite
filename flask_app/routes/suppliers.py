@@ -37,7 +37,7 @@ def add():
             business_name = body['business_name'],
             contact_person = body['contact_person'],
             email = body['email'],
-            phone = body['phone'],
+            phone = body['phone_code'] + body['phone'],
             plus_code = body['plus_code'],
             address = body['address'],
             additional_info = body['additional_info']

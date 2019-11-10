@@ -205,45 +205,15 @@
                     </div>
                 </div>
 
-                <div class="columns">
+                <!-- <div class="columns">
                     <div class="column">
                         <div class="card events-card">
                             <header class="card-header"><p class="card-header-title">Invoices & Bulk Procurement</p></header>
                             <div class="card-table">
-                                <!-- <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Procurement Id</th>
-                                            <th>Product</th>
-                                            <th>SKU</th>
-                                            <th>Invoice</th>
-                                            <th>Quantity</th>
-                                            <th>Unit Cost</th>
-                                            <th>Total Cost</th>
-                                            <th>Location</th>
-                                            <th>Date</th>
-                                            <th>Paid</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="p in procurement" :key="p.id">
-                                        <td>{{ p.id }}</td>
-                                        <td>{{ p.product.description }}</td>
-                                        <td>{{ p.product.sku }}</td>
-                                        <td>{{ p.invoice }}</td>
-                                        <td>{{ p.quantity }}</td>
-                                        <td>{{ p.unit_cost }}</td>
-                                        <td>{{ p.total_cost }}</td>
-                                        <td>{{ p.created }}</td>
-                                        <td>{{ p.location }}</td>
-                                        <td><span class="tag is-info">{{ p.paid }}</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table> -->
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
             </article>
         </div>

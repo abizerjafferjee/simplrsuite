@@ -2,18 +2,27 @@ from app import db, ma
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 from sqlalchemy.orm import relationship
+from flask_login import UserMixin
 from datetime import datetime
 import marshmallow
 
+class User(UserMixin, db.Model):
+    __tablename__ = 'user'
 
+    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100))
+    name = db.Column(db.String(1000))
+    created = db.Column(db.DateTime(), default=datetime.now())
 
 class Inventory(db.Model):
     __tablename__ = 'inventory'
 
     id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     quantity = db.Column(db.Float())
-    updated = db.Column(db.DateTime(), default=datetime.now())
+    updated = db.Column(db.DateTime(), default=datetime.now(), onupdate=datetime.now())
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -22,6 +31,7 @@ class Procurement(db.Model):
     __tablename__ = 'procurement'
 
     id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
     unit_cost = db.Column(db.Float())
@@ -41,6 +51,7 @@ class Payment(db.Model):
     __tablename__ = 'payment'
 
     id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
     amount = db.Column(db.Float())
     currency = db.Column(db.String())
@@ -64,6 +75,7 @@ class Product(db.Model):
     __tablename__ = 'product'
 
     id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     description = db.Column(db.String())
     sku = db.Column(db.String())
@@ -74,8 +86,8 @@ class Product(db.Model):
     currency = db.Column(db.String())
     price = db.Column(db.Float())
     image_path = db.Column(db.String())
-    created = db.Column(db.DateTime(), default=datetime.now())
     additional_info = db.Column(db.String())
+    created = db.Column(db.DateTime(), default=datetime.now())
 
     procurements = relationship("Procurement", backref='product')
     inventory = relationship("Inventory", backref='product')
@@ -88,6 +100,7 @@ class Supplier(db.Model):
     __tablename__ = 'supplier'
 
     id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     business_name = db.Column(db.String())
     contact_person = db.Column(db.String())
     email = db.Column(db.String())
@@ -107,6 +120,7 @@ class Category(db.Model):
     __tablename__ = 'category'
 
     id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String())
     products = relationship("Product", backref='category')
 
@@ -117,6 +131,7 @@ class MailList(db.Model):
     __tablename__ = 'maillist'
 
     id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String())
     business = db.Column(db.String())
     email = db.Column(db.String())
@@ -126,6 +141,10 @@ class MailList(db.Model):
 
     def __repr__(self):
         return '<id {}, name {}, business {}, email {}, phone {}>'.format(self.id, self.name, self.business, self.email, self.phone)
+
+class UserSchema(ma.ModelSchema):
+    class Meta:
+        model = User
 
 class CategorySchema(ma.ModelSchema):
     class Meta:

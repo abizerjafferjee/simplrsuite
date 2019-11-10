@@ -7,6 +7,7 @@ import json
 import pandas as pd
 from numpy import genfromtxt
 
+from flask_app.routes.auth import AuthRoutes
 from flask_app.routes.products import ProductRoutes
 from flask_app.routes.category import CategoryRoutes
 from flask_app.routes.suppliers import SupplierRoutes
@@ -14,6 +15,7 @@ from flask_app.routes.inventory import InventoryRoutes
 from flask_app.routes.maillist import MailListRoutes
 from flask_app.routes.payments import PaymentRoutes
 
+app.register_blueprint(AuthRoutes)
 app.register_blueprint(ProductRoutes)
 app.register_blueprint(CategoryRoutes)
 app.register_blueprint(SupplierRoutes)

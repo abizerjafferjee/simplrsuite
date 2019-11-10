@@ -12,10 +12,22 @@ import SupplierDetailView from '@/components/SupplierDetailView'
 import Dashboard from '@/components/Dashboard'
 import PaymentsView from '@/components/PaymentsView'
 import PaymentsForm from '@/components/PaymentsForm'
+import SignUpForm from '@/components/SignUpForm'
+import SignInForm from '@/components/SignInForm'
 
 Vue.use(VueRouter)
 
 const routes = [
+    {
+        path: '/signin',
+        name: 'SignIn',
+        component: SignInForm
+    },
+    {
+        path: '/signup',
+        name: 'SignUp',
+        component: SignUpForm
+    },
     {
         path: '/dashboard',
         name: 'Dashboard',

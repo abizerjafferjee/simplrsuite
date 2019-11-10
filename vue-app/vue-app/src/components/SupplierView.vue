@@ -52,7 +52,7 @@
                                                 <font-awesome-icon class="font-margin" icon="envelope-square" size="lg" /> <a>{{ supplier.email }}</a>
                                             </p>
                                             <p class="level-item" aria-label="transactions" v-if="supplier.phone">
-                                                <font-awesome-icon class="font-margin" icon="phone-square-alt" size="lg" />  +255-{{ supplier.phone }}
+                                                <font-awesome-icon class="font-margin" icon="phone-square-alt" size="lg" />{{ supplier.phone }}
                                             </p>
                                         </div>
                                     </div>

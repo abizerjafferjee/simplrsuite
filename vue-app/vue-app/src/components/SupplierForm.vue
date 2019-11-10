@@ -1,5 +1,5 @@
 <template>
-    <div id="product-form">
+    <div id="supplier-form">
         <div class="tile is-parent">
             <article class="tile is-child">
 
