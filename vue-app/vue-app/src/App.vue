@@ -2,26 +2,27 @@
   <div id="app" class="container is-fullhd">
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <!-- <a class="navbar-item" href="https://bulma.io"> -->
           <img src="./assets/logo_2.jpg" width="150" height="150">
-          <!-- Simplr Suite</a> -->
-        <!-- </a> -->
       </div>
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <router-link to="/signup" class="button is-primary">
+            <a v-if="!user" @click="show('signup')" class="button is-primary">
               <strong>Sign Up</strong>
-            </router-link>
-            <router-link to="/signin" class="button is-light">
+            </a>
+            <a v-if="!user" @click="show('signin')" class="button is-light">
               Log in
-            </router-link>
+            </a>
+            <p v-if="user">{{ user.name }}</p>
+            <a v-if="user" @click="logout()" class="button is-light">
+              Logout
+            </a>
           </div>
         </div>
       </div>
     </nav>
 
-    <div class="columns">
+    <div class="columns" v-if="!this.signin && !this.signup">
       <div class="column is-one-fifth">
         <aside class="menu is-size-5">
           <ul class="menu-list">
@@ -44,13 +45,66 @@
         <router-view></router-view>
       </div>
     </div>
+
+    <div class="columns" v-else>
+      <div class="column">
+        <signup-form v-if="this.signup"></signup-form>
+        <signin-form v-if="this.signin" @isAuthenticated="userSignin"></signin-form>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
-
+import SignUpForm from './components/SignUpForm.vue'
+import SignInForm from './components/SignInForm.vue'
 export default {
   name: 'app',
+  components: {
+    'signup-form': SignUpForm,
+    'signin-form': SignInForm
+  },
+  data() {
+    return {
+      user: null,
+      signup: false,
+      signin: true,
+      response: null
+    }
+  },
+  methods: {
+    show(form) {
+      if (form === 'signup') {
+        this.signup = true
+        this.signin = false
+      } else {
+        this.signin = true
+        this.signup = false
+      }
+    },
+    userSignin(isAuthenticated) {
+      try {
+        if (isAuthenticated) {
+          console.log('hello')
+          var jwt = this.$store.state.jwt
+          this.axios.get('http://localhost:5000/profile', { headers: { Authorization: `Bearer: ${jwt}`}})
+          .then(response => {
+            this.user = response.data[0]['user']
+            this.signup = false
+            this.signin = false
+          })
+          .catch(e => {
+            console.log(e)
+            this.response = e
+          })
+        }
+      } catch (error) {
+          console.log(error)
+          this.response = error
+      }
+    }
+  }
 }
 </script>
 

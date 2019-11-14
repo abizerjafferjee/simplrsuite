@@ -3,7 +3,6 @@ sys.path.append('../')
 from flask import Flask, jsonify, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from flask_login import LoginManager
 from flask_cors import CORS
 
 # internal imports
@@ -17,11 +16,6 @@ ma = Marshmallow(app)
 
 # enable CORS
 cors = CORS(app)
-
-# login manager
-login_manager = LoginManager()
-login_manager.login_view = 'AuthRoutes.login'
-login_manager.init_app(app)
 
 from flask_app.views import *
 

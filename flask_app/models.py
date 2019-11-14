@@ -5,8 +5,9 @@ from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from datetime import datetime
 import marshmallow
+from werkzeug.security import generate_password_hash, check_password_hash
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
@@ -14,6 +15,27 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(100))
     name = db.Column(db.String(1000))
     created = db.Column(db.DateTime(), default=datetime.now())
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password, method='sha256')
+
+    @classmethod
+    def authenticate(cls, **kwargs):
+        email = kwargs.get('email')
+        password = kwargs.get('password')
+
+        if not email or not password:
+            return None
+        
+        user = cls.query.filter_by(email=email).first()
+        if not user or not check_password_hash(user.password, password):
+            return None
+        
+        return user
+    
+    def to_dict(self):
+        return dict(id=self.id, name=self.name, email=self.email)
+
 
 class Inventory(db.Model):
     __tablename__ = 'inventory'

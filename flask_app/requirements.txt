@@ -163,6 +163,7 @@ pycurl==7.43.0.1
 pyflakes==1.6.0
 Pygments==2.2.0
 pyhacrf-datamade==0.2.3
+PyJWT==1.7.1
 PyLBFGS==0.2.0.12
 pylint==1.8.4
 pyodbc==4.0.23

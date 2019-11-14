@@ -26,12 +26,12 @@
                                         <input ref="password" @focus="clearStatus" @keypress="clearStatus" v-model="user.password" class="input is-large" type="password" placeholder="Your Password">
                                     </div>
                                 </div>
-                                <div class="field">
+                                <!-- <div class="field">
                                     <label class="checkbox">
                                     <input type="checkbox" ref="remember" @focus="clearStatus" @keypress="clearStatus" v-model="user.remember">
                                     Remember me
                                     </label>
-                                </div>
+                                </div> -->
                                 <button class="button is-block is-info is-large is-fullwidth">Login</button>
                             </form>
                         </div>
@@ -59,7 +59,6 @@ export default {
            user: {
                email: null,
                password: null,
-               remember: true
            }
        }
    },
@@ -92,20 +91,25 @@ export default {
         },
         signin() {
             try {
+                this.$store.commit('setUserData', this.user.email)
                 this.axios.post('http://localhost:5000/login', {'body': this.user})
                 .then(response => {
                     if (response.data[0]['success']) {
+                        this.$store.commit('setJwtToken', response.data[0]['token'])
                         this.showSuccess()
+                        this.$emit('isAuthenticated', this.$store.getters.isAuthenticated)
                     } else {
                         this.errors.push({'id':1, 'e': response.data[0]['body']})
                         this.showError()
                     }
                 })
                 .catch(e => {
+                    console.log(e)
                     this.response = e
                     this.showError()
                 })
             } catch (error) {
+                console.log(error)
                 this.response = error
                 this.showError()
             }
