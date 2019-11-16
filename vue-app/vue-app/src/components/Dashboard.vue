@@ -1,48 +1,120 @@
 <template>
     <div id="dashboard">
-        <div class="tile is-ancestor">
-            <div class="tile is-vertical is-8">
-                <div class="tile">
-                <div class="tile is-parent is-vertical">
-                    <article class="tile is-child notification is-primary">
-                    <p class="title">Payments</p>
-                    <p class="subtitle">Total to be Paid</p>
-                    </article>
-                    <article class="tile is-child notification is-warning">
-                    <p class="title">Payment History</p>
-                    <p class="subtitle">Last 10 Payments</p>
-                    </article>
-                </div>
-                <div class="tile is-parent">
-                    <article class="tile is-child notification is-info">
-                    <p class="title">Customers</p>
-                    <p class="subtitle">With an image</p>
-                    <figure class="image is-4by3">
-                        <img src="https://bulma.io/images/placeholders/640x480.png">
-                    </figure>
-                    </article>
-                </div>
-                </div>
-                <div class="tile is-parent">
-                <article class="tile is-child notification is-danger">
-                    <p class="title">Products</p>
-                    <p class="subtitle">Fastest Moving Inventory</p>
-                    <div class="content">
-                    <!-- Content -->
+        <div class="container">
+            <div class="column">
+                <section class="hero is-info welcome is-small">
+                    <div class="hero-body">
+                        <div class="container">
+                            <h1 class="title">
+                                Hello, {{ user }}.
+                            </h1>
+                            <h2 class="subtitle">
+                                Simplr Post helps you manage your product catalogs and track purchases, inventory and payment.
+                            </h2>
+                        </div>
                     </div>
-                </article>
-                </div>
-            </div>
-            <div class="tile is-parent">
-                <article class="tile is-child notification is-success">
-                <div class="content">
-                    <p class="title">Sales</p>
-                    <p class="subtitle">Daily Sales Record</p>
-                    <div class="content">
-                    <!-- Content -->
+                </section>
+                <br>
+
+                <section class="hero notification">
+                    <div class="hero-body">
+                        <div class="container has-text-centered">
+                            <div class="column is-6 is-offset-3">
+                                <font-awesome-icon class="icon font-margin has-text-grey" icon="hard-hat" size="lg" />
+                                <h3 class="title has-text-grey">Dashboard Under Construction</h3>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                </article>
+                </section>
+
+                <!-- <section class="info-tiles">
+                    <div class="tile is-ancestor has-text-centered">
+                        <div class="tile is-parent">
+                            <article class="tile is-child box">
+                                <p class="title">439k</p>
+                                <p class="subtitle">Users</p>
+                            </article>
+                        </div>
+                        <div class="tile is-parent">
+                            <article class="tile is-child box">
+                                <p class="title">59k</p>
+                                <p class="subtitle">Products</p>
+                            </article>
+                        </div>
+                        <div class="tile is-parent">
+                            <article class="tile is-child box">
+                                <p class="title">3.4k</p>
+                                <p class="subtitle">Open Orders</p>
+                            </article>
+                        </div>
+                        <div class="tile is-parent">
+                            <article class="tile is-child box">
+                                <p class="title">19</p>
+                                <p class="subtitle">Exceptions</p>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="card events-card">
+                            <header class="card-header">
+                                <p class="card-header-title">
+                                    Events
+                                </p>
+                                <a href="#" class="card-header-icon" aria-label="more options">
+                                    <span class="icon">
+                                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                    </span>
+                                </a>
+                            </header>
+                            <div class="card-table">
+                                <div class="content">
+                                    <table class="table is-fullwidth is-striped">
+                                        <tbody>
+                                            <tr>
+                                                <td width="5%"><i class="fa fa-bell-o"></i></td>
+                                                <td>Lorum ipsum dolem aire</td>
+                                                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="#" class="card-footer-item">View All</a>
+                            </footer>
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">
+                                    Inventory Search
+                                </p>
+                                <a href="#" class="card-header-icon" aria-label="more options">
+                                    <span class="icon">
+                                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                    </span>
+                                </a>
+                            </header>
+                            <div class="card-content">
+                                <div class="content">
+                                    <div class="control has-icons-left has-icons-right">
+                                        <input class="input is-large" type="text" placeholder="">
+                                        <span class="icon is-medium is-left">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <span class="icon is-medium is-right">
+                                            <i class="fa fa-check"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -54,6 +126,7 @@ export default {
     data() {
         return {
             response: null,
+            user: this.$store.state.user
         }
     },
     mounted() {
@@ -67,5 +140,8 @@ export default {
 <style scoped>
 button {
     margin: 0 0.5 rem 0;
+}
+.font-margin {
+    margin: 0px 5px 0px 0px;
 }
 </style>

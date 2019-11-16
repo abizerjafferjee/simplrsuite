@@ -15,13 +15,22 @@ export default new Vuex.Store({
           state.user = payload
         },
         setJwtToken (state, payload) {
-          localStorage.token = payload
+          localStorage.jwt = payload
           state.jwt = payload
         }
     },
     getters: {
       isAuthenticated (state) {
-        return isValidJwt(state.jwt)
+        if (isValidJwt(state.jwt)) {
+          return true
+        } else {
+          var jwt = localStorage.jwt
+          state.jwt = jwt
+          if (isValidJwt(state.jwt)) {
+            return true
+          }
+        }
+        return false
       }
     }
 })

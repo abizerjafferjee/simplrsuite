@@ -3,10 +3,10 @@
        <section class="hero is-fullheight">
             <div class="hero-body">
                 <div class="container has-text-centered">
-                    <div class="column is-4 is-offset-4">
+                    <div class="column is-6 is-offset-3">
                         <h3 class="title has-text-black">Login</h3>
-                        <hr class="signin-hr">
-                        <p class="subtitle has-text-black">Please login into your account.</p>
+                        <!-- <hr class="signin-hr"> -->
+                        <!-- <p class="subtitle has-text-black">Please login into your account.</p> -->
 
                         <div v-if="error && submitting">
                             <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
@@ -36,7 +36,7 @@
                             </form>
                         </div>
                         <p class="has-text-grey">
-                            <router-link to="/signup">Sign Up</router-link> &nbsp;·&nbsp;
+                            <!-- <router-link to="/signup">Sign Up</router-link> &nbsp;·&nbsp; -->
                             <a href="../">Forgot Password</a> &nbsp;·&nbsp;
                         </p>
                     </div>

@@ -7,14 +7,14 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <a v-if="!user" @click="show('signup')" class="button is-primary">
-              <strong>Sign Up</strong>
-            </a>
-            <a v-if="!user" @click="show('signin')" class="button is-light">
+            <a v-if="!isAuthenticated" @click="show('signin')" class="button is-light">
               Log in
             </a>
-            <p v-if="user">{{ user.name }}</p>
-            <a v-if="user" @click="logout()" class="button is-light">
+            <a v-if="!isAuthenticated" @click="show('signup')" class="button is-primary">
+              <strong>Sign Up</strong>
+            </a>
+            <a v-if="isAuthenticated && user" class="button is-light">{{ user.name }}</a>
+            <a v-if="isAuthenticated" @click="logout()" class="button is-danger is-light">
               Logout
             </a>
           </div>
@@ -22,7 +22,7 @@
       </div>
     </nav>
 
-    <div class="columns" v-if="!this.signin && !this.signup">
+    <div class="columns" v-if="isAuthenticated">
       <div class="column is-one-fifth">
         <aside class="menu is-size-5">
           <ul class="menu-list">
@@ -46,10 +46,10 @@
       </div>
     </div>
 
-    <div class="columns" v-else>
+    <div class="columns" v-if="!isAuthenticated">
       <div class="column">
+        <signin-form v-if="this.signin" @isAuthenticated="authenticate"></signin-form>
         <signup-form v-if="this.signup"></signup-form>
-        <signin-form v-if="this.signin" @isAuthenticated="userSignin"></signin-form>
       </div>
     </div>
 
@@ -67,11 +67,15 @@ export default {
   },
   data() {
     return {
+      isAuthenticated: false,
       user: null,
+      signin: false,
       signup: false,
-      signin: true,
       response: null
     }
+  },
+  created () {
+    this.authenticate(this.$store.getters.isAuthenticated)
   },
   methods: {
     show(form) {
@@ -79,30 +83,42 @@ export default {
         this.signup = true
         this.signin = false
       } else {
-        this.signin = true
         this.signup = false
+        this.signin = true
       }
     },
-    userSignin(isAuthenticated) {
+    authenticate(isAuthenticated) {
       try {
         if (isAuthenticated) {
-          console.log('hello')
           var jwt = this.$store.state.jwt
           this.axios.get('http://localhost:5000/profile', { headers: { Authorization: `Bearer: ${jwt}`}})
           .then(response => {
+            this.isAuthenticated = true
             this.user = response.data[0]['user']
-            this.signup = false
+            this.$store.commit('setUserData', this.user.email)
             this.signin = false
+            this.signup = false
+            if (this.$route.path === '/' | this.$route.path === '/signin' | this.$route.path === '/signup') {
+              this.$router.push({path: '/dashboard'})
+            }
           })
           .catch(e => {
-            console.log(e)
             this.response = e
           })
+        } else {
+          this.isAuthenticated = false
+          this.signin = true
         }
       } catch (error) {
-          console.log(error)
           this.response = error
       }
+    },
+    logout() {
+      this.$store.commit('setUserData', '')
+      this.$store.commit('setJwtToken', '')
+      this.isAuthenticated = false
+      this.user = null
+      this.signin = true
     }
   }
 }

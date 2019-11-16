@@ -16,6 +16,10 @@
                     </div>
                 </section>
 
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>         
                 <br>
 
                 <div v-if="procurements && procurements.length < 1" class="notification">
@@ -92,6 +96,8 @@ export default {
             },
             editing: null,
             response: null,
+            errorNotification: null,
+            jwt: ''
         }
     },
     filters: {
@@ -102,24 +108,32 @@ export default {
             return moment(String(value)).format('L')
         }
     },
-    mounted() {
+    created() {
+        this.jwt = this.$store.state.jwt
         this.getProcurements(1)
     },
     methods: {
         getProcurements(page) {
             try {
-                this.axios.get('http://localhost:5000/procurement?page='+page)
+                this.axios.get('http://localhost:5000/procurement?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.procurements = response.data[0].body
-                    this.procurementPages.page = response.data[0].page
-                    this.procurementPages.next = response.data[0].next
-                    this.procurementPages.prev = response.data[0].prev
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.procurements = response.data[0].body
+                        this.procurementPages.page = response.data[0].page
+                        this.procurementPages.next = response.data[0].next
+                        this.procurementPages.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         editMode(procurement) {
@@ -132,43 +146,51 @@ export default {
         },
         editProcurement(updatedProcurement) {
             try {
-                this.axios.put('http://localhost:5000/procurement?id='+updatedProcurement.id, {'body': updatedProcurement}, {'Content-Type': 'application/json'})
+                this.axios.put('http://localhost:5000/procurement?id='+updatedProcurement.id, {'body': updatedProcurement}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.procurements = this.procurements.map(procurements => procurements.id === updatedProcurement.id ? procurements: updatedProcurement)
-                    this.editing = null
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.procurements = this.procurements.map(procurements => procurements.id === updatedProcurement.id ? procurements: updatedProcurement)
+                        this.editing = null
+                    }
                 })
                 .catch(error => {
                     this.response = error
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch(error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         deleteProcurement(id) {
             try {
-                this.axios.delete('http://localhost:5000/procurement?id='+id)
+                this.axios.delete('http://localhost:5000/procurement?id='+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    // this.procurements = this.procurements.filter(procurements => procurement.id !== id);
-                    this.getProcurements(this.procurementPages.page)
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        // this.procurements = this.procurements.filter(procurements => procurement.id !== id);
+                        this.getProcurements(this.procurementPages.page)
+                    }
                 })
                 .catch(error => {
                     this.response = error
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
-        // getCategories() {
-        //     this.axios.get('http://localhost:5000/categories')
-        //     .then(response => {
-        //         this.categories = response.data[0]['categories']
-        //     })
-        //     .catch(error => {
-        //         this.response = error
-        //     })
-        // },
+        closeNotification() {
+            this.errorNotification = null
+        }
     }
 }
 </script>

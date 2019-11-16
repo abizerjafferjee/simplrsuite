@@ -16,6 +16,10 @@
                     </div>
                 </section>
 
+                <div class="notification" v-if="error">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ error }}
+                </div>
                 <br>
                 
                 <div v-if="suppliers && suppliers.length < 1" class="notification">
@@ -98,28 +102,41 @@ export default {
             },
             editing: null,
             response: null,
+            error: null,
+            jwt: ''
         }
     },
     created() {
+        this.jwt = this.$store.state.jwt
         this.getSuppliers(1)
     },
     methods: {
         getSuppliers(page) {
             try {
-                this.axios.get('http://localhost:5000/suppliers?page='+page+'&search='+this.search.text)
+                this.axios.get('http://localhost:5000/suppliers?page='+page+'&search='+this.search.text, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.suppliers = response.data[0].body
-                    this.pages.page = response.data[0].page
-                    this.pages.next = response.data[0].next
-                    this.pages.prev = response.data[0].prev
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.error = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.suppliers = response.data[0].body
+                        this.pages.page = response.data[0].page
+                        this.pages.next = response.data[0].next
+                        this.pages.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.error = "Internal Server Error"
                 })
             } catch (error) {
                 this.response = error
+                this.error = "Internal Server Error"
             }
         },
+        closeNotification() {
+            this.error = null
+        }
     }
 }
 </script>

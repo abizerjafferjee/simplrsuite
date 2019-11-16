@@ -23,6 +23,11 @@
 
                 <br>
 
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>
+
                 <section>
                     <div class="content">
                         <div v-if="error && submitting">
@@ -101,6 +106,7 @@ export default {
            errors: [],
            success: false,
            response: null,
+           errorNotification: null,
            supplier: {
                business_name: null,
                contact_person: null,
@@ -111,7 +117,11 @@ export default {
                address: null,
                additional_info: null
            },
+           jwt: ''
        }
+   },
+   created () {
+       this.jwt = this.$store.state.jwt
    },
    methods: {
         handleSubmit() {
@@ -146,10 +156,15 @@ export default {
         },
         addSupplier() {
             try {
-                this.axios.post('http://localhost:5000/suppliers', {'body': this.supplier})
+                this.axios.post('http://localhost:5000/suppliers', {'body': this.supplier}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.showSuccess()
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.showSuccess()
+                    }
                 })
                 .catch(e => {
                     this.response = e
@@ -209,6 +224,9 @@ export default {
             } else {
                 return false
             }
+        },
+        closeNotification() {
+            this.errorNotification = null
         }
     }
 }

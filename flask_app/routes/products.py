@@ -7,6 +7,7 @@ import os, sys
 import string
 import random
 import re
+from flask_app.auth_decorator import token_required
 
 # from flask_app.database.product import Product, ProductSchema
 from flask_app.models import db, Product, Category, Procurement, Inventory, ProductSchema
@@ -34,7 +35,8 @@ def generateSKU(id, category_id, product):
     return "{}{}00{}".format(product[:3].upper(), str(category_id), str(id))
 
 @ProductRoutes.route('/products', methods=['POST'])
-def add():
+@token_required
+def add(current_user):
     """
     Add a product to db
     """
@@ -54,6 +56,7 @@ def add():
 
         category = Category.query.filter_by(name=body['category']).first()
         product = Product(
+            user = current_user.id,
             category = category,
             description = body['description'],
             product_type = body['product_type'],
@@ -80,7 +83,8 @@ def add():
         return make_response(jsonify({'success': False}, 400))
 
 @ProductRoutes.route('/products', methods=['PUT'])
-def put():
+@token_required
+def put(current_user):
     """
     Update a product in db
     *Modify to handle category updates
@@ -100,13 +104,13 @@ def put():
         return make_response(jsonify({'success': False}, 400))
 
 @ProductRoutes.route('/products', methods=['DELETE'])
-def delete():
+@token_required
+def delete(current_user):
     """
     Delete a product in db by id
     """
     try:
         id = request.args.get('id', type=int)
-        print(id)
         Product.query.filter_by(id=id).delete()
         db.session.commit()
         return make_response(jsonify({'success': True}, 200))
@@ -115,7 +119,8 @@ def delete():
         return make_response(jsonify({'success': False}, 400))
 
 @ProductRoutes.route('/products/<int:id>', methods=['GET'])
-def get(id):
+@token_required
+def get(current_user, id):
     """
     Get a product from db by id
     """
@@ -130,7 +135,8 @@ def get(id):
         return make_response(jsonify({'success':False}, 400))
 
 @ProductRoutes.route('/products', methods=['GET'])
-def search():
+@token_required
+def search(current_user):
     """
     Search and paginate products for product view
     """
@@ -142,16 +148,27 @@ def search():
         per_page = 24
 
         if search != '' and category != '':
-            print("searching text and category")
-            products = Product.query.filter(Product.description.like(search)).join(Category).filter(Category.name == category).paginate(page=page, per_page=per_page, error_out=False)
+            products = Product.query\
+                .filter(Product.user==current_user.id)\
+                .filter(Product.description.like(search))\
+                .join(Category)\
+                .filter(Category.name == category)\
+                .paginate(page=page, per_page=per_page, error_out=False)
         elif category != '':
-            print("searching category")
-            products = Product.query.join(Category).filter(Category.name == category).paginate(page=page, per_page=per_page, error_out=False)
+            products = Product.query\
+                .filter(Product.user==current_user.id)\
+                .join(Category)\
+                .filter(Category.name == category)\
+                .paginate(page=page, per_page=per_page, error_out=False)
         elif search != '':
-            print("searching")
-            products = Product.query.filter(Product.description.like(search)).paginate(page=page, per_page=per_page, error_out=False)
+            products = Product.query\
+            .filter(Product.user==current_user.id)\
+            .filter(Product.description.like(search))\
+            .paginate(page=page, per_page=per_page, error_out=False)
         else:
-            products = Product.query.paginate(page=page, per_page=per_page, error_out=False)
+            products = Product.query\
+                .filter(Product.user==current_user.id)\
+                .paginate(page=page, per_page=per_page, error_out=False)
 
         product_schema = ProductSchema(many=True)
         output = product_schema.dump(products.items)
@@ -163,58 +180,60 @@ def search():
         return make_response(jsonify({'success': False}, 400))
 
 @ProductRoutes.route('/products/names', methods=['GET'])
-def get_names():
+@token_required
+def get_names(current_user):
     """
     Return all product names from db
     """
     try:
-        products = Product.query.all()
+        products = Product.query.filter(Product.user==current_user.id)
         product_names = [{'value': p.id, 'text': p.description, 'packing_type': p.packing_type} for p in products]
         return make_response(jsonify({'success': True, 'products': product_names}, 200))
     except Exception as e:
         print(e)
         return make_response(jsonify({'success': False}, 400))
 
-@ProductRoutes.route('/products/file', methods=['GET'])
-def add_many():
-    """
-    Modify this function to take a multipart form of a file with many products
-    and add to db
-    """
-    try:
-        data = pd.read_csv('../docs/data.csv')
-        data.fillna(0, inplace=True)
-        data = data.to_json(orient='records')
-        data = json.loads(data)
+# @ProductRoutes.route('/products/file', methods=['GET'])
+# @token_required
+# def add_many(current_user):
+#     """
+#     Modify this function to take a multipart form of a file with many products
+#     and add to db
+#     """
+#     try:
+#         data = pd.read_csv('../docs/data.csv')
+#         data.fillna(0, inplace=True)
+#         data = data.to_json(orient='records')
+#         data = json.loads(data)
 
-        for row in data:
-            category = Category.query.filter_by(name = row['category']).first()
+#         for row in data:
+#             category = Category.query.filter_by(name = row['category']).first()
 
-            product = Product(
-                category = category,
-                description = row['description'],
-                code = row['code'],
-                packing = row['packing'],
-                price = float(row['setlife_price'])
-            )
+#             product = Product(
+#                 category = category,
+#                 description = row['description'],
+#                 code = row['code'],
+#                 packing = row['packing'],
+#                 price = float(row['setlife_price'])
+#             )
 
-            inventory = Inventory(
-                product = product,
-                quantity = float(row['quantity'])
-            )
+#             inventory = Inventory(
+#                 product = product,
+#                 quantity = float(row['quantity'])
+#             )
 
-            procurement = Procurement(
-                product = product,
-                unit_cost = float(row['price']),
-                quantity = float(row['quantity']),
-                total_cost = float(row['cost'])
-            )
+#             procurement = Procurement(
+#                 product = product,
+#                 unit_cost = float(row['price']),
+#                 quantity = float(row['quantity']),
+#                 total_cost = float(row['cost'])
+#             )
 
-            db.session.add(product)
-        db.session.commit()
-        return make_response(jsonify({'success': True}, 200))
-    except Exception as e:
-        print(e)
-        return make_response(jsonify({'success': False}, 400))
+#             db.session.add(product)
+#         db.session.commit()
+#         return make_response(jsonify({'success': True}, 200))
+#     except Exception as e:
+#         print(e)
+#         return make_response(jsonify({'success': False}, 400))
 
 

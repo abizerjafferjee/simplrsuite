@@ -3,16 +3,19 @@ import json
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os, sys
+from flask_app.auth_decorator import token_required
 
 from flask_app.models import db, MailList, MailListSchema
 
 MailListRoutes = Blueprint('MailListRoutes', __name__)
 
 @MailListRoutes.route('/mailer/add', methods=['POST'])
-def add_mailer():
+@token_required
+def add_mailer(current_user):
         try:
             body = json.loads(request.data)['body']
             new_mailer = MailList(
+                user = current_user.id,
                 name = body['name'],
                 business = body['business'],
                 email = body['email'],

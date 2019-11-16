@@ -22,6 +22,10 @@
                     </div>
                 </section>
 
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>         
                 <br>
 
                 <section>
@@ -103,6 +107,7 @@ export default {
            success: false,
            response: null,
            errors: [],
+           errorNotification: null,
            payment_caution_flag: false,
            payment: {
                supplier_id: null,
@@ -112,10 +117,12 @@ export default {
                additional_info: null,
            },
            supplierNames: [],
-           outStandingInvoices: []
+           outStandingInvoices: [],
+           jwt: ''
        }
    },
    created: function() {
+       this.jwt = this.$store.state.jwt
        this.getSupplierNames()
    },
    watch: {
@@ -159,10 +166,15 @@ export default {
         },
         recordPayment() { 
             try {
-                this.axios.post('http://localhost:5000/payments', {'body': this.payment, 'from': 'form'})
+                this.axios.post('http://localhost:5000/payments', {'body': this.payment, 'from': 'form'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.showSuccess()
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.showSuccess()
+                    }
                 })
                 .catch(e => {
                     this.response = e
@@ -184,30 +196,44 @@ export default {
         },
         getSupplierNames() {
             try {
-                this.axios.get('http://localhost:5000/suppliers/names')
+                this.axios.get('http://localhost:5000/suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.supplierNames = response.data[0]['suppliers']
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.supplierNames = response.data[0]['suppliers']
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
 
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getOutStandingInvoices(){
             try {
-                this.axios.get('http://localhost:5000/payments/due/' + this.payment.supplier_id)
+                this.axios.get('http://localhost:5000/payments/due/' + this.payment.supplier_id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.outStandingInvoices = response.data[0]['body']
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.outStandingInvoices = response.data[0]['body']
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
 
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         invalidSupplier() {
@@ -231,6 +257,9 @@ export default {
                this.payment_caution_flag = false
            }
         },
+        closeNotification() {
+            this.errorNotification = null
+        }
     }
 }
 </script>

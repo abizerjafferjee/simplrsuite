@@ -18,12 +18,16 @@
                             <h1 v-if="supplier" class="title level-left">
                                 {{ supplier.business_name }}
                             </h1>
-                            <h3 v-else>Supplier information could not load</h3>
                         </div>
                     </div>
                 </section>
-                <br>
 
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>         
+                <br>
+                
                 <section class="info-tiles">
                     <!-- <div class="tile is-ancestor has-text-centered" v-if="stats">
                         <div class="tile is-parent">
@@ -119,7 +123,15 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="content" v-else><p class="notification">Supplier information failed to load.</p></div>
+                            <div class="content hero" v-else>
+                                <div class="hero-body">
+                                    <div class="container has-text-centered">
+                                        <div class="column is-6 is-offset-3">
+                                            <h3 class="title has-text-grey">Supplier information failed to load.</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -149,7 +161,15 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <p class="title" v-else>No payments have been made.</p>
+                                    <div class="content hero" v-else>
+                                        <div class="hero-body">
+                                            <div class="container has-text-centered">
+                                                <div class="column is-6 is-offset-3">
+                                                    <h3 class="title has-text-grey">No Payments have been made</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <footer class="card-footer level">
@@ -200,7 +220,15 @@
                                     <a class="pagination-next level-right" :disabled="procurementPages.next==false" @click="getProcurement(procurementPages.page+1)">Next page</a>
                                 </footer>
                             </div>
-                            <div v-else><p class="title notification">No Procurements found for this supplier</p></div>
+                            <div class="content hero" v-else>
+                                <div class="hero-body">
+                                    <div class="container has-text-centered">
+                                        <div class="column is-6 is-offset-3">
+                                            <h3 class="title has-text-grey">No procurements found for this supplier.</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -243,6 +271,8 @@ export default {
                 prev: null
             },
             response: null,
+            errorNotification: null,
+            jwt: ''
         }
     },
     filters: {
@@ -254,6 +284,7 @@ export default {
         }
     },
     created() {
+        this.jwt = this.$store.state.jwt
         if (this.$route.query.supplierId) {
             this.supplierId = this.$route.query.supplierId
             this.getSupplier()
@@ -274,64 +305,93 @@ export default {
         },
         getSupplier() {
             try {
-                this.axios.get('http://localhost:5000/suppliers/'+this.supplierId)
+                this.axios.get('http://localhost:5000/suppliers/'+this.supplierId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.supplier = response.data[0].body
-                    this.getProcurement(1)
-                    this.getPayments(1)
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.supplier = response.data[0].body
+                        this.getProcurement(1)
+                        this.getPayments(1)
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         saveSupplier() {
             try {
-                this.axios.put('http://localhost:5000/products?id='+this.supplier.id, {'body': this.supplier}, {'Content-Type': 'application/json'})
+                this.axios.put('http://localhost:5000/products?id='+this.supplier.id, {'body': this.supplier}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.cachedSupplier = Object.assign({}, this.supplier);
-                    this.cancelEdit('supplier')
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.cachedSupplier = Object.assign({}, this.supplier);
+                        this.cancelEdit('supplier')
+                    }
                 })
                 .catch(error => {
                     this.response = error
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch(error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getProcurement(page) {
             try {
-                this.axios.get('http://localhost:5000/procurement/supplier/'+this.supplier.id+'?page='+page)
+                this.axios.get('http://localhost:5000/procurement/supplier/'+this.supplier.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.procurement = response.data[0].body
-                    this.procurementPages.page = response.data[0].page
-                    this.procurementPages.next = response.data[0].next
-                    this.procurementPages.prev = response.data[0].prev
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.procurement = response.data[0].body
+                        this.procurementPages.page = response.data[0].page
+                        this.procurementPages.next = response.data[0].next
+                        this.procurementPages.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error"
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getPayments(page) {
             try {
-                this.axios.get('http://localhost:5000/payments/supplier/'+this.supplier.id+'?page='+page)
+                this.axios.get('http://localhost:5000/payments/supplier/'+this.supplier.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.payments = response.data[0].body
-                    this.paymentPages.page = response.data[0].page
-                    this.paymentPages.next = response.data[0].next
-                    this.paymentPages.prev = response.data[0].prev
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.payments = response.data[0].body
+                        this.paymentPages.page = response.data[0].page
+                        this.paymentPages.next = response.data[0].next
+                        this.paymentPages.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
+
             }
         },
         parseInvoiceInfo(invoices) {
@@ -346,6 +406,9 @@ export default {
             }
             return parsed.toString()
         },
+        closeNotification() {
+            this.errorNotification = null
+        }
     }
 }
 </script>

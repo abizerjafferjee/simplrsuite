@@ -49,6 +49,6 @@ def signup():
 
     return make_response(jsonify({'success':True}, 200))
 
-@AuthRoutes.route('/logout', methods=["GET"])
-def logout():
-    return make_response(jsonify({'success':True}, 200))
+# @AuthRoutes.route('/logout', methods=["GET"])
+# def logout():
+#     return make_response(jsonify({'success':True}, 200))

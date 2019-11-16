@@ -21,7 +21,11 @@
                         </div>
                     </div>
                 </section>
-
+                
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>         
                 <br>
                 
                 <section>
@@ -156,10 +160,13 @@ export default {
            categories: [],
            response: null,
            enterCode: true,
-           errors: []
+           errors: [],
+           errorNotification: null,
+           jwt: ''
        }
    },
    created: function() {
+       this.jwt = this.$store.state.jwt
        this.getCategories()
    },
    computed: {
@@ -200,10 +207,15 @@ export default {
                 formData.append('file', this.product_file)
                 formData.append('body', JSON.stringify(this.product))
                 
-                this.axios.post('http://localhost:5000/products', formData, { headers: {'Content-Type': 'multipart/form-data'}})
+                this.axios.post('http://localhost:5000/products', formData, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.showSuccess()
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.showSuccess()
+                    }
                 })
                 .catch(e => {
                     this.response = e
@@ -228,12 +240,18 @@ export default {
            }
         },
         getCategories() {
-                this.axios.get('http://localhost:5000/categories')
+                this.axios.get('http://localhost:5000/categories', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.categories = response.data[0]['categories']
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.categories = response.data[0]['categories']
+                    }
                 })
                 .catch(error => {
                     this.response = error
+                    this.errorNotification = "Internal Server Error."
                 })
         },
         show () {
@@ -250,16 +268,23 @@ export default {
         },
         addCategory(category) {
             try {
-                this.axios.post('http://localhost:5000/categories', {'body': category})
+                this.axios.post('http://localhost:5000/categories', {'body': category}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    var newCategory = response.data[0]['category']
-                    this.categories.push(newCategory)
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        var newCategory = response.data[0]['category']
+                        this.categories.push(newCategory)
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         invalidProduct() {
@@ -279,6 +304,9 @@ export default {
             }
             return false
         },
+        closeNotification() {
+            this.errorNotification = null
+        }
     }
 }
 </script>

@@ -3,13 +3,15 @@ import json
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os, sys
+from flask_app.auth_decorator import token_required
 
 from flask_app.models import db, Supplier, SupplierSchema
 
 SupplierRoutes = Blueprint('SupplierRoutes', __name__)
 
 @SupplierRoutes.route('/suppliers/<int:id>', methods=['GET'])
-def get(id):
+@token_required
+def get(current_user, id):
     """
     Handles get request for getting a supplier by id, post request for adding
     new supplier and put request for editing a supplier's information.
@@ -26,7 +28,8 @@ def get(id):
         return make_response(jsonify({'success': False}, 400))
 
 @SupplierRoutes.route('/suppliers', methods=['POST'])
-def add():
+@token_required
+def add(current_user):
     """
     Handles post request for adding new supplier.
     """
@@ -34,6 +37,7 @@ def add():
         req = json.loads(request.data)
         body = req['body']
         supplier = Supplier(
+            user = current_user.id,
             business_name = body['business_name'],
             contact_person = body['contact_person'],
             email = body['email'],
@@ -54,7 +58,8 @@ def add():
         return make_response(jsonify({'success': False}, 400))
 
 @SupplierRoutes.route('/suppliers', methods=['PUT'])
-def update():
+@token_required
+def update(current_user):
     """
     Handles get request for getting a supplier by id, post request for adding
     new supplier and put request for editing a supplier's information.
@@ -83,13 +88,13 @@ def update():
         return make_response(jsonify({'success': False}, 400))
 
 @SupplierRoutes.route('/suppliers', methods=['DELETE'])
-def delete():
+@token_required
+def delete(current_user):
     """
     Delete a supplier in db by id
     """
     try:
         id = request.args.get('id', type=int)
-        print(id)
         Supplier.query.filter_by(id=id).delete()
         db.session.commit()
         return make_response(jsonify({'success': True}, 200))
@@ -98,17 +103,21 @@ def delete():
         return make_response(jsonify({'success': False}, 400))
 
 @SupplierRoutes.route('/suppliers', methods=['GET'])
-def search():
+@token_required
+def search(current_user):
     try:
         per_page = 6
         page = request.args.get('page', type=int)
         search = request.args.get('search', type=str)
 
         if search != '':
-            print("searching")
-            suppliers = Supplier.query.filter(Supplier.business_name.like(search)).paginate(page=page, per_page=per_page, error_out=False)
+            suppliers = Supplier.query\
+                .filter(Suppler.user==current_user.id)\
+                .filter(Supplier.business_name.like(search)).paginate(page=page, per_page=per_page, error_out=False)
         else:
-            suppliers = Supplier.query.paginate(page=page, per_page=per_page, error_out=False)
+            suppliers = Supplier.query\
+            .filter(Supplier.user==current_user.id)\
+            .paginate(page=page, per_page=per_page, error_out=False)
 
         supplier_schema = SupplierSchema(many=True)
         output = supplier_schema.dump(suppliers.items)
@@ -120,9 +129,10 @@ def search():
         return make_response(jsonify({'success': False}, 400))
 
 @SupplierRoutes.route('/suppliers/names', methods=['GET'])
-def get_names():
+@token_required
+def get_names(current_user):
     try:
-        suppliers = Supplier.query.all()
+        suppliers = Supplier.query.filter(Supplier.user==current_user.id)
         supplier_names = [{'value': s.id, 'text': s.business_name} for s in suppliers]
         return make_response(jsonify({'success': True, 'suppliers': supplier_names}, 200))
     except:

@@ -20,6 +20,10 @@
                     </div>
                 </section>
 
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>         
                 <br>
 
                 <section>
@@ -162,13 +166,16 @@ export default {
                 additional_info: null
             },
             response: null,
+            errorNotification: null,
             productNames: [],
             supplierNames: [],
             checked: false,
             errors: [],
+            jwt: ''
         }
     },
     created: function() {
+        this.jwt = this.$store.state.jwt
         this.getProductNames()
         this.getSupplierNames()
     },
@@ -194,10 +201,15 @@ export default {
         },
         addProcurement() {
             try {
-                this.axios.post('http://localhost:5000/inventory', {'body': this.procurement})
+                this.axios.post('http://localhost:5000/inventory', {'body': this.procurement}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.showSuccess()
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.showSuccess()
+                    }
                 })
                 .catch(e => {
                     this.response = e
@@ -252,30 +264,44 @@ export default {
         },
         getProductNames() {
             try {
-                this.axios.get('http://localhost:5000/products/names')
+                this.axios.get('http://localhost:5000/products/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.productNames = response.data[0]['products']
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.productNames = response.data[0]['products']
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
 
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getSupplierNames() {
             try {
-                this.axios.get('http://localhost:5000/suppliers/names')
+                this.axios.get('http://localhost:5000/suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.supplierNames = response.data[0]['suppliers']
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.supplierNames = response.data[0]['suppliers']
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
 
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         invalidProduct() {

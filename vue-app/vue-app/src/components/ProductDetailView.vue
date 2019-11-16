@@ -22,6 +22,11 @@
                         </div>
                     </div>
                 </section>
+
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>         
                 <br>
 
                 <div class="columns">
@@ -154,6 +159,7 @@ export default {
     data() {
         return {
             response: null,
+            errorNotification: null,
             productId: null,
             product: null,
             inventoryId: null,
@@ -166,6 +172,7 @@ export default {
                 next: null,
                 prev: null
             },
+            jwt: ''
         }
     },
     filters: {
@@ -176,7 +183,8 @@ export default {
             return moment(String(value)).format('L')
         }
     },
-    mounted() {
+    created() {
+        this.jwt = this.$store.state.jwt
         if (this.$route.query.productId) {
             this.productId = this.$route.query.productId
             this.getProduct()
@@ -203,81 +211,119 @@ export default {
         },
         getProduct() {
             try {
-                this.axios.get('http://localhost:5000/products/'+this.productId)
+                this.axios.get('http://localhost:5000/products/'+this.productId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.product = response.data[0].body
-                    this.inventoryId = this.product['inventory'][0]
-                    if (this.inventoryId) {
-                        this.getInventory()
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.product = response.data[0].body
+                        this.inventoryId = this.product['inventory'][0]
+                        if (this.inventoryId) {
+                            this.getInventory()
+                        }
+                        this.getProcurement(1)
                     }
-                    this.getProcurement(1)
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getInventory() {
             try {
-                this.axios.get('http://localhost:5000/inventory/'+this.inventoryId)
+                this.axios.get('http://localhost:5000/inventory/'+this.inventoryId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.inventory = response.data[0].body
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.inventory = response.data[0].body
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         saveProduct() {
             try {
-                this.axios.put('http://localhost:5000/products?id='+this.product.id, {'body': this.product}, {'Content-Type': 'application/json'})
+                this.axios.put('http://localhost:5000/products?id='+this.product.id, {'body': this.product}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.cachedProduct = Object.assign({}, this.product);
-                    this.cancelEdit('product')
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.cachedProduct = Object.assign({}, this.product);
+                        this.cancelEdit('product')
+                    }
                 })
                 .catch(error => {
                     this.response = error
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch(error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         saveInventory() {
             try {
-                this.axios.put('http://localhost:5000/inventory?id='+this.inventory.id, {'body': this.inventory}, {'Content-Type': 'application/json'})
+                this.axios.put('http://localhost:5000/inventory?id='+this.inventory.id, {'body': this.inventory}, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.cachedInventory = Object.assign({}, this.inventory);
-                    this.cancelEdit('inventory')
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.cachedInventory = Object.assign({}, this.inventory);
+                        this.cancelEdit('inventory')
+                    }
                 })
                 .catch(error => {
                     this.response = error
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch(error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getProcurement(page) {
             try {
-                this.axios.get('http://localhost:5000/procurement/product/'+this.product.id+'?page='+page)
+                this.axios.get('http://localhost:5000/procurement/product/'+this.product.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.procurement = response.data[0].body
-                    this.procurementPages.page = response.data[0].page
-                    this.procurementPages.next = response.data[0].next
-                    this.procurementPages.prev = response.data[0].prev
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.procurement = response.data[0].body
+                        this.procurementPages.page = response.data[0].page
+                        this.procurementPages.next = response.data[0].next
+                        this.procurementPages.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
+        closeNotification() {
+            this.errorNotification = null
+        }
     }
 }
 </script>

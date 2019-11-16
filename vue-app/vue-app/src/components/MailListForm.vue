@@ -2,8 +2,22 @@
     <div id="mail-form">
         <div class="tile is-parent">
             <article class="tile is-child">
-                <p class="title">Add to Mailing List</p>
-                <p class="subtitle">Add your contact information.</p>
+
+                <section class="hero welcome is-small has-background-light">
+                    <div class="hero-body">
+                        <div class="container">
+                            <p class="title">Add to Mailing List</p>
+                            <p class="subtitle">Add your contact information.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>         
+                <br>
+
                 <div class="content">
                     <form @submit.prevent="handleSubmit">
                         
@@ -51,6 +65,7 @@ export default {
        return {
            submitting: false,
            error: false,
+           errorNotification: null,
            success: false,
            mailer: {
                name: null,
@@ -64,6 +79,7 @@ export default {
        }
    },
    created: function() {
+       this.jwt = this.$store.state.jwt
     //    this.getCategories()
    },
    computed: {
@@ -84,17 +100,27 @@ export default {
         },
         addMailer(mailer) {
             try {
-                this.axios.post('http://localhost:5000/mailer/add', {'body': mailer})
+                this.axios.post('http://localhost:5000/mailer/add', {'body': mailer}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    var newMailer = response.data[0]['mailer']
-                    this.mailers.push(newMailer)
+                    if (response.data[1] == 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        var newMailer = response.data[0]['mailer']
+                        this.mailers.push(newMailer)
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
+        },
+        closeNotification() {
+            this.errorNotification = null
         }
     }
   

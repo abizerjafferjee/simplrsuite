@@ -16,6 +16,10 @@
                         </div>
                     </section>
 
+                    <div class="notification" v-if="errorNotification">
+                        <button @click="closeNotification" class="delete"></button>
+                        {{ errorNotification }}
+                    </div>         
                     <br>
 
                     <section class="info-tiles">
@@ -193,6 +197,7 @@ export default {
         return {
             editing: null,
             response: null,
+            errorNotification: null,
             outstandingPayments: [],
             pagesOutstanding: {
                 page: null,
@@ -211,7 +216,8 @@ export default {
                 next: null,
                 prev: null
             },
-            stats: null
+            stats: null,
+            jwt: ''
         }
     },
     filters: {
@@ -223,6 +229,7 @@ export default {
         }
     },
     created() {
+        this.jwt = this.$store.state.jwt
         this.handleSubmit()
     },
     methods: {
@@ -234,20 +241,26 @@ export default {
         },
         getOutstandingPayments(page) {
             try {
-                this.axios.get('http://localhost:5000/payments/due?page='+page)
+                this.axios.get('http://localhost:5000/payments/due?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.outstandingPayments = response.data[0].body
-                    this.outstandingPayments = this.filterUniqueInvoices(this.outstandingPayments)
-                    console.log(this.outstandingPayments)
-                    this.pagesOutstanding.page = response.data[0].page
-                    this.pagesOutstanding.next = response.data[0].next
-                    this.pagesOutstanding.prev = response.data[0].prev
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.outstandingPayments = response.data[0].body
+                        this.outstandingPayments = this.filterUniqueInvoices(this.outstandingPayments)
+                        this.pagesOutstanding.page = response.data[0].page
+                        this.pagesOutstanding.next = response.data[0].next
+                        this.pagesOutstanding.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         filterUniqueInvoices(outstandingPayments) {
@@ -265,94 +278,138 @@ export default {
         },
         getOutstandingUninvoiced(page) {
             try {
-                this.axios.get('http://localhost:5000/payments/due/uninvoiced?page='+page)
+                this.axios.get('http://localhost:5000/payments/due/uninvoiced?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.outstandingUninvoiced = response.data[0].body
-                    this.pagesUninvoiced.page = response.data[0].page
-                    this.pagesUninvoiced.next = response.data[0].next
-                    this.pagesUninvoiced.prev = response.data[0].prev
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.outstandingUninvoiced = response.data[0].body
+                        this.pagesUninvoiced.page = response.data[0].page
+                        this.pagesUninvoiced.next = response.data[0].next
+                        this.pagesUninvoiced.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getPaymentsMade(page) {
             try {
-                this.axios.get('http://localhost:5000/payments/made?page='+page)
+                this.axios.get('http://localhost:5000/payments/made?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.paymentsMade = response.data[0].body
-                    this.pagesPayment.page = response.data[0].page
-                    this.pagesPayment.next = response.data[0].next
-                    this.pagesPayment.prev = response.data[0].prev
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.paymentsMade = response.data[0].body
+                        this.pagesPayment.page = response.data[0].page
+                        this.pagesPayment.next = response.data[0].next
+                        this.pagesPayment.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getPaymentStats() {
             try {
-                this.axios.get('http://localhost:5000/payments/stats')
+                this.axios.get('http://localhost:5000/payments/stats', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.stats = response.data[0].body
-                    console.log(this.stats.latest_payment)
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.stats = response.data[0].body
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         recordInvoicedPayment(index) {
             try {
                 var outstandingInvoices = this.outstandingPayments[index]
-                this.axios.post('http://localhost:5000/payments', {'body': outstandingInvoices, 'from': 'view-invoiced'})
+                this.axios.post('http://localhost:5000/payments', {'body': outstandingInvoices, 'from': 'view-invoiced'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.handleSubmit()
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.handleSubmit()
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         recordUninvoicedPayment(index) {
             try {
                 var outstandingUninvoiced = this.outstandingUninvoiced[index]
-                this.axios.post('http://localhost:5000/payments', {'body': outstandingUninvoiced, 'from': 'view-uninvoiced'})
+                this.axios.post('http://localhost:5000/payments', {'body': outstandingUninvoiced, 'from': 'view-uninvoiced'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.handleSubmit()
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.handleSubmit()
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         deletePayment(id) {
             try {
-                this.axios.delete('http://localhost:5000/payment/'+id)
+                this.axios.delete('http://localhost:5000/payment/'+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.response = response
-                    this.handleSubmit()
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.response = response
+                        this.handleSubmit()
+                    }
                 })
                 .catch(error => {
                     this.response = error
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
+        closeNotification() {
+            this.errorNotification = null
+        }
     }
 }
 </script>

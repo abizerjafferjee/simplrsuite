@@ -8,6 +8,7 @@ import string
 import random
 import re
 from sqlalchemy import func
+from flask_app.auth_decorator import token_required
 
 from flask_app.models import db, Inventory, Procurement, Supplier, Payment,\
 InventorySchema, ProcurementSchema, PaymentSchema, OutstandingPaymentsSchema,\
@@ -16,7 +17,8 @@ OutstandingPaymentsSupplierSchema
 PaymentRoutes = Blueprint('PaymentRoutes', __name__)
 
 @PaymentRoutes.route('/payments', methods=['POST'])
-def record_payment():
+@token_required
+def record_payment(current_user):
     """
     Handles post request for recording a payment.
     * test whether adding payment record before
@@ -32,6 +34,7 @@ def record_payment():
         # from record payment form
         if _from == 'form': 
 
+            # get all unique invoices
             paid_invoices = []
             for invoice in body['invoices']:
                 if invoice not in paid_invoices:
@@ -46,6 +49,7 @@ def record_payment():
             supplier = Supplier.query.get(body['supplier_id'])
 
             payment = Payment(
+                user = current_user.id,
                 supplier_id = supplier,
                 amount = float(body['amount']),
                 currency = body['currency'],
@@ -59,6 +63,7 @@ def record_payment():
         # clicked "record as paid" from payment view
         elif _from == 'view-invoiced':
 
+            # get all unique invoices
             paid_invoices = []
             for invoice in body['invoices']:
                 if invoice not in paid_invoices:
@@ -73,6 +78,7 @@ def record_payment():
             supplier = Supplier.query.get(body['supplier_id'])
 
             payment = Payment(
+                user = current_user.id,
                 supplier_id = supplier.id,
                 amount = float(body['total_cost']),
                 currency = 'TZS',
@@ -91,6 +97,7 @@ def record_payment():
             supplier = Supplier.query.get(body['supplier'])
 
             payment = Payment(
+                user = current_user.id,
                 supplier_id = supplier.id,
                 amount = float(body['total_cost']),
                 procurements = str(body['id']),
@@ -107,7 +114,8 @@ def record_payment():
         return make_response(jsonify({'success': False}, 400))
 
 @PaymentRoutes.route('/payment/<int:id>', methods=['DELETE'])
-def delete_payment(id):
+@token_required
+def delete_payment(current_user, id):
     """
     Delete a procurement record in db by id
     subtract the procurement quantity from inventory
@@ -134,13 +142,15 @@ def delete_payment(id):
         return make_response(jsonify({'success': False}, 400))
 
 @PaymentRoutes.route('/payments/made', methods=['GET'])
-def get_payments_made():
+@token_required
+def get_payments_made(current_user):
     """
     Return payments that have been made
     """
     per_page = 10
     page = request.args.get('page', type=int)
-    payments = Payment.query.order_by(Payment.created.desc())\
+    payments = Payment.query\
+        .filter(Payment.user==current_user.id)\
         .order_by(Payment.created.desc())\
         .paginate(page=page, per_page=per_page, error_out=False)
     schema = PaymentSchema(many=True)
@@ -149,7 +159,8 @@ def get_payments_made():
                                   'prev': payments.has_prev, 'next': payments.has_next}, 200))
 
 @PaymentRoutes.route('/payments/due', methods=['GET'])
-def get_invoices_due():
+@token_required
+def get_invoices_due(current_user):
     """
     Return payments that are due. A list of suppliers and the outstanding amounts
     i.e procurement records with Paid == 'Unpaid'.
@@ -157,6 +168,7 @@ def get_invoices_due():
     per_page = 10
     page = request.args.get('page', type=int)
     outstanding_by_supplier = Procurement.query\
+        .filter(Procurement.user==current_user.id)\
         .filter(Procurement.paid=='Unpaid')\
         .filter(Procurement.invoice != None)\
         .join(Supplier, Procurement.supplier_id==Supplier.id)\
@@ -172,7 +184,8 @@ def get_invoices_due():
                                   'next': outstanding_by_supplier.has_next}, 200))
 
 @PaymentRoutes.route('/payments/due/uninvoiced', methods=['GET'])
-def get_uninvoiced_due():
+@token_required
+def get_uninvoiced_due(current_user):
     """
     Return payments that are due for procurements without invoices.
     A list of procurments and the outstanding amounts
@@ -181,6 +194,7 @@ def get_uninvoiced_due():
     per_page = 10
     page = request.args.get('page', type=int)
     outstanding_by_procurement = Procurement.query\
+        .filter(Procurement.user==current_user.id)\
         .filter(Procurement.paid=='Unpaid')\
         .filter(Procurement.invoice == None)\
         .join(Supplier, Procurement.supplier_id==Supplier.id)\
@@ -194,11 +208,13 @@ def get_uninvoiced_due():
                                   'next': outstanding_by_procurement.has_next}, 200))
 
 @PaymentRoutes.route('/payments/due/<int:id>', methods=['GET'])
-def get_outstanding_invoices(id):
+@token_required
+def get_outstanding_invoices(current_user, id):
     """
     Return distinct invoices which are unpaid by supplier
     """
     supplier_outstanding = Procurement.query\
+        .filter(Procurement.user==current_user.id)\
         .filter_by(paid='Unpaid', supplier_id=id)\
         .with_entities(Procurement.invoice,
                        func.sum(Procurement.total_cost).label('total_cost'),
@@ -208,12 +224,12 @@ def get_outstanding_invoices(id):
     
     schema = OutstandingPaymentsSupplierSchema(many=True)
     output = schema.dump(supplier_outstanding)
-    # print(output)
 
     return make_response(jsonify({'success': True, 'body': output}, 200))
 
 @PaymentRoutes.route('/payments/stats', methods=['GET'])
-def get_payment_stats():
+@token_required
+def get_payment_stats(current_user):
     """
     Return total amount due, total outstanding invoices,
     total procurments without invoices, last payment details
@@ -221,6 +237,7 @@ def get_payment_stats():
     stats = {}
 
     total_outstanding = Procurement.query\
+    .filter(Procurement.user==current_user.id)\
     .filter_by(paid='Unpaid')\
     .with_entities(func.sum(Procurement.total_cost).label('total_cost'))\
     .all()
@@ -228,6 +245,7 @@ def get_payment_stats():
     stats['total_outstanding'] = total_outstanding[0][0]
 
     invoice_outstanding = Procurement.query\
+    .filter(Procurement.user==current_user.id)\
     .filter(Procurement.paid=='Unpaid')\
     .filter(Procurement.invoice!=None)\
     .with_entities(Procurement.invoice)\
@@ -236,6 +254,7 @@ def get_payment_stats():
     stats['total_invoices'] = len(invoice_outstanding)
 
     uninvoiceed_outstand = Procurement.query\
+    .filter(Procurement.user==current_user.id)\
     .filter(Procurement.paid=='Unpaid')\
     .filter(Procurement.invoice==None)\
     .with_entities(func.sum(Procurement.total_cost).label('total_cost'))\
@@ -244,6 +263,7 @@ def get_payment_stats():
     stats['uninvoiced_outstanding'] = uninvoiceed_outstand[0][0] if not None else 0
 
     latest_payment = Payment.query\
+    .filter(Payment.user==current_user.id)\
     .order_by(Payment.created.desc())\
     .limit(1)\
     .all()
@@ -255,14 +275,16 @@ def get_payment_stats():
     return make_response(jsonify({'success': True, 'messe': 'hello', 'body':stats}, 200))
 
 @PaymentRoutes.route('/payments/supplier/<int:id>', methods=['GET'])
-def get_payments_by_supplier(id):
+@token_required
+def get_payments_by_supplier(current_user, id):
     """
     Get payments from db by supplier id
     """
     try:
         page = request.args.get('page', type=int)
         per_page = 10
-        payments = Payment.query.filter(Payment.supplier_id == id)\
+        payments = Payment.query.filter(Payment.user==current_user.id)\
+            .filter(Payment.supplier_id == id)\
             .order_by(Payment.created.desc())\
             .paginate(page=page, per_page=per_page, error_out=False)
         schema = PaymentSchema(many=True)

@@ -3,6 +3,13 @@
         <div class="tile is-parent">
             <article class="tile is-child">
                 <p class="title">Add Category</p>
+
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>         
+                <br>
+
                 <div class="content">
                     <form @submit.prevent="handleSubmit">
                         <label>Category Name</label>
@@ -28,11 +35,16 @@ export default {
             submitting: false,
             error: false,
             success: false,
+            errorNotification: null,
             category: {
                 name: '',
-            }
+            },
+            jwt: ''
         }
     },
+   created: function() {
+       this.jwt = this.$store.state.jwt
+   },
     methods: {
        handleSubmit() {
            this.submitting = true
@@ -47,6 +59,9 @@ export default {
            this.error = false
            this.success = false
        },
+        closeNotification() {
+            this.errorNotification = null
+        }
     }
 }
 </script>

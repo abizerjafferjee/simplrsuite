@@ -1,4 +1,4 @@
-from flask import current_app, request
+from flask import current_app, request, jsonify
 from flask_app.models import User
 import jwt
 from functools import wraps

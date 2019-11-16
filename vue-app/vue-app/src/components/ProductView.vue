@@ -16,6 +16,10 @@
                     </div>
                 </section>
 
+                <div class="notification" v-if="errorNotification">
+                    <button @click="closeNotification" class="delete"></button>
+                    {{ errorNotification }}
+                </div>
                 <br>
 
                 <div v-if="products && products.length < 1" class="notification">
@@ -86,6 +90,8 @@ export default {
             },
             editing: null,
             response: null,
+            errorNotification: null,
+            jwt: ''
         }
     },
     filters: {
@@ -97,72 +103,107 @@ export default {
         }
     },
     created() {
+        this.jwt = this.$store.state.jwt
         this.getProducts(1)
         this.getCategories()
     },
     methods: {
         getProducts(page) {
             try {
-                this.axios.get('http://localhost:5000/products?page='+page+'&search='+this.search.text+'&category='+this.search.category)
+                this.axios.get('http://localhost:5000/products?page='+page+'&search='+this.search.text+'&category='+this.search.category, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
-                    this.products = response.data[0].body
-                    // console.log(this.products)
-                    this.pages.page = response.data[0].page
-                    this.pages.next = response.data[0].next
-                    this.pages.prev = response.data[0].prev
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.products = response.data[0].body
+                        this.pages.page = response.data[0].page
+                        this.pages.next = response.data[0].next
+                        this.pages.prev = response.data[0].prev
+                    }
                 })
                 .catch(e => {
                     this.response = e
+                    this.errorNotification = "Internal Server Error."
                 })
             } catch (error) {
                 this.response = error
-            }
-        },
-        editMode(product) {
-            this.cachedProduct = Object.assign({}, product);
-            this.editing = product.id
-        },
-        cancelEdit(product) {
-            Object.assign(product, this.cachedProduct)
-            this.editing = null
-        },
-        editProduct(updatedProduct) {
-            try {
-                this.axios.put('http://localhost:5000/products/edit?id='+updatedProduct.id, {'product': updatedProduct}, {'Content-Type': 'application/json'})
-                .then(response => {
-                    this.response = response
-                    this.products = this.products.map(product => product.id === updatedProduct.id ? product: updatedProduct)
-                })
-                .catch(error => {
-                    this.response = error
-                })
-            } catch(error) {
-                this.response = error
-            }
-        },
-        deleteProduct(id) {
-            try {
-                this.axios.delete('http://localhost:5000/products/delete?id='+id)
-                .then(response => {
-                    this.response = response
-                    this.products = this.products.filter(product => product.id !== id);
-                })
-                .catch(error => {
-                    this.response = error
-                })
-            } catch (error) {
-                this.response = error
+                this.errorNotification = "Connection Error."
             }
         },
         getCategories() {
-            this.axios.get('http://localhost:5000/categories')
-            .then(response => {
-                this.categories = this.categories.concat(response.data[0]['categories'])
-            })
-            .catch(error => {
+            try {
+                this.axios.get('http://localhost:5000/categories', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                .then(response => {
+                    if (response.data[1] === 401) {
+                        this.response = response
+                        this.errorNotification = "Your session has expired. Please logout and login again."
+                    } else {
+                        this.categories = this.categories.concat(response.data[0]['categories'])
+                    }
+                })
+                .catch(error => {
+                    this.response = error
+                    this.errorNotification = "Internal Server Error."
+                })
+            } catch (error) {
                 this.response = error
-            })
+                this.errorNotification = "Connection Error."
+            }
         },
+        closeNotification() {
+            this.errorNotification = null
+        },
+        // editMode(product) {
+        //     this.cachedProduct = Object.assign({}, product);
+        //     this.editing = product.id
+        // },
+        // cancelEdit(product) {
+        //     Object.assign(product, this.cachedProduct)
+        //     this.editing = null
+        // },
+        // editProduct(updatedProduct) {
+        //     try {
+        //         this.axios.put('http://localhost:5000/products/edit?id='+updatedProduct.id, {'product': updatedProduct}, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
+        //         .then(response => {
+        //             if (response.data[1] === 401) {
+        //                 this.response = response
+        //                 this.errorNotification = "Your session has expired. Please logout and login again."
+        //             } else {
+        //                 this.response = response
+        //                 this.products = this.products.map(product => product.id === updatedProduct.id ? product: updatedProduct)
+        //             }
+        //         })
+        //         .catch(error => {
+        //             this.response = error
+        //             this.errorNotification = "Internal Server Error."
+        //         })
+        //     } catch(error) {
+        //         this.response = error
+        //         this.errorNotification = "Connection Error."
+        //     }
+        // },
+        // deleteProduct(id) {
+        //     try {
+        //         this.axios.delete('http://localhost:5000/products/delete?id='+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+        //         .then(response => {
+        //             if (response.data[1] === 401) {
+        //                 this.response = response
+        //                 this.errorNotification = "Your session has expired. Please logout and login again."
+        //             } else {
+        //                 this.response = response
+        //                 this.products = this.products.filter(product => product.id !== id);
+        //             }
+        //         })
+        //         .catch(error => {
+        //             this.response = error
+        //             this.errorNotification = "Interval Server Error"
+        //         })
+        //     } catch (error) {
+        //         this.response = error
+        //         this.errorNotification = "Connection Error."
+        //     }
+        // },
     }
 }
 </script>
