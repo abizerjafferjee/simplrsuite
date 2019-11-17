@@ -30,7 +30,11 @@
                 <br>
 
                 <div class="columns">
-                    <div class="column">
+                    <div class="column" v-if="product">
+                        <img :src="require('../assets/uploads/' + product.image_path)" v-if="product.image_path">
+                        <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image" v-else>
+                    </div>
+                    <div class="column" v-else>
                         <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image">
                     </div>
                     <div class="column is-8">

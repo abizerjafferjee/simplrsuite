@@ -8,6 +8,6 @@ class Config(object):
     SECRET_KEY = '5S73gu33234qWSC1O2'
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Qsaxzop15@localhost/thumbtack'
     SQLALCHEMY_ENGINE_OPTIONS = {'pool_size': 100, 'max_overflow':40, 'pool_recycle': 300}
-    UPLOAD_FOLDER = '../vue-app/vue-app/src/assets/uploads'
+    UPLOAD_FOLDER = '../vue-app/vue-app/src/assets/uploads' # the relative path to upload to
 
 

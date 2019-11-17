@@ -47,7 +47,8 @@
                         <div class="column is-3" v-for="product in products" :key="product.id">
                             <div class="card">
                                 <div class="card-image">
-                                    <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image">
+                                    <img :src="require('../assets/uploads/' + product.image_path)" v-if="product.image_path">
+                                    <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image" v-else>
                                 </div>
                                 <div class="card-content is-size-6 has-text-grey">
                                     <div class="content">

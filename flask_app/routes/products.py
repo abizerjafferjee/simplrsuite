@@ -45,12 +45,11 @@ def add(current_user):
         if 'file' in request.files:
             file = request.files['file']
         
-        filepath = None
+        filename = None
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            # filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            filepath = app.config['UPLOAD_FOLDER']+'/'+filename
-            file.save(filepath)
+            write_path = app.config['UPLOAD_FOLDER']+'/'+filename
+            file.save(write_path)
 
         body = json.loads(request.form['body'])
 
@@ -65,7 +64,7 @@ def add(current_user):
             packing = body['packing'],
             currency = body['currency'],
             price = float(body['price']) if body['price'] else None,
-            image_path = filepath,
+            image_path = filename,
             additional_info = body['additional_info']
         )
 

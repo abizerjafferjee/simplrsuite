@@ -9,7 +9,7 @@
                                 Hello, {{ user }}.
                             </h1>
                             <h2 class="subtitle">
-                                Simplr Post helps you manage your product catalogs and track purchases, inventory and payment.
+                                Simplr Suite helps you manage your product catalogs and track purchases, inventory and payment.
                             </h2>
                         </div>
                     </div>
