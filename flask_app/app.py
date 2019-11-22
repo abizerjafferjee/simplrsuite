@@ -26,6 +26,7 @@ def index():
 
 from flask_app.views import *
 
-port = os.getenv('PORT', '5000')
 if __name__ == "__main__":
-    app.run(host='localhost', port=int(port), threaded=True)
+    # port = os.getenv('PORT', '5000')
+    # app.run(host='localhost', port=int(port), threaded=True)
+    app.run(host='0.0.0.0')
