@@ -3,9 +3,11 @@ An all-in-one solution for managing a business and selling through retail and on
 
 Migrations
 
-python manage.py db show heads (not sure)
-
 python manage.py db heads
+
+python manage.py db current
+
+python manage.py db stamp heads
 
 python manage.py db migrate
 
