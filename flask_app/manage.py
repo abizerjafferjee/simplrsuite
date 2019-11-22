@@ -5,7 +5,11 @@ import config
 
 from app import app, db
 
-app.config.from_object(config.Config)
+# app.config.from_object(config.Config)
+if os.environ.get('FLASK_ENVIRONMENT') == 'PROD':
+    app.config.from_object(config.ProductionConfig)
+else:
+    app.config.from_object(config.DevelopmentConfig)
 
 migrate = Migrate(app, db)
 manager = Manager(app)
