@@ -20,6 +20,10 @@ ma = Marshmallow(app)
 # enable CORS
 cors = CORS(app)
 
+@app.route('/')
+def index():
+    return '<h1>Simplr Suite is lives</h1>'
+
 from flask_app.views import *
 
 port = os.getenv('PORT', '5000')
