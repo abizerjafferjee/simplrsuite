@@ -4,8 +4,8 @@ from flask import render_template, jsonify, request, redirect, url_for, flash, m
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import json
-import pandas as pd
-from numpy import genfromtxt
+# import pandas as pd
+# from numpy import genfromtxt
 
 from flask_app.routes.auth import AuthRoutes
 from flask_app.routes.products import ProductRoutes
