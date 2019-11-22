@@ -6,10 +6,13 @@ from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 
 # internal imports
-from flask_app.config import Config
+from flask_app.config import *
 
 app = Flask(__name__)
-app.config.from_object(Config)
+if os.environ.get('FLASK_ENVIRONMENT') == 'PROD':
+    app.config.from_object(ProductionConfig)
+else:
+    app.config.from_object(DevelopmentConfig)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app, engine_options=app.config['SQLALCHEMY_ENGINE_OPTIONS'])
 ma = Marshmallow(app)
@@ -21,4 +24,4 @@ from flask_app.views import *
 
 port = os.getenv('PORT', '5000')
 if __name__ == "__main__":
-    app.run(debug=False, host='localhost', port=int(port), threaded=True)
+    app.run(host='localhost', port=int(port), threaded=True)
