@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { isValidJwt, EventBus } from '../utils'
+import { isValidJwt } from '../utils'
 
 Vue.use(Vuex)
 
