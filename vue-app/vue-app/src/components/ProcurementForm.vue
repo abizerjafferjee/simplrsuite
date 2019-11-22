@@ -201,7 +201,7 @@ export default {
         },
         addProcurement() {
             try {
-                this.axios.post('http://localhost:5000/inventory', {'body': this.procurement}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('inventory', {'body': this.procurement}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -264,7 +264,7 @@ export default {
         },
         getProductNames() {
             try {
-                this.axios.get('http://localhost:5000/products/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('products/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -285,7 +285,7 @@ export default {
         },
         getSupplierNames() {
             try {
-                this.axios.get('http://localhost:5000/suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response

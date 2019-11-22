@@ -241,7 +241,7 @@ export default {
         },
         getOutstandingPayments(page) {
             try {
-                this.axios.get('http://localhost:5000/payments/due?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('payments/due?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -278,7 +278,7 @@ export default {
         },
         getOutstandingUninvoiced(page) {
             try {
-                this.axios.get('http://localhost:5000/payments/due/uninvoiced?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('payments/due/uninvoiced?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -301,7 +301,7 @@ export default {
         },
         getPaymentsMade(page) {
             try {
-                this.axios.get('http://localhost:5000/payments/made?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('payments/made?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -324,7 +324,7 @@ export default {
         },
         getPaymentStats() {
             try {
-                this.axios.get('http://localhost:5000/payments/stats', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('payments/stats', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -345,7 +345,7 @@ export default {
         recordInvoicedPayment(index) {
             try {
                 var outstandingInvoices = this.outstandingPayments[index]
-                this.axios.post('http://localhost:5000/payments', {'body': outstandingInvoices, 'from': 'view-invoiced'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('payments', {'body': outstandingInvoices, 'from': 'view-invoiced'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -367,7 +367,7 @@ export default {
         recordUninvoicedPayment(index) {
             try {
                 var outstandingUninvoiced = this.outstandingUninvoiced[index]
-                this.axios.post('http://localhost:5000/payments', {'body': outstandingUninvoiced, 'from': 'view-uninvoiced'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('payments', {'body': outstandingUninvoiced, 'from': 'view-uninvoiced'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -388,7 +388,7 @@ export default {
         },
         deletePayment(id) {
             try {
-                this.axios.delete('http://localhost:5000/payment/'+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.delete('payment/'+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response

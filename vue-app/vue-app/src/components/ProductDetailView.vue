@@ -215,7 +215,7 @@ export default {
         },
         getProduct() {
             try {
-                this.axios.get('http://localhost:5000/products/'+this.productId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('products/'+this.productId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -240,7 +240,7 @@ export default {
         },
         getInventory() {
             try {
-                this.axios.get('http://localhost:5000/inventory/'+this.inventoryId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('inventory/'+this.inventoryId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -260,7 +260,7 @@ export default {
         },
         saveProduct() {
             try {
-                this.axios.put('http://localhost:5000/products?id='+this.product.id, {'body': this.product}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
+                this.axios.put('products?id='+this.product.id, {'body': this.product}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -282,7 +282,7 @@ export default {
         },
         saveInventory() {
             try {
-                this.axios.put('http://localhost:5000/inventory?id='+this.inventory.id, {'body': this.inventory}, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
+                this.axios.put('inventory?id='+this.inventory.id, {'body': this.inventory}, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -304,7 +304,7 @@ export default {
         },
         getProcurement(page) {
             try {
-                this.axios.get('http://localhost:5000/procurement/product/'+this.product.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('procurement/product/'+this.product.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response

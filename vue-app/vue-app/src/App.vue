@@ -91,7 +91,7 @@ export default {
       try {
         if (isAuthenticated) {
           var jwt = this.$store.state.jwt
-          this.axios.get('http://localhost:5000/profile', { headers: { Authorization: `Bearer: ${jwt}`}})
+          this.axios.get('profile', { headers: { Authorization: `Bearer: ${jwt}`}})
           .then(response => {
             this.isAuthenticated = true
             this.user = response.data[0]['user']

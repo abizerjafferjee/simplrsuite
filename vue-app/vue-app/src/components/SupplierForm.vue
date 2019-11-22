@@ -156,7 +156,7 @@ export default {
         },
         addSupplier() {
             try {
-                this.axios.post('http://localhost:5000/suppliers', {'body': this.supplier}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('suppliers', {'body': this.supplier}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response

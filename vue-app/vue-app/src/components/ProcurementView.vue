@@ -115,7 +115,7 @@ export default {
     methods: {
         getProcurements(page) {
             try {
-                this.axios.get('http://localhost:5000/procurement?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('procurement?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -146,7 +146,7 @@ export default {
         },
         editProcurement(updatedProcurement) {
             try {
-                this.axios.put('http://localhost:5000/procurement?id='+updatedProcurement.id, {'body': updatedProcurement}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
+                this.axios.put('procurement?id='+updatedProcurement.id, {'body': updatedProcurement}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -168,7 +168,7 @@ export default {
         },
         deleteProcurement(id) {
             try {
-                this.axios.delete('http://localhost:5000/procurement?id='+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.delete('procurement?id='+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response

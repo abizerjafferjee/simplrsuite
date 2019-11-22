@@ -305,7 +305,7 @@ export default {
         },
         getSupplier() {
             try {
-                this.axios.get('http://localhost:5000/suppliers/'+this.supplierId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('suppliers/'+this.supplierId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -327,7 +327,7 @@ export default {
         },
         saveSupplier() {
             try {
-                this.axios.put('http://localhost:5000/products?id='+this.supplier.id, {'body': this.supplier}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
+                this.axios.put('products?id='+this.supplier.id, {'body': this.supplier}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -349,7 +349,7 @@ export default {
         },
         getProcurement(page) {
             try {
-                this.axios.get('http://localhost:5000/procurement/supplier/'+this.supplier.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('procurement/supplier/'+this.supplier.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -372,7 +372,7 @@ export default {
         },
         getPayments(page) {
             try {
-                this.axios.get('http://localhost:5000/payments/supplier/'+this.supplier.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('payments/supplier/'+this.supplier.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response

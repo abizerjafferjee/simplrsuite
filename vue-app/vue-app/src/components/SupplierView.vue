@@ -113,7 +113,7 @@ export default {
     methods: {
         getSuppliers(page) {
             try {
-                this.axios.get('http://localhost:5000/suppliers?page='+page+'&search='+this.search.text, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('suppliers?page='+page+'&search='+this.search.text, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response

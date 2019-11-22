@@ -96,7 +96,7 @@ export default {
         signup() {
             try {
                 this.$store.commit('setUserData', this.user.email)
-                this.axios.post('http://localhost:5000/signup', {'body': this.user})
+                this.axios.post('signup', {'body': this.user})
                 .then(response => {
                     if (response.data[0]['success']) {
                         this.showSuccess()

@@ -166,7 +166,7 @@ export default {
         },
         recordPayment() { 
             try {
-                this.axios.post('http://localhost:5000/payments', {'body': this.payment, 'from': 'form'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('payments', {'body': this.payment, 'from': 'form'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -196,7 +196,7 @@ export default {
         },
         getSupplierNames() {
             try {
-                this.axios.get('http://localhost:5000/suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -217,7 +217,7 @@ export default {
         },
         getOutStandingInvoices(){
             try {
-                this.axios.get('http://localhost:5000/payments/due/' + this.payment.supplier_id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('payments/due/' + this.payment.supplier_id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response

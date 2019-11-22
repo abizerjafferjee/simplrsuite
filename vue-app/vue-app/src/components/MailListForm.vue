@@ -114,7 +114,7 @@ export default {
        return {
            submitting: false,
            error: false,
-           error: [],
+           errors: [],
            errorNotification: null,
            success: false,
            contact: {
@@ -167,7 +167,7 @@ export default {
         },
         addContact() {
             try {
-                this.axios.post('http://localhost:5000/maillist', {'body': this.contact}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('maillist', {'body': this.contact}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -189,7 +189,7 @@ export default {
         },
         getMaillist(page) {
             try {
-                this.axios.get('http://localhost:5000/maillist?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('maillist?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response

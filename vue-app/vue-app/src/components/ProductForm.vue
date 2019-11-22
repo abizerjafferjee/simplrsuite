@@ -207,7 +207,7 @@ export default {
                 formData.append('file', this.product_file)
                 formData.append('body', JSON.stringify(this.product))
                 
-                this.axios.post('http://localhost:5000/products', formData, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
+                this.axios.post('products', formData, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -240,7 +240,7 @@ export default {
            }
         },
         getCategories() {
-                this.axios.get('http://localhost:5000/categories', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('categories', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response
@@ -268,7 +268,7 @@ export default {
         },
         addCategory(category) {
             try {
-                this.axios.post('http://localhost:5000/categories', {'body': category}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('categories', {'body': category}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
                         this.response = response

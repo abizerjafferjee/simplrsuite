@@ -92,7 +92,7 @@ export default {
         signin() {
             try {
                 this.$store.commit('setUserData', this.user.email)
-                this.axios.post('http://localhost:5000/login', {'body': this.user})
+                this.axios.post('login', {'body': this.user})
                 .then(response => {
                     if (response.data[0]['success']) {
                         this.$store.commit('setJwtToken', response.data[0]['token'])
@@ -104,12 +104,10 @@ export default {
                     }
                 })
                 .catch(e => {
-                    console.log(e)
                     this.response = e
                     this.showError()
                 })
             } catch (error) {
-                console.log(error)
                 this.response = error
                 this.showError()
             }

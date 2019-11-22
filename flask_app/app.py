@@ -7,6 +7,7 @@ from flask_cors import CORS
 
 # internal imports
 from flask_app.config import Config
+from flask_app.views import *
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -17,7 +18,6 @@ ma = Marshmallow(app)
 # enable CORS
 cors = CORS(app)
 
-from flask_app.views import *
 
 port = os.getenv('PORT', '5000')
 if __name__ == "__main__":
