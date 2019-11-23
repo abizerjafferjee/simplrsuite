@@ -20,7 +20,7 @@ ma = Marshmallow(app)
 # enable CORS
 cors = CORS(app)
 
-@app.route('/')
+@app.route('/api')
 def index():
     return '<h1>Simplr Suite is lives</h1>'
 

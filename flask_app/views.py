@@ -15,12 +15,14 @@ from flask_app.routes.inventory import InventoryRoutes
 from flask_app.routes.payments import PaymentRoutes
 from flask_app.routes.customers import CustomerRoutes
 
-app.register_blueprint(AuthRoutes)
-app.register_blueprint(ProductRoutes)
-app.register_blueprint(CategoryRoutes)
-app.register_blueprint(SupplierRoutes)
-app.register_blueprint(InventoryRoutes)
-app.register_blueprint(PaymentRoutes)
-app.register_blueprint(CustomerRoutes)
+prefix = '/api'
+
+app.register_blueprint(AuthRoutes, url_prefix=prefix)
+app.register_blueprint(ProductRoutes, url_prefix=prefix)
+app.register_blueprint(CategoryRoutes, url_prefix=prefix)
+app.register_blueprint(SupplierRoutes, url_prefix=prefix)
+app.register_blueprint(InventoryRoutes, url_prefix=prefix)
+app.register_blueprint(PaymentRoutes, url_prefix=prefix)
+app.register_blueprint(CustomerRoutes, url_prefix=prefix)
 
 from flask_app.models import *
