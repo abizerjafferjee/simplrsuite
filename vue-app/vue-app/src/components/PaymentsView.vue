@@ -248,6 +248,8 @@ export default {
                         this.errorNotification = "Your session has expired. Please logout and login again."
                     } else {
                         this.outstandingPayments = response.data[0].body
+                        /* eslint-disable no-console */
+                        console.log(this.outstandingPayments)
                         if (this.outstandingPayments) {
                             this.outstandingPayments = this.filterUniqueInvoices(this.outstandingPayments)
                         }
