@@ -258,7 +258,7 @@ export default {
                 })
                 .catch(e => {
                     this.response = e
-                    this.errorNotification = "Internal Server Error."
+                    this.errorNotification = "Internal Server Error: get outstanding payments."
                 })
             } catch (error) {
                 this.response = error
@@ -294,7 +294,7 @@ export default {
                 })
                 .catch(e => {
                     this.response = e
-                    this.errorNotification = "Internal Server Error."
+                    this.errorNotification = "Internal Server Error: get outstanding uninvoiced."
                 })
             } catch (error) {
                 this.response = error
@@ -317,7 +317,7 @@ export default {
                 })
                 .catch(e => {
                     this.response = e
-                    this.errorNotification = "Internal Server Error."
+                    this.errorNotification = "Internal Server Error (get payments made)."
                 })
             } catch (error) {
                 this.response = error
@@ -337,7 +337,7 @@ export default {
                 })
                 .catch(e => {
                     this.response = e
-                    this.errorNotification = "Internal Server Error."
+                    this.errorNotification = "Internal Server Error (payment stats)."
                 })
             } catch (error) {
                 this.response = error
@@ -359,7 +359,7 @@ export default {
                 })
                 .catch(e => {
                     this.response = e
-                    this.errorNotification = "Internal Server Error."
+                    this.errorNotification = "Internal Server Error (record invoiced payment)."
                 })
             } catch (error) {
                 this.response = error
@@ -381,7 +381,7 @@ export default {
                 })
                 .catch(e => {
                     this.response = e
-                    this.errorNotification = "Internal Server Error."
+                    this.errorNotification = "Internal Server Error (record uninvoiced payment)."
                 })
             } catch (error) {
                 this.response = error
@@ -402,7 +402,7 @@ export default {
                 })
                 .catch(error => {
                     this.response = error
-                    this.errorNotification = "Internal Server Error."
+                    this.errorNotification = "Internal Server Error (delete payment)."
                 })
             } catch (error) {
                 this.response = error
