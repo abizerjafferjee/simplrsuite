@@ -178,10 +178,11 @@ def get_invoices_due(current_user):
                        func.min(Supplier.business_name).label('business_name'))\
         .group_by(Procurement.supplier_id)\
         .paginate(page=page, per_page=per_page, error_out=False)
+        
+    schema = OutstandingPaymentsSchema(many=True)
+    output = schema.dump(outstanding_by_supplier.items)
 
-    print(outstanding_by_supplier.items)
-
-    return make_response(jsonify({'success': True, 'body': outstanding_by_supplier.items,
+    return make_response(jsonify({'success': True, 'body': output,
                                   'page': outstanding_by_supplier.page, 'prev': outstanding_by_supplier.has_prev,
                                   'next': outstanding_by_supplier.has_next}, 200))
 
