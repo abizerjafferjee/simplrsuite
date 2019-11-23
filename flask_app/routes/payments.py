@@ -179,6 +179,8 @@ def get_invoices_due(current_user):
         .group_by(Procurement.supplier_id)\
         .paginate(page=page, per_page=per_page, error_out=False)
 
+    print(outstanding_by_supplier.items)
+
     return make_response(jsonify({'success': True, 'body': outstanding_by_supplier.items,
                                   'page': outstanding_by_supplier.page, 'prev': outstanding_by_supplier.has_prev,
                                   'next': outstanding_by_supplier.has_next}, 200))
