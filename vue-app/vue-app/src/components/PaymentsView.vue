@@ -63,7 +63,7 @@
                                     </p>
                                 </header>
                                 <div class="card-table" style="height:500px">
-                                    <div class="content" v-if="outstandingPayments.length > 0">
+                                    <div class="content" v-if="outstandingPayments && outstandingPayments.length > 0">
                                         <table class="table is-fullwidth is-striped">
                                             <tbody>
                                                 <tr>
@@ -75,7 +75,7 @@
                                                 <tr v-for="(payment, index) in outstandingPayments" v-bind:key="index">
                                                     <td>{{ payment.business_name }} ({{ payment.supplier_id }})</td>
                                                     <td>TZS {{ payment.total_cost | currency }}</td>
-                                                    <td>{{ payment.invoices.length }} Invoices</td>
+                                                    <td v-if="payment.invoices">{{ payment.invoices.length }} Invoices</td>
                                                     <td><a class="button is-primary" @click="recordInvoicedPayment(index)"><font-awesome-icon class="icon has-text-white" icon="check" size="sm" /></a></td>
                                                 </tr>
                                             </tbody>
@@ -100,7 +100,7 @@
                                     </p>
                                 </header>
                                 <div class="card-table" style="height:500px">
-                                    <div class="content" v-if="paymentsMade.length > 0">
+                                    <div class="content" v-if="paymentsMade && paymentsMade.length > 0">
                                         <table class="table is-fullwidth is-striped">
                                             <tbody>
                                                 <tr>          
@@ -142,7 +142,7 @@
                                     </p>
                                 </header>
                                 <div class="card-table" style="height:500px">
-                                    <div class="content" v-if="outstandingUninvoiced.length> 0">
+                                    <div class="content" v-if="outstandingUninvoiced && outstandingUninvoiced.length> 0">
                                         <table class="table is-fullwidth is-striped">
                                             <tbody>
                                                 <tr>
@@ -248,7 +248,9 @@ export default {
                         this.errorNotification = "Your session has expired. Please logout and login again."
                     } else {
                         this.outstandingPayments = response.data[0].body
-                        this.outstandingPayments = this.filterUniqueInvoices(this.outstandingPayments)
+                        if (this.outstandingPayments) {
+                            this.outstandingPayments = this.filterUniqueInvoices(this.outstandingPayments)
+                        }
                         this.pagesOutstanding.page = response.data[0].page
                         this.pagesOutstanding.next = response.data[0].next
                         this.pagesOutstanding.prev = response.data[0].prev
