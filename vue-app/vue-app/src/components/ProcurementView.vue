@@ -58,7 +58,7 @@
                             <td v-if="editing === procurement.id"><input type="number" v-model="procurement.total_cost"></td>
                             <td v-else>{{ procurement.total_cost | currency }}</td>
                             <td>{{ procurement.created | date }}</td>
-                            <td><span v-bind:class="{'tag is-success': procurement.paid === 'Paid', 'tag is-danger': procurement.paid === 'Unpaid'}">{{ procurement.paid }}</span></td>
+                            <td><span v-bind:class="{'tag is-success': procurement.paid === true, 'tag is-danger': procurement.paid === false}">{{ procurement.paid }}</span></td>
                             <td v-if="editing == procurement.id">
                                 <button class="button is-small is-success" @click="editProcurement(procurement)">save</button>
                                 <button class="button is-small muted-button" @click="cancelEdit(procurement)">cancel</button>
@@ -199,5 +199,8 @@ export default {
 <style scoped>
 button {
     margin: 0 0.5 rem 0;
+}
+.font-margin {
+    margin: 0px 5px 0px 0px;
 }
 </style>

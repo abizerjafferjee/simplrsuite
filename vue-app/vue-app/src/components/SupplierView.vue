@@ -43,8 +43,8 @@
                             <article class="media">
                                 <div class="media-content">
                                     <div class="content">
-                                        <p class="title is-3">
-                                            <router-link :to="{ path: '/supplier-detail', query: {supplierId: supplier.id}}">{{ supplier.business_name }}</router-link>
+                                        <p class="title is-3 has-text-link">
+                                            {{ supplier.business_name }}
                                         </p>
                                     </div>
                                     <div class="level is-mobile">

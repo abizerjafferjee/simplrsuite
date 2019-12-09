@@ -16,10 +16,22 @@ def get(current_user):
     Get all categories from db
     """
     try:
-        categories = Category.query.filter(Category.user==current_user.id)
-        category_schema = CategorySchema(many=True)
-        output = category_schema.dump(categories)
-        return make_response(jsonify({'success':True, 'categories': output}, 200))    
+        per_page = 10
+        page = request.args.get('page', type=int)
+        if page:
+            categories = Category.query\
+                .filter(Category.user==current_user.id)\
+                .paginate(page=page, per_page=per_page, error_out=False)
+            category_schema = CategorySchema(many=True)
+            output = category_schema.dump(categories.items)
+            return make_response(jsonify({'success':True, 'categories': output,
+                                        'page': categories.page, 'prev': categories.has_prev,
+                                        'next': categories.has_next}, 200))   
+        else:
+            categories = Category.query.filter(Category.user==current_user.id)
+            category_schema = CategorySchema(many=True)
+            output = category_schema.dump(categories)
+            return make_response(jsonify({'success':True, 'categories': output}, 200))    
 
     except Exception as e:
         print(e)
@@ -39,9 +51,46 @@ def add(current_user):
             )
         db.session.add(new_category)
         db.session.commit()
-        category_schema = CategorySchema()
-        output = category_schema.dump(new_category)
-        return make_response(jsonify({'success': True, 'category':output}, 200))
+        # category_schema = CategorySchema()
+        # output = category_schema.dump(new_category)
+        return make_response(jsonify({'success': True}, 200))
+
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'success': False}, 400))
+
+@CategoryRoutes.route('/categories', methods=['DELETE'])
+@token_required
+def delete(current_user):
+    """
+    Delete a supplier in db by id
+    """
+    try:
+        id = request.args.get('id', type=int)
+        Category.query.filter_by(id=id).delete()
+        db.session.commit()
+        return make_response(jsonify({'success': True}, 200))
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'success': False}, 400))
+
+@CategoryRoutes.route('/categories', methods=['PUT'])
+@token_required
+def update(current_user):
+    """
+    Handles get request for getting a supplier by id, post request for adding
+    new supplier and put request for editing a supplier's information.
+    """
+    try:        
+        id = request.args.get('id', type=int)
+        req = json.loads(request.data)
+        body = req['body']
+        category = Category.query.get(id)
+
+        category.name = body['name'],
+        db.session.commit()
+
+        return make_response(jsonify({'success': True}, 200))
 
     except Exception as e:
         print(e)

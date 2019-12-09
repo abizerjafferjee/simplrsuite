@@ -1,99 +1,102 @@
 <template>
     <div id="product-form">
 
-        <div class="tile is-parent">
-            <article class="tile is-child">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><router-link to="/payments">Payments</router-link></li>
+            <li class="is-active">
+                <a aria-current="page">Record Payment</a>
+            </li>
+        </ul>
+        </nav>
 
-                <nav class="breadcrumb" aria-label="breadcrumbs">
-                <ul>
-                    <li><router-link to="/payments">Payments</router-link></li>
-                    <li class="is-active">
-                        <a aria-current="page">Record Payment</a>
-                    </li>
-                </ul>
-                </nav>
+        <!-- <section class="hero is-info welcome is-small">
+            <div class="hero-body">
+                <div class="container">
+                    <p class="title">Record a Payment</p>
+                    <p class="subtitle">Add a record of a payment that you have made. Record an invoice payment, a payment for another purchase or a custom amount that you have paid.</p>
+                </div>
+            </div>
+        </section> -->
 
-                <section class="hero welcome is-small has-background-light">
-                    <div class="hero-body">
-                        <div class="container">
-                            <p class="title">Record Payment</p>
-                            <p class="subtitle">Select the invoices you want to record payment for and keep your outstanding amounts in check</p>
-                        </div>
-                    </div>
-                </section>
+        <div class="notification" v-if="errorNotification">
+            <button @click="closeNotification" class="delete"></button>
+            {{ errorNotification }}
+        </div>         
 
-                <div class="notification" v-if="errorNotification">
-                    <button @click="closeNotification" class="delete"></button>
-                    {{ errorNotification }}
-                </div>         
-                <br>
-
-                <section>
-                    <div class="content">
-                        <div v-if="error && submitting">
-                            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
-                        </div>
-                        <p v-if="success" class="notification is-success">Payment recorded successfully.</p>
-
-                        <form @submit.prevent="handleSubmit">
-
-                            <label class="label">* Supplier</label>
+        <section>
+            <form @submit.prevent="handleSubmit">
+                <div class="card card-content has-background-light">
+                    <div class="columns">
+                        <div class="column is-three-fifths">
+                            <label class="label">Supplier</label>
                             <div class="field is-grouped">
                                 <div class="control is-expanded">
-                                    <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="payment.supplier_id" placeholder="select item"></model-select>
+                                    <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="suppliers" v-model="payment.supplier_id" placeholder="select item"></model-select>
                                 </div>
                                 <div class="control"><router-link to="/add-supplier" class="button">Add Supplier</router-link></div>
                             </div>
+                        </div>
+                        <div class="column">
+                            <label class="label">Payment Date</label>
+                            <input class="input" ref="date" @focus="clearStatus" @keypress="clearStatus" v-model="payment.date" type="date"/>
+                        </div>
+                        <div class="column">
+                            <label class="label">Receipt Number</label>
+                            <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="payment.receipt" type="text"/>
+                        </div>
+                    </div>                       
 
-                            <label class="label">Total Amount</label>
-                            <div class="field has-addons">
-                                <p class="control">
-                                    <span class="select">
-                                    <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="payment.currency" type="text">
-                                        <option>TZS</option>
-                                        <option>KES</option>
-                                        <option>USD</option>
-                                        <option>RMB</option>
-                                        <option>AED</option>
-                                    </select>
-                                    </span>
-                                </p>
-                                <p class="control is-expanded">
-                                    <input ref="amount" @focus="clearStatus" @keypress="clearStatus" v-model="payment.amount" class="input" type="number" placeholder=5000>
-                                </p>
-                            </div>
+                    <label class="label">Click the checkbox next to the invoices that you want to include in your payment record.</label>
+                    <p v-if="payment.supplier_id === null">Select a supplier to show outstanding invoices</p>
+                    <p v-if="invoices.length === 0 && payment.supplier_id">This supplier has 0 outstanding invoices.</p>
 
-                            <label class="label">Invoices</label>
-                            <p v-if="payment.supplier_id === null">Select a supplier to show outstanding invoices</p>
-                            <table class="table" v-else>
-                                <tbody>
-                                    <tr v-for="(invoice, index) in outStandingInvoices" v-bind:key="index">
-                                        <td>{{ invoice.invoice }}</td>
-                                        <td>{{ invoice.total_cost }}</td>
-                                        <td>{{ invoice.created }}</td>
-                                        <td><input :id="invoice.invoice" :value="invoice.invoice" name="invoice" type="checkbox" v-model="payment.invoices" /></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <table class="table" v-if="invoices.length > 0 && payment.supplier_id">
+                        <thead>
+                            <td>Invoice Number</td>
+                            <td>Amount</td>
+                            <td>Date</td>
+                            <td></td>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(invoice, index) in invoices" v-bind:key="index">
+                                <td>{{ invoice.invoice_number }}</td>
+                                <td>{{ invoice.currency }} {{ invoice.total_cost | currency }}</td>
+                                <td>{{ invoice.date }}</td>
+                                <td><input :id="invoice.id" :value="invoice.id" name="invoice" type="checkbox" v-model="payment.invoices" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                            <p v-if="payment_caution_flag" class="error-message">!Caution: Total sum of invoices does not match total amount.
-                                If you submit the unmatched amount, selected invoices will still be recorded as paid.</p>
-
-                            <label class="label">Additional Info</label>
-                            <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="payment.additional_info" placeholder="e.g. Product description, dimensions, weight and colors."></textarea></div>
-                            
-                            <button id="submit" class="button is-primary">Record Payment</button>
-                        </form>
+                    <div class="columns">
+                        <div class="column is-one-fifth">
+                            <label class="label">Method of Payment</label>
+                            <model-select class="input" ref="payment_type" @focus="clearStatus" @keypress="clearStatus" :options="paymentTypes" v-model="payment.payment_type" placeholder="select item"></model-select>
+                        </div>
+                        <div class="column is-one-fifth" v-if="payment.payment_type === 'CHEQUE'">
+                            <label class="label">Cheque No.</label>
+                            <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="payment.cheque" type="text"/>
+                        </div>
+                        <div class="column is-one-fifth" v-if="payment.payment_type === 'BANK'">
+                            <label class="label">Bank Transfer Ref.</label>
+                            <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="payment.bank_transfer" type="text"/>
+                        </div>
                     </div>
-                </section>
-            </article>
-        </div>
+
+                    <button id="submit" class="button is-primary">Record Payment</button>
+    
+                </div>
+
+            </form>
+        </section>
 
     </div>
 </template>
 
 <script>
 import { ModelSelect } from 'vue-search-select'
+var numeral = require("numeral");
+import moment from 'moment'
 
 export default {
    name: 'payments-form',
@@ -102,42 +105,51 @@ export default {
     },
    data() {
        return {
+           jwt: '',
            submitting: false,
            error: false,
            success: false,
            response: null,
            errors: [],
            errorNotification: null,
-           payment_caution_flag: false,
+           paymentTypes:[
+                {'text': 'Cheque', value: 'CHEQUE'},
+                {'text': 'Bank Transfer', value: 'BANK'},
+                {'text': 'Cash', value: 'CASH'}
+           ],
            payment: {
                supplier_id: null,
-               amount: 0,
                invoices: [],
                currency: "TZS",
-               additional_info: null,
+               payment_type: null,
+               receipt: null,
+               cheque: null,
+               bank_transfer: null,
+               reason: null,
            },
-           supplierNames: [],
-           outStandingInvoices: [],
-           jwt: ''
+           suppliers: [],
+           invoices: [],
        }
    },
    created: function() {
        this.jwt = this.$store.state.jwt
-       this.getSupplierNames()
+       this.getSuppliers()
    },
    watch: {
        'payment.supplier_id': function() {
-           this.getOutStandingInvoices()
+           if (this.payment.supplier_id) {
+               this.getInvoices()
+           }
        },
-       'payment.amount': function() {
-           if (this.payment.invoices.length > 0) {
-               this.invalidAmount()
-           }    
-       },
-       'payment.invoices': function() {
-           this.invalidAmount()
-       }
    },
+    filters: {
+        currency: function (value) {
+            return numeral(value).format("0,0")
+        },
+        date: function (value) {
+            return moment(String(value)).format('L')
+        }
+    },
    methods: {
         handleSubmit() {
             this.submitting = true
@@ -166,7 +178,7 @@ export default {
         },
         recordPayment() { 
             try {
-                this.axios.post('payments', {'body': this.payment, 'from': 'form'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('payment', {'body': this.payment}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -190,11 +202,16 @@ export default {
                supplier_id: null,
                amount: 0,
                invoices: [],
+               purchases: [],
                currency: "TZS",
-               additional_info: null,
+               payment_type: null,
+               receipt: null,
+               cheque: null,
+               bank_transfer: null,
+               reason: null,
            }
         },
-        getSupplierNames() {
+        getSuppliers() {
             try {
                 this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
@@ -202,7 +219,7 @@ export default {
                         this.response = response
                         this.errorNotification = "Your session has expired. Please logout and login again."
                     } else {
-                        this.supplierNames = response.data[0]['suppliers']
+                        this.suppliers = response.data[0]['suppliers']
                     }
                 })
                 .catch(e => {
@@ -215,15 +232,16 @@ export default {
                 this.errorNotification = "Connection Error."
             }
         },
-        getOutStandingInvoices(){
+        getInvoices(){
             try {
-                this.axios.get('payments/due/' + this.payment.supplier_id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.get('invoices/' + this.payment.supplier_id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
                         this.errorNotification = "Your session has expired. Please logout and login again."
                     } else {
-                        this.outStandingInvoices = response.data[0]['body']
+                        this.invoices = response.data[0]['body']
+                        console.log(this.invoices)
                     }
                 })
                 .catch(e => {
@@ -243,23 +261,9 @@ export default {
             }
             return false
         },
-        invalidAmount() {
-           var sum = 0
-           for (var i=0; i < this.outStandingInvoices.length; i++) {
-               if (this.payment.invoices.includes(this.outStandingInvoices[i]['invoice'])) {
-                   sum += this.outStandingInvoices[i]['total_cost']
-               }
-           }
-
-           if (sum !== Number(this.payment.amount)) {
-               this.payment_caution_flag = true
-           } else {
-               this.payment_caution_flag = false
-           }
-        },
         closeNotification() {
             this.errorNotification = null
-        }
+        },
     }
 }
 </script>

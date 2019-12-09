@@ -1,207 +1,287 @@
 <template>
     <div id="product-form">
 
-        <div class="tile is-parent">
-            <article class="tile is-child">
-                <nav class="breadcrumb" aria-label="breadcrumbs">
-                <ul>
-                    <li><router-link to="/inventory">Inventory</router-link></li>
-                    <li class="is-active">
-                        <a aria-current="page">Add Inventory</a>
-                    </li>
-                </ul>
-                </nav>
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                <li><router-link to="/inventory">Purchases</router-link></li>
+                <li class="is-active">
+                    <a aria-current="page">Add Invoice</a>
+                </li>
+            </ul>
+        </nav>
 
-                <section class="hero welcome is-small has-background-light">
-                    <div class="hero-body">
-                        <div class="container">
-                            <p class="title">Adds to your inventory, tracks invoices and payments</p>
-                        </div>
-                    </div>
-                </section>
-
-                <div class="notification" v-if="errorNotification">
-                    <button @click="closeNotification" class="delete"></button>
-                    {{ errorNotification }}
-                </div>         
-                <br>
-
-                <section>
-                    <div class="content">
-                        <div v-if="error && submitting">
-                            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
-                        </div>
-                        <p v-if="success" class="notification is-success">Successfully added to Inventory</p>
-                        
-                        <br>
-                        <form @submit.prevent="handleSubmit">
-
-                            <p class="title is-size-4">Add Inventory</p>
-
-                            <label class="label">* Product</label>
-                            <div class="field is-grouped">
-                                <div class="control is-expanded">
-                                    <model-select class="input" ref="product" @focus="clearStatus" @keypress="clearStatus" :options="productNames" v-model="procurement.product" placeholder="select item"></model-select>
-                                </div>
-                                <div class="control"><router-link to="/add-product" class="button">Add Product</router-link></div>
-                            </div>
-
-                            <label class="label">* Quantity</label>
-                            <div class="field is-horizontal">
-                                <div class="field-body">
-                                    <div class="field is-expanded">
-                                    <div class="field has-addons">
-                                        <p class="control"><a class="button is-light">Units</a></p>
-                                        <p class="control is-expanded">
-                                        <input class="input" ref="quantity" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.quantity" type="number" placeholder="e.g. 10"/>
-                                        </p>
-                                    </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p class="title is-size-4">Record Procurement</p>
-
-                            <label class="label">* Supplier</label>
-                            <div class="field is-grouped">
-                                <div class="control is-expanded">
-                                    <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="supplierNames" v-model="procurement.supplier" placeholder="select item"></model-select>
-                                </div>
-                                <div class="control"><router-link to="/add-supplier" class="button">Add Supplier</router-link></div>
-                                
-                            </div>
-                            
-                            <label class="label">Location</label>
-                            <input class="input" ref="location" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.location" type="text" placeholder="e.g. Shop or Warehouse"/>
-
-                            <label class="label">Invoice Number</label>
-                            <input class="input" ref="invoice" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.invoice" type="text" placeholder=""/>
-
-                            <label class="label">* Unit Cost</label>
-                            <div class="field has-addons">
-                                <p class="control">
-                                    <span class="select">
-                                    <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.currency" type="text">
-                                        <option>TZS</option>
-                                        <option>KES</option>
-                                        <option>USD</option>
-                                        <option>RMB</option>
-                                        <option>AED</option>
-                                    </select>
-                                    </span>
-                                </p>
-                                <p class="control is-expanded">
-                                    <input class="input" ref="unit_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.unit_cost" type="number" placeholder="e.g. 1000"/>
-                                </p>
-                            </div>
-
-                            <label class="label">* Total Cost</label>
-                            <div class="field has-addons">
-                                <p class="control">
-                                    <span class="select">
-                                    <select class="button is-light" ref="currency" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.currency" type="text">
-                                        <option>TZS</option>
-                                        <option>KES</option>
-                                        <option>USD</option>
-                                        <option>RMB</option>
-                                        <option>AED</option>
-                                    </select>
-                                    </span>
-                                </p>
-                                <p class="control is-expanded">
-                                    <input class="input" ref="total_cost" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.total_cost" type="number" placeholder="e.g. 50000" />
-                                </p>
-                                <p class="control">
-                                    <label class="checkbox"><input type="checkbox" @click="checkbox()">Unit Cost * Quantity</label>
-                                </p>
-                            </div>
-
-                            <label class="label">* Paid</label>
-                            <div class="field is-horizontal">
-                                <select class="input" ref="paid" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.paid" type="text">
-                                    <option>Paid</option>
-                                    <option>Unpaid</option>
-                                </select>
-                            </div>
-
-                            <label class="label">Additional Info</label>
-                            <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="procurement.additional_info" placeholder="e.g. Delivery note number for reference, note of damage to goods etc"></textarea></div>
-                            
-                            <button id="submit" class="button is-primary">Add</button>
-                        </form>
-                    </div>
-                </section>
-
-            </article>
+        <div class="notification" v-if="errorNotification">
+            <button @click="closeNotification" class="delete"></button>
+            {{ errorNotification }}
         </div>
+
+        <div v-if="error && submitting">
+            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+        </div>
+        <p v-if="success" class="notification is-success">Successfully added the invoice</p>         
+
+        <section>
+            <form>
+                <div class="card card-content has-background-light">
+                    <div class="columns">
+                        <div class="column is-two-fifths">
+                            <label class="label">Supplier</label>
+                            <div class="field is-grouped">
+                                <div class="control is-expanded">
+                                    <model-select class="input" ref="supplier" @focus="clearStatus" @keypress="clearStatus" :options="suppliers" v-model="invoice.supplier" placeholder="select item"></model-select>
+                                </div>
+                                <router-link class="control" to="/add-supplier"><button class="button is-small is-link">Add Supplier</button></router-link>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <label class="label">Invoice No.</label>
+                            <input class="input" ref="date" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.invoice" type="text"/>
+                        </div>
+                        <div class="column">
+                            <label class="label">Invoice Date</label>
+                            <input class="input" ref="date" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.date" type="date"/>
+                        </div>
+                        <div class="column">
+                            <label class="label">Total Tax</label>
+                            <p class="control is-expanded has-icons-left">
+                                <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.total_tax" type="number"/>
+                                <span class="icon is-small is-left">TZS</span>
+                            </p>
+                        </div>
+                        <div class="column">
+                            <label class="label">Total Amount</label>
+                            <p class="control is-expanded has-icons-left">
+                                <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.total_cost" type="number"/>
+                                <span class="icon is-small is-left">TZS</span>
+                            </p>                        
+                        </div>
+                    </div>                       
+                </div>
+
+                <div class="card card-content" v-if="invoice.items.length > 0">
+                    <div class="level title is-5">
+                        <div class="level-item">Product</div>
+                        <div class="level-item">Quantity</div>
+                        <div class="level-item">Unit Cost</div>
+                        <div class="level-item">Tax</div>
+                        <div class="level-item">Total Cost</div>
+                    </div>
+                    <div class="level has-background-light" v-for="(item, index) in invoice.items" v-bind:key="index">
+
+                        <div class="level-item">
+                            {{ item.product }}
+                        </div>
+
+                        <div class="level-item">
+                            {{ item.quantity }}
+                        </div>
+
+                        <div class="level-item">
+                            {{ item.unit_cost | currency }}
+                        </div>
+
+                        <div class="level-item">
+                            {{ item.tax |currency }}
+                        </div>
+
+                        <div class="level-item">
+                            {{ item.total_cost | currency }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-content has-text-centered" v-else>There are no items in your invoice. Add an item.</div>
+            
+                <div class="section">
+                    <div class="columns">
+
+                        <div class="column is-two-fifths">
+                            <label class="label">Product</label>
+                            <div class="field is-grouped">
+                                <div class="control is-expanded">
+                                    <model-select class="input" ref="product" @focus="clearStatus" @keypress="clearStatus" :options="products" v-model="item.product" placeholder="select item"></model-select>
+                                </div>
+                                <router-link to="/add-product"><font-awesome-icon class="icon has-text-link" icon="plus" size="sm" /></router-link>
+                            </div>
+                        </div>
+
+                        <div class="column">
+                            <label class="label">Quantity</label>
+                            <p class="control">
+                                <input class="input" ref="quantity" @focus="clearStatus" @keypress="clearStatus" v-model="item.quantity" type="number"/>
+                            </p>
+                        </div>
+
+                        <div class="column">
+                            <label class="label">Unit Cost</label>
+                            <p class="control has-icons-left">
+                                <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="item.unit_cost" type="number"/>
+                                <span class="icon is-small is-left">TZS</span>
+                            </p>
+                        </div>
+
+                        <div class="column">
+                            <label class="label">Tax</label>
+                            <p class="control has-icons-left">
+                                <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="item.tax" type="number"/>
+                                <span class="icon is-small is-left">TZS</span>
+                            </p>
+                        </div>
+
+                        <div class="column">
+                            <label class="label">Total Cost</label>
+                            <p class="control has-icons-left">
+                                <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="item.total_cost" type="number"/>
+                                <span class="icon is-small is-left">TZS</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="button is-small is-link" @click="addItem()">Add Item</div>
+                </div>
+
+                <div class="card card-content has-background-light">
+                    <div class="columns">
+                        <div class="column is-one-fifth">
+                            <label class="label">Invoice Paid?</label>
+                            <model-select class="input" ref="paid" @focus="clearStatus" @keypress="clearStatus" :options="booleanOptions" v-model="invoice.paid" placeholder="select item"></model-select>
+                        </div>
+                        <div class="column is-one-fifth" v-if="invoice.paid">
+                            <label class="label">Payment Date</label>
+                            <input class="input" ref="date" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.payment.date" type="date"/>
+                        </div>
+                        <div class="column is-one-fifth" v-if="invoice.paid">
+                            <label class="label">Receipt Number</label>
+                            <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.payment.receipt" type="number"/>                    
+                        </div>
+                        <div class="column is-one-fifth" v-if="invoice.paid">
+                            <label class="label">Method of Payment</label>
+                            <model-select class="input" ref="payment_type" @focus="clearStatus" @keypress="clearStatus" :options="paymentTypes" v-model="invoice.payment.payment_type" placeholder="select item"></model-select>
+                        </div>
+                        <div class="column is-one-fifth" v-if="invoice.paid && invoice.payment.payment_type === 'CHEQUE'">
+                            <label class="label">Cheque No.</label>
+                            <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.payment.cheque" type="text"/>
+                        </div>
+                        <div class="column is-one-fifth" v-if="invoice.paid && invoice.payment.payment_type === 'BANK'">
+                            <label class="label">Bank Transfer Ref.</label>
+                            <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.payment.bank_transfer" type="text"/>
+                        </div>
+                        <div class="column is-one-fifth" v-if="!invoice.paid">
+                            <label class="label">Payment Terms</label>
+                            <model-select class="input" ref="terms" @focus="clearStatus" @keypress="clearStatus" :options="paymentTerms" v-model="invoice.terms" placeholder="select item"></model-select>
+                        </div>
+                    </div>
+
+                    <div class="columns">
+                        <div class="column is-one-fifth">
+                            <label class="label">Goods Received?</label>
+                            <model-select class="input" ref="received" @focus="clearStatus" @keypress="clearStatus" :options="booleanOptions" v-model="invoice.received" placeholder="select item"></model-select>
+                        </div>
+                        <div class="column is-one-fifth" v-if="invoice.received">
+                            <label class="label">Delivery Number</label>
+                            <input class="input" ref="receipt" @focus="clearStatus" @keypress="clearStatus" v-model="invoice.delivery" type="text"/>  
+                        </div>
+                    </div>
+
+                    <button id="submit" class="button is-primary" @click="handleSubmit()">Submit Invoice</button>
+                </div>
+
+            </form>
+        </section>
 
     </div>
 </template>
 
 <script>
 import { ModelSelect } from 'vue-search-select'
+var numeral = require("numeral");
+import moment from 'moment'
 
 export default {
     name: 'procurement-form',
     components: {
-        // ProductForm,
-        // SupplierForm,
         ModelSelect
     },
     data() {
         return {
-            submitting: false,
+            jwt: '',
             error: false,
-            success: false,
-            procurement: {
-                supplier: null,
-                product: null,
-                location: null,
-                invoice: null,
-                quantity: 0,
-                currency: "TZS",
-                unit_cost: 0,
-                total_cost: 0,
-                paid: 'Paid',
-                additional_info: null
-            },
-            response: null,
-            errorNotification: null,
-            productNames: [],
-            supplierNames: [],
-            checked: false,
             errors: [],
-            jwt: ''
+            errorNotification: null,
+            submitting: false,
+            success: false,
+            response: null,
+            products: [],
+            suppliers: [],
+            item:{},
+            booleanOptions:[
+                {'text': 'True', value: true},
+                {'text': 'False', value: false}
+            ],
+            paymentTypes:[
+                {'text': 'Cheque', value: 'CHEQUE'},
+                {'text': 'Bank Transfer', value: 'BANK'},
+                {'text': 'Cash', value: 'CASH'}
+            ],
+            paymentTerms:[
+                {'text': '30 days', value: '30'},
+                {'text': '60 days', value: '60'},
+                {'text': '90 days', value: '90'}
+            ],
+            invoice: {
+                supplier: null,
+                invoice: null,
+                date: null,
+                currency: "TZS",
+                total_tax: null,
+                total_cost: null,
+                paid: false,
+                terms: null,
+                received: false,
+                delivery: null,
+                items: [],
+                payment: {
+                    currency: "TZS",
+                    payment_date: null,
+                    receipt: null,
+                    payment_type: null,
+                    cheque: null,
+                    bank_transfer: null,
+                }        
+            },
+        }
+    },
+    filters: {
+        currency: function (value) {
+            return numeral(value).format("0,0")
+        },
+        date: function (value) {
+            return moment(String(value)).format('L')
         }
     },
     created: function() {
         this.jwt = this.$store.state.jwt
-        this.getProductNames()
-        this.getSupplierNames()
-    },
-    computed: {
-        // packingUnit() {
-        //     return this.getPackingUnit()
-        // }
+        this.getProducts()
+        this.getSuppliers()
     },
     methods: {
         handleSubmit() {
             this.submitting = true
-            if (this.invalidSupplier() || this.invalidProduct()) {
+            if (this.invalidSupplier()) {
                 this.showError()
                 return
             }
             this.clearStatus()
-            this.addProcurement()
+            this.addInvoice()
  
         },
         clearStatus() {
             this.error = false
             this.success = false
         },
-        addProcurement() {
+        addInvoice() {
             try {
-                this.axios.post('inventory', {'body': this.procurement}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+                this.axios.post('invoice', {'body': this.invoice}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] == 401) {
                         this.response = response
@@ -232,13 +312,6 @@ export default {
             this.clearForm()
             // this.$refs.supplier.focus()
         },
-        show (form_number) {
-            if (form_number === 1) {
-                this.$modal.show('add-supplier');
-            } else if (form_number === 2) {
-                this.$modal.show('add-product');
-            }
-        },
         clearForm() {
             this.procurement = {
                 supplier: null,
@@ -249,20 +322,11 @@ export default {
                 currency: "TZS",
                 unit_cost: 0,
                 total_cost: 0,
-                paid: 'Paid',
+                paid: true,
                 additional_info: null
             }
         },
-        checkbox () {
-            if (this.checked) {
-                this.procurement.total_cost = 0
-                this.checked = false
-            } else {
-                this.procurement.total_cost = this.procurement.unit_cost * this.procurement.quantity
-                this.checked = true
-            }
-        },
-        getProductNames() {
+        getProducts() {
             try {
                 this.axios.get('products/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
@@ -270,7 +334,7 @@ export default {
                         this.response = response
                         this.errorNotification = "Your session has expired. Please logout and login again."
                     } else {
-                        this.productNames = response.data[0]['products']
+                        this.products = response.data[0]['products']
                     }
                 })
                 .catch(e => {
@@ -283,7 +347,7 @@ export default {
                 this.errorNotification = "Connection Error."
             }
         },
-        getSupplierNames() {
+        getSuppliers() {
             try {
                 this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
@@ -291,7 +355,7 @@ export default {
                         this.response = response
                         this.errorNotification = "Your session has expired. Please logout and login again."
                     } else {
-                        this.supplierNames = response.data[0]['suppliers']
+                        this.suppliers = response.data[0]['suppliers']
                     }
                 })
                 .catch(e => {
@@ -304,18 +368,16 @@ export default {
                 this.errorNotification = "Connection Error."
             }
         },
-        invalidProduct() {
-           if (this.procurement.product === null) {
-               this.errors.push({'id':1, 'e':'!Product Name is required.'})
-               return true
-           }
-        },
         invalidSupplier() {
-            if (this.procurement.supplier === null) {
+            if (this.invoice.supplier === null) {
                 this.errors.push({'id':2, 'e':'!Supplier Name is required.'})
                 return true
             }
         },
+        addItem() {
+            this.invoice.items.push(this.item)
+            this.item = {}
+        }
     }
 }
 </script>

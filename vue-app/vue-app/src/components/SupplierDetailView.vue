@@ -211,7 +211,7 @@
                                         <td>{{ p.total_cost | currency }}</td>
                                         <td>{{ p.location }}</td>
                                         <td>{{ p.created | date }}</td>
-                                        <td><span v-bind:class="{'tag is-success': p.paid === 'Paid', 'tag is-danger': p.paid === 'Unpaid'}">{{ p.paid }}</span></td>
+                                        <td><span v-bind:class="{'tag is-success': p.paid === true, 'tag is-danger': p.paid === false}">{{ p.paid }}</span></td>
                                         </tr>
                                     </tbody>
                                 </table>

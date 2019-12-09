@@ -11,7 +11,7 @@ if os.environ.get('FLASK_ENVIRONMENT') == 'PROD':
 else:
     app.config.from_object(config.DevelopmentConfig)
 
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, compare_type=True)
 manager = Manager(app)
 
 manager.add_command('db', MigrateCommand)

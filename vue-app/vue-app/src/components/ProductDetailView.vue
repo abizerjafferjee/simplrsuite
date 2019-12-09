@@ -109,46 +109,6 @@
                     </div>
                 </div>
 
-                <div class="columns">
-                    <div class="column">
-                        <div class="card events-card">
-                            <header class="card-header"><p class="card-header-title">Procurements</p></header>
-                            <div class="card-table">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Supplier</th>
-                                            <th>Invoice</th>
-                                            <th>Quantity</th>
-                                            <th>Currency</th>
-                                            <th>Unit Cost</th>
-                                            <th>Total Cost</th>
-                                            <th>Date</th>
-                                            <th>Paid</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="p in procurement" :key="p.id">
-                                        <td>{{ p.supplier }}</td>
-                                        <td>{{ p.invoice }}</td>
-                                        <td>{{ p.quantity }}</td>
-                                        <td>{{ p.currency }}</td>
-                                        <td>{{ p.unit_cost | currency }}</td>
-                                        <td>{{ p.total_cost | currency }}</td>
-                                        <td>{{ p.created | date }}</td>
-                                        <td><span v-bind:class="{'tag is-success': p.paid === 'Paid', 'tag is-danger': p.paid === 'Unpaid'}">{{ p.paid }}</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <footer class="card-footer level">
-                                    <a class="pagination-previous level-left" title="This is the first page" :disabled="procurementPages.prev==false" @click="getProcurement(procurementPages.page-1)">Previous</a>
-                                    <a class="pagination-next level-right" :disabled="procurementPages.next==false" @click="getProcurement(procurementPages.page+1)">Next page</a>
-                                </footer>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </article>
         </div>
     </div>
@@ -226,7 +186,6 @@ export default {
                         if (this.inventoryId) {
                             this.getInventory()
                         }
-                        this.getProcurement(1)
                     }
                 })
                 .catch(e => {
@@ -298,29 +257,6 @@ export default {
                     this.errorNotification = "Internal Server Error."
                 })
             } catch(error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
-        },
-        getProcurement(page) {
-            try {
-                this.axios.get('procurement/product/'+this.product.id+'?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.procurement = response.data[0].body
-                        this.procurementPages.page = response.data[0].page
-                        this.procurementPages.next = response.data[0].next
-                        this.procurementPages.prev = response.data[0].prev
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error."
-                })
-            } catch (error) {
                 this.response = error
                 this.errorNotification = "Connection Error."
             }

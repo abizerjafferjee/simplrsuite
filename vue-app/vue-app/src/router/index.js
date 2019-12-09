@@ -8,12 +8,12 @@ import ProcurementForm from '@/components/ProcurementForm'
 import ProcurementView from '@/components/ProcurementView'
 import SupplierForm from '@/components/SupplierForm'
 import SupplierView from '@/components/SupplierView'
-import SupplierDetailView from '@/components/SupplierDetailView'
 import Dashboard from '@/components/Dashboard'
 import PaymentsView from '@/components/PaymentsView'
 import PaymentsForm from '@/components/PaymentsForm'
 import SignUpForm from '@/components/SignUpForm'
 import SignInForm from '@/components/SignInForm'
+import CategoryView from '@/components/CategoryView'
 
 Vue.use(VueRouter)
 
@@ -59,6 +59,11 @@ const routes = [
         component: ProductDetailView
     },
     {
+        path: '/categories',
+        name: 'CategoryView',
+        component: CategoryView
+    },
+    {
         path: '/add-contact',
         name: 'MailListForm',
         component: MailListForm
@@ -83,11 +88,6 @@ const routes = [
         name: 'SupplierForm',
         component: SupplierForm,
         props: true
-    },
-    {
-        path: '/supplier-detail',
-        name: 'SupplierDetailView',
-        component: SupplierDetailView
     },
 ];
 

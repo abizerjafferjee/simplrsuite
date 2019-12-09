@@ -55,16 +55,34 @@ class Procurement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'))
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
-    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
+    invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'))
+    currency = db.Column(db.String())
     unit_cost = db.Column(db.Float())
+    unit_tax = db.Column(db.Float())
     quantity = db.Column(db.Float())
     total_cost = db.Column(db.Float())
-    currency = db.Column(db.String())
-    invoice = db.Column(db.String())
-    paid = db.Column(db.String())
-    additional_info = db.Column(db.String())
-    location = db.Column(db.String())
     created = db.Column(db.DateTime(), default=datetime.now())
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+class Invoice(db.Model):
+    __tablename__ = 'invoice'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
+    invoice_number = db.Column(db.String())
+    currency = db.Column(db.String())
+    total_tax = db.Column(db.Float())
+    total_cost = db.Column(db.Float())
+    date = db.Column(db.String())
+    paid = db.Column(db.Boolean, default=False)
+    terms = db.Column(db.Integer, default=30)
+    delivery_number = db.Column(db.String())
+    created = db.Column(db.DateTime(), default=datetime.now())
+
+    items = relationship("Procurement", backref='invoice')
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -75,23 +93,37 @@ class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'))
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
-    amount = db.Column(db.Float())
-    currency = db.Column(db.String())
-    invoices = db.Column(db.String())
-    procurements = db.Column(db.String())
-    invoiced = db.Column(db.Boolean, default=True)
-    additional_info = db.Column(db.String())
+    invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'))
+    payment_type = db.Column(db.String())
+    cheque = db.Column(db.String())
+    bank_transfer = db.Column(db.String())
+    receipt = db.Column(db.String())
+    date = db.Column(db.String())
+    reason = db.Column(db.String())
     created = db.Column(db.DateTime(), default=datetime.now())
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
-# def generateSKU(context):
-#     params = context.get_current_parameters()
-#     product = params['description']
-#     category_id = params['category_id']
-#     id = params['id']
-#     return product + str(category_id) + "00" + str(id)
+class Supplier(db.Model):
+    __tablename__ = 'supplier'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
+    business_name = db.Column(db.String())
+    contact_person = db.Column(db.String())
+    email = db.Column(db.String())
+    phone = db.Column(db.String())
+    plus_code = db.Column(db.String())
+    address = db.Column(db.String())
+    additional_info = db.Column(db.String())
+    created = db.Column(db.DateTime(), default=datetime.now())
+
+    invoices = relationship("Invoice", backref='supplier')
+    payments = relationship("Payment", backref='supplier') 
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
 
 class Product(db.Model):
     __tablename__ = 'product'
@@ -118,32 +150,13 @@ class Product(db.Model):
         return '<id {}>'.format(self.id)
 
 
-class Supplier(db.Model):
-    __tablename__ = 'supplier'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user = db.Column(db.Integer, db.ForeignKey('user.id'))
-    business_name = db.Column(db.String())
-    contact_person = db.Column(db.String())
-    email = db.Column(db.String())
-    phone = db.Column(db.String())
-    plus_code = db.Column(db.String())
-    address = db.Column(db.String())
-    additional_info = db.Column(db.String())
-    created = db.Column(db.DateTime(), default=datetime.now())
-
-    procurements = relationship("Procurement", backref='supplier')
-    payments = relationship("Payment", backref='supplier') 
-
-    def __repr__(self):
-        return '<id {}>'.format(self.id)
-
 class Category(db.Model):
     __tablename__ = 'category'
 
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String())
+    created = db.Column(db.DateTime(), default=datetime.now())
     products = relationship("Product", backref='category')
 
     def __repr__(self):
@@ -176,6 +189,10 @@ class InventorySchema(ma.ModelSchema):
     class Meta:
         model = Inventory
 
+class InvoiceSchema(ma.ModelSchema):
+    class Meta:
+        model = Invoice
+
 class ProductSchema(ma.ModelSchema):
     class Meta:
         model = Product
@@ -202,9 +219,15 @@ class OutstandingPaymentsSchema(ma.Schema):
     invoices = marshmallow.fields.List(marshmallow.fields.String())
     business_name = marshmallow.fields.String()
 
-class OutstandingPaymentsSupplierSchema(ma.Schema):
-    total_cost = marshmallow.fields.Number()
+class supplierInvoicesSchema(ma.Schema):
     invoice = marshmallow.fields.String()
+    total_cost = marshmallow.fields.Number()
+    created = marshmallow.fields.Date()
+
+class supplierPurchasesSchema(ma.Schema):
+    id = marshmallow.fields.Integer()
+    description = marshmallow.fields.String()
+    total_cost = marshmallow.fields.Number()
     created = marshmallow.fields.Date()
 
 class MailListSchema(ma.ModelSchema):

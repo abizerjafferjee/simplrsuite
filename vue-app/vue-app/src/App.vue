@@ -27,15 +27,21 @@
         <aside class="menu is-size-5">
           <ul class="menu-list">
             <li><router-link to="/dashboard"><font-awesome-icon class="icon has-text-info font-margin" icon="chart-line" size="lg" />Dashboard</router-link></li>
-            <li><router-link to="/add-contact"><font-awesome-icon class="font-margin" icon="at" size="lg" />Mailing List</router-link></li>
           </ul>
           <p class="menu-label">
-            Procurement
+            Sales
           </p>
           <ul class="menu-list">
             <li><router-link to="/products"><font-awesome-icon class="icon has-text-info font-margin" icon="store" size="lg" />Products</router-link></li>
+            <li><router-link to="/categories"><font-awesome-icon class="icon has-text-primary font-margin" icon="list" size="lg" />Categories</router-link></li>
+            <li><router-link to="/add-contact"><font-awesome-icon class="font-margin" icon="at" size="lg" />Mailing List</router-link></li>
+          </ul>
+          <p class="menu-label">
+            Procurements
+          </p>
+          <ul class="menu-list">
             <li><router-link to="/suppliers"><font-awesome-icon class="icon has-text-danger font-margin" icon="truck" size="lg" />Suppliers</router-link></li>
-            <li><router-link to="/inventory"><font-awesome-icon class="font-margin" icon="warehouse" size="lg" />Inventory</router-link></li>
+            <li><router-link to="/inventory"><font-awesome-icon class="font-margin" icon="warehouse" size="lg" />Purchases</router-link></li>
             <li><router-link to="/payments"><font-awesome-icon class="icon has-text-success font-margin" icon="money-check-alt" size="lg" />Payments</router-link></li>
           </ul>
         </aside>

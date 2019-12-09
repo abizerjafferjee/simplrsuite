@@ -257,6 +257,9 @@ export default {
         show () {
            this.$modal.show('add-category');
         },
+        hide () {
+            this.$modal.hide('add-category');
+        },
         handleFile() {
             this.product_file = this.$refs.file.files[0];
         },
@@ -268,6 +271,7 @@ export default {
         },
         addCategory(category) {
             try {
+                this.hide()
                 this.axios.post('categories', {'body': category}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
                     if (response.data[1] === 401) {
@@ -280,7 +284,7 @@ export default {
                 })
                 .catch(e => {
                     this.response = e
-                    this.errorNotification = "Internal Server Error."
+                    this.errorNotification = "Internal Server Error: add category."
                 })
             } catch (error) {
                 this.response = error
