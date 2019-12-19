@@ -108,7 +108,7 @@ def get_invoices(current_user):
 
         schema = InvoiceSchema(many=True)
         output = schema.dump(invoices.items)
-        
+        print(output)
         return make_response(jsonify({'success': True, 'body':output, 'page': invoices.page,
                                       'prev': invoices.has_prev,
                                       'next': invoices.has_next}), 200)

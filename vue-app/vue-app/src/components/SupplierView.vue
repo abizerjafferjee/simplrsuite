@@ -112,7 +112,7 @@ export default {
                 this.pages.next = response.data.next
                 this.pages.prev = response.data.prev
             })
-            .catch(e => {
+            .catch(error => {
                 if (error.response.status === 401) {
                     this.error = "Your session has expired. Please login again."
                 } else {
@@ -125,7 +125,7 @@ export default {
             .then(response => {
                 this.supplierList = response.data.suppliers
             })
-            .catch(e => {
+            .catch(error => {
                 if (error.response.status === 401) {
                     this.error = "Your session has expired. Please login again."
                 } else {

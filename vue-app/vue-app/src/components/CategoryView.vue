@@ -130,6 +130,7 @@ export default {
             } else {
                 this.axios.post('categories', {'body': this.category}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
                 .then(response => {
+                    this.response = response
                     this.getCategories(this.pages.page)
                 })
                 .catch(error => {

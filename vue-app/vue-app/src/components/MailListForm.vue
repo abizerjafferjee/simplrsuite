@@ -111,7 +111,6 @@ export default {
    data() {
        return {
            submitting: false,
-           error: false,
            errors: [],
            error: null,
            success: false,
