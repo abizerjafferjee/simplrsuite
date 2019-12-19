@@ -41,8 +41,14 @@
           </p>
           <ul class="menu-list">
             <li><router-link to="/suppliers"><font-awesome-icon class="icon has-text-danger font-margin" icon="truck" size="lg" />Suppliers</router-link></li>
-            <li><router-link to="/inventory"><font-awesome-icon class="font-margin" icon="warehouse" size="lg" />Purchases</router-link></li>
-            <li><router-link to="/payments"><font-awesome-icon class="icon has-text-success font-margin" icon="money-check-alt" size="lg" />Payments</router-link></li>
+            <li><router-link to="/invoices"><font-awesome-icon class="font-margin" icon="warehouse" size="lg" />Invoices</router-link></li>
+            <li>
+              <a><font-awesome-icon class="icon has-text-success font-margin" icon="money-check-alt" size="lg" />Payments</a>
+              <ul>
+                <li><router-link to="/outstanding">Outstanding Invoices</router-link></li>
+                <li><router-link to="/payments">Payment History</router-link></li>
+              </ul>
+            </li>
           </ul>
         </aside>
       </div>

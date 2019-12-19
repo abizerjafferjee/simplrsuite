@@ -30,12 +30,6 @@
                                         <input ref="description" @focus="clearStatus" @keypress="clearStatus" v-model="user.password" class="input is-large" type="password" placeholder="Your Password">
                                     </div>
                                 </div>
-                                <!-- <div class="field">
-                                    <label class="checkbox">
-                                    <input type="checkbox">
-                                    Remember me
-                                    </label>
-                                </div> -->
                                 <button class="button is-block is-info is-large is-fullwidth">Sign Up</button>
                             </form>
                         </div>
@@ -94,25 +88,20 @@ export default {
             // this.$refs.category.focus()
         },
         signup() {
-            try {
-                this.$store.commit('setUserData', this.user.email)
-                this.axios.post('signup', {'body': this.user})
-                .then(response => {
-                    if (response.data[0]['success']) {
-                        this.showSuccess()
-                    } else {
-                        this.errors.push({'id':1, 'e': response.data[0]['body']})
-                        this.showError()
-                    }
-                })
-                .catch(e => {
-                    this.response = e
+            this.$store.commit('setUserData', this.user.email)
+            this.axios.post('signup', {'body': this.user})
+            .then(response => {
+                if (response.data['success']) {
+                    this.showSuccess()
+                } else {
+                    this.errors.push({'id':1, 'e': response.data['body']})
                     this.showError()
-                })
-            } catch (error) {
-                this.response = error
+                }
+            })
+            .catch(e => {
+                this.response = e
                 this.showError()
-            }
+            })
         },
         clearForm() {
            this.user = {

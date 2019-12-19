@@ -12,6 +12,7 @@ from flask_app.routes.products import ProductRoutes
 from flask_app.routes.category import CategoryRoutes
 from flask_app.routes.suppliers import SupplierRoutes
 from flask_app.routes.inventory import InventoryRoutes
+from flask_app.routes.invoice import InvoiceRoutes
 from flask_app.routes.payments import PaymentRoutes
 from flask_app.routes.customers import CustomerRoutes
 
@@ -22,6 +23,7 @@ app.register_blueprint(ProductRoutes, url_prefix=prefix)
 app.register_blueprint(CategoryRoutes, url_prefix=prefix)
 app.register_blueprint(SupplierRoutes, url_prefix=prefix)
 app.register_blueprint(InventoryRoutes, url_prefix=prefix)
+app.register_blueprint(InvoiceRoutes, url_prefix=prefix)
 app.register_blueprint(PaymentRoutes, url_prefix=prefix)
 app.register_blueprint(CustomerRoutes, url_prefix=prefix)
 

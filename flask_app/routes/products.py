@@ -76,10 +76,9 @@ def add(current_user):
         product_schema = ProductSchema()
         output = product_schema.dump(product)
 
-        return make_response(jsonify({'success': True, 'body': output}, 200))
+        return make_response(jsonify({'success': True, 'body': output}), 200)
     except Exception as e:
-        print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 @ProductRoutes.route('/products', methods=['PUT'])
 @token_required
@@ -97,10 +96,10 @@ def put(current_user):
         d.product_type = updatedProduct['product_type']
         d.packing = updatedProduct['packing']
         db.session.commit()
-        return make_response(jsonify({'success': True}, 200))
+        return make_response(jsonify({'success': True}), 200)
     except Exception as e:
         print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 @ProductRoutes.route('/products', methods=['DELETE'])
 @token_required
@@ -112,10 +111,9 @@ def delete(current_user):
         id = request.args.get('id', type=int)
         Product.query.filter_by(id=id).delete()
         db.session.commit()
-        return make_response(jsonify({'success': True}, 200))
+        return make_response(jsonify({'success': True}), 200)
     except Exception as e:
-        print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 @ProductRoutes.route('/products/<int:id>', methods=['GET'])
 @token_required
@@ -128,52 +126,29 @@ def get(current_user, id):
         product_schema = ProductSchema()
         output = product_schema.dump(product)
 
-        return make_response(jsonify({'success':True, 'body':output}, 200))
+        return make_response(jsonify({'success':True, 'body':output}), 200)
     except Exception as e:
         print(e)
-        return make_response(jsonify({'success':False}, 400))
+        return make_response(jsonify({'success':False}), 400)
 
 @ProductRoutes.route('/products', methods=['GET'])
 @token_required
-def search(current_user):
+def get_products(current_user):
     """
     Search and paginate products for product view
     """
     try:
         page = request.args.get('page', type=int)
-        search = request.args.get('search', type=str)
-        category = request.args.get('category', type=str)
-
-        per_page = 24
-
-        if search != '' and category != '':
-            products = Product.query\
-                .filter(Product.user==current_user.id)\
-                .filter(Product.description.like(search))\
-                .join(Category)\
-                .filter(Category.name == category)\
-                .paginate(page=page, per_page=per_page, error_out=False)
-        elif category != '':
-            products = Product.query\
-                .filter(Product.user==current_user.id)\
-                .join(Category)\
-                .filter(Category.name == category)\
-                .paginate(page=page, per_page=per_page, error_out=False)
-        elif search != '':
-            products = Product.query\
+        per_page = 12
+        products = Product.query\
             .filter(Product.user==current_user.id)\
-            .filter(Product.description.like(search))\
             .paginate(page=page, per_page=per_page, error_out=False)
-        else:
-            products = Product.query\
-                .filter(Product.user==current_user.id)\
-                .paginate(page=page, per_page=per_page, error_out=False)
 
         product_schema = ProductSchema(many=True)
         output = product_schema.dump(products.items)
         return make_response(jsonify({'success': True, 'body': output,
                                         'page': products.page, 'prev': products.has_prev,
-                                        'next': products.has_next}, 200))
+                                        'next': products.has_next}), 200)
     except Exception as e:
         print(e)
         return make_response(jsonify({'success': False}, 400))
@@ -187,52 +162,8 @@ def get_names(current_user):
     try:
         products = Product.query.filter(Product.user==current_user.id)
         product_names = [{'value': p.id, 'text': p.description, 'packing_type': p.packing_type} for p in products]
-        return make_response(jsonify({'success': True, 'products': product_names}, 200))
+        return make_response(jsonify({'success': True, 'products': product_names}), 200)
     except Exception as e:
-        print(e)
-        return make_response(jsonify({'success': False}, 400))
-
-# @ProductRoutes.route('/products/file', methods=['GET'])
-# @token_required
-# def add_many(current_user):
-#     """
-#     Modify this function to take a multipart form of a file with many products
-#     and add to db
-#     """
-#     try:
-#         data = pd.read_csv('../docs/data.csv')
-#         data.fillna(0, inplace=True)
-#         data = data.to_json(orient='records')
-#         data = json.loads(data)
-
-#         for row in data:
-#             category = Category.query.filter_by(name = row['category']).first()
-
-#             product = Product(
-#                 category = category,
-#                 description = row['description'],
-#                 code = row['code'],
-#                 packing = row['packing'],
-#                 price = float(row['setlife_price'])
-#             )
-
-#             inventory = Inventory(
-#                 product = product,
-#                 quantity = float(row['quantity'])
-#             )
-
-#             procurement = Procurement(
-#                 product = product,
-#                 unit_cost = float(row['price']),
-#                 quantity = float(row['quantity']),
-#                 total_cost = float(row['cost'])
-#             )
-
-#             db.session.add(product)
-#         db.session.commit()
-#         return make_response(jsonify({'success': True}, 200))
-#     except Exception as e:
-#         print(e)
-#         return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 

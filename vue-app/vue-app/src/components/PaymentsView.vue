@@ -1,223 +1,135 @@
 <template>
-    <div id="product-table">
-        <div class="tile is-parent">
-            <article class="tile is-child">
-                <div class="content">
-                    <section class="hero is-light welcome is-small">
-                        <div class="hero-body">
-                            <div class="container level">
-                                <h1 class="title level-left">
-                                    Payments
-                                </h1>
-                                <div class="level-right">
-                                    <p class="level-item"><router-link to="/record-payment" class="button">Record Payment</router-link></p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+    <div id="payments-view">
 
-                    <div class="notification" v-if="errorNotification">
-                        <button @click="closeNotification" class="delete"></button>
-                        {{ errorNotification }}
-                    </div>         
-                    <br>
+        <div class="section notification" v-if="error">
+            <button @click="closeNotification" class="delete"></button>
+            {{ error }}
+        </div>
 
-                    <section class="info-tiles">
-                        <div class="tile is-ancestor has-text-centered" v-if="stats">
-                            <div class="tile is-parent">
-                                <article class="tile is-child box">
-                                    <p class="title">TZS {{ stats.total_outstanding | currency }}</p>
-                                    <p class="subtitle">Total Outstanding Amount</p>
-                                </article>
-                            </div>
-                            <div class="tile is-parent">
-                                <article class="tile is-child box">
-                                    <p class="title">{{ stats.total_invoices }}</p>
-                                    <p class="subtitle">Total Outstanding Invoices</p>
-                                </article>
-                            </div>
-                            <div class="tile is-parent">
-                                <article class="tile is-child box">
-                                    <p class="title">TZS {{ stats.uninvoiced_outstanding | currency }}</p>
-                                    <p class="subtitle">Total Procurement without Invoices</p>
-                                </article>
-                            </div>
-                            <div class="tile is-parent">
-                                <article class="tile is-child box">
-                                    <p class="title" v-if="stats.latest_payment.created">{{ stats.latest_payment.created | date }}</p>
-                                    <p class="title" v-else>No Payments</p>
-                                    <p class="subtitle">Last Payment</p>
-                                </article>
-                            </div>
+        <section class="welcome card card-content has-background-light">
+            <div class="columns has-text-centered">
+                <div class="column is-three-fifths">
+                    <div class="field is-grouped is-expanding">
+                        <div class="control is-expanded">
+                            <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
                         </div>
-                    </section>
-                    
-                    <br>
-                    
-                    <div class="columns">
-                        <div class="column">
-                            <div class="card events-card">
-                                <header class="card-header">
-                                    <p class="card-header-title">
-                                        Outstanding Invoices
-                                    </p>
-                                </header>
-                                <div class="card-table" style="height:500px">
-                                    <div class="content" v-if="outstandingPayments && outstandingPayments.length > 0">
-                                        <table class="table is-fullwidth is-striped">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Supplier (Id)</th>
-                                                    <th>Amount</th>
-                                                    <th>Number of Invoices</th>
-                                                    <th>Record as Paid</th>
-                                                </tr>
-                                                <tr v-for="(payment, index) in outstandingPayments" v-bind:key="index">
-                                                    <td>{{ payment.business_name }} ({{ payment.supplier_id }})</td>
-                                                    <td>TZS {{ payment.total_cost | currency }}</td>
-                                                    <td v-if="payment.invoices">{{ payment.invoices.length }} Invoices</td>
-                                                    <td><a class="button is-primary" @click="recordInvoicedPayment(index)"><font-awesome-icon class="icon has-text-white" icon="check" size="sm" /></a></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="content is-vcentered notification" v-else>
-                                        <p class="is-centered">No outstanding invoice amounts to show</p>
-                                    </div>
-                                </div>
-                                <footer class="card-footer level">
-                                    <a class="pagination-previous level-left" title="This is the first page" :disabled="pagesOutstanding.prev==false" @click="getOutstandingPayments(pagesOutstanding.page-1)">Previous</a>
-                                    <a class="pagination-next level-right" :disabled="pagesOutstanding.next==false" @click="getOutstandingPayments(pagesOutstanding.page+1)">Next page</a>
-                                </footer>
-                            </div>
-                        </div>
+                        <div class="control button is-primary">search</div>
+                    </div>
+                </div>
+                <div class="column"></div>
+            </div>
+        </section>
 
-                        <div class="column">
-                            <div class="card events-card">
-                                <header class="card-header">
-                                    <p class="card-header-title">
-                                        Payments Made
-                                    </p>
-                                </header>
-                                <div class="card-table" style="height:500px">
-                                    <div class="content" v-if="paymentsMade && paymentsMade.length > 0">
-                                        <table class="table is-fullwidth is-striped">
-                                            <tbody>
-                                                <tr>          
-                                                    <th>Payment Id</th>                              
-                                                    <th>Supplier (Id)</th>
-                                                    <th>Amount</th>
-                                                    <th>Date</th>
-                                                    <th>Reverse Payment</th>
-                                                </tr>
-                                                <tr v-for="(payment, index) in paymentsMade" v-bind:key="index">
-                                                    <td>{{ payment.id }}</td>
-                                                    <td>{{ payment.supplier.business_name }}</td>
-                                                    <td>TZS {{ payment.amount | currency }}</td>
-                                                    <td>{{ payment.created | date }}</td>
-                                                    <td><a class="button is-danger" @click="deletePayment(payment.id)"><font-awesome-icon class="icon has-text-white" icon="times" size="sm"/></a></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="content is-vcentered notification" v-else>
-                                        <p class="is-centered">No payments to show</p>
-                                    </div>
-                                </div>
-                                <footer class="card-footer level">
-                                    <a class="pagination-previous level-left" title="This is the first page" :disabled="pagesPayment.prev==false" @click="getPaymentsMade(pagesPayment.page-1)">Previous</a>
-                                    <a class="pagination-next level-right" :disabled="pagesPayment.next==false" @click="getPaymentsMade(pagesPayment.page+1)">Next page</a>
-                                </footer>
-                            </div>
-                        </div>
+
+        <div v-if="payments.length===0" class="section notification">
+            You don't have a payment history. View your outstanding invoices and record payments.
+        </div>
+
+
+        <div class="section has-text-centered" v-if="payments.length>0">
+            <div class="box has-background-light">
+                <div class="columns">
+                    <div class="column">Supplier</div>
+                    <div class="column">Invoice Number</div>
+                    <div class="column">Payment Method</div>
+                    <div class="column">Transaction Details</div>
+                    <div class="column">Receipt</div>
+                    <div class="column">Date</div>
+                </div>
+            </div>
+            <div class="card card-content" v-for="(payment, index) in payments" v-bind:key="index" style="margin:0px 0px 10px 0px">
+                <div class="columns">
+                    <div class="column"><div class="title is-6">{{ payment.payment.supplier.business_name }}</div></div>
+                    <div class="column"><div class="title is-6 has-text-info">{{ payment.payment.invoice_number }}</div></div>
+                    <div class="column">
+                        <div class="title is-6" v-if="payment.payment_type === 'BANK'">Bank Transfer</div>
+                        <div class="title is-6" v-else-if="payment.payment_type === 'CHEQUE'">Cheque</div>
+                        <div class="title is-6" v-else-if="payment.payment_type === 'CASH'">Cash</div>
+                        <div class="title is-6" v-else>No Payment Method</div>
+                    </div>
+                    <div class="column">
+                        <div class="title is-6" v-if="payment.payment_type === 'BANK' && payment.bank_transfer">{{ payment.bank_transfer }}</div>
+                        <div class="title is-6" v-else-if="payment.payment_type === 'CHEQUE' && payment.cheque">{{ payment.cheque }}</div>
+                        <div class="title is-6" v-else>No Transaction Details</div>
                     </div>
 
-
-                    <div class="columns">
-                        <div class="column">
-                            <div class="card events-card">
-                                <header class="card-header">
-                                    <p class="card-header-title">
-                                        Procurements without Invoices
-                                    </p>
-                                </header>
-                                <div class="card-table" style="height:500px">
-                                    <div class="content" v-if="outstandingUninvoiced && outstandingUninvoiced.length> 0">
-                                        <table class="table is-fullwidth is-striped">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Procurement Id</th>
-                                                    <th>Product</th>
-                                                    <th>Supplier Id</th>
-                                                    <th>Quantity</th>
-                                                    <th>Total Cost</th>
-                                                    <th>Date</th>
-                                                    <th>Record as Paid</th>
-                                                </tr>
-                                                <tr v-for="(payment, index) in outstandingUninvoiced" v-bind:key="index">
-                                                    <td>{{ payment.id }}
-                                                    <td>{{ payment.product.description }} ({{ payment.product.sku }})</td>
-                                                    <td>{{ payment.supplier }}</td>
-                                                    <td>{{ payment.quantity }}
-                                                    <td>TZS {{ payment.total_cost | currency }}</td>
-                                                    <td>{{ payment.created | date }}
-                                                    <td><a class="button is-primary" @click="recordUninvoicedPayment(index)"><font-awesome-icon class="icon has-text-white" icon="check" size="sm" /></a></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="content is-vcentered notification" v-else>
-                                        <p class="is-centered">No uninvoiced procurements to show</p>
-                                    </div>
-                                </div>
-                                <footer class="card-footer level">
-                                    <a class="pagination-previous level-left" title="This is the first page" :disabled="pagesUninvoiced.prev==false" @click="getOutstandingUninvoiced(pagesUninvoiced.page-1)">Previous</a>
-                                    <a class="pagination-next level-right" :disabled="pagesUninvoiced.next==false" @click="getOutstandingUninvoiced(pagesOutstanding.page+1)">Next page</a>
-                                </footer>
-                            </div>
-                        </div>
+                    <div class="column">
+                        <div class="title is-6" v-if="payment.receipt">{{ payment.receipt }}</div>
+                        <div class="title is-6" v-else>No Receipt</div>
                     </div>
 
+                    <div class="column">
+                        <div class="title is-6" v-if="payment.date">{{ payment.date }}</div>
+                        <div class="title is-6" v-else>No Date</div>
+                    </div>
 
                 </div>
-            </article>
+            </div>
         </div>
+
+        <div class="level">
+            <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
+            <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
+        </div>
+        
+
+        <!-- <section class="info-tiles">
+            <div class="tile is-ancestor has-text-centered" v-if="stats">
+                <div class="tile is-parent">
+                    <article class="tile is-child box">
+                        <p class="title">TZS {{ stats.total_outstanding | currency }}</p>
+                        <p class="subtitle">Total Outstanding Amount</p>
+                    </article>
+                </div>
+                <div class="tile is-parent">
+                    <article class="tile is-child box">
+                        <p class="title">{{ stats.total_invoices }}</p>
+                        <p class="subtitle">Total Outstanding Invoices</p>
+                    </article>
+                </div>
+                <div class="tile is-parent">
+                    <article class="tile is-child box">
+                        <p class="title">TZS {{ stats.uninvoiced_outstanding | currency }}</p>
+                        <p class="subtitle">Total Procurement without Invoices</p>
+                    </article>
+                </div>
+                <div class="tile is-parent">
+                    <article class="tile is-child box">
+                        <p class="title" v-if="stats.latest_payment.created">{{ stats.latest_payment.created | date }}</p>
+                        <p class="title" v-else>No Payments</p>
+                        <p class="subtitle">Last Payment</p>
+                    </article>
+                </div>
+            </div>
+        </section> -->
+
     </div>
 </template>
 
 <script>
 var numeral = require("numeral");
 import moment from 'moment'
-
+import { ModelSelect } from 'vue-search-select';
 export default {
     name: 'payments-view',
     components: {
+        ModelSelect,
     },
     data() {
         return {
+            jwt: '',
             editing: null,
             response: null,
-            errorNotification: null,
-            outstandingPayments: [],
-            pagesOutstanding: {
-                page: null,
-                next: null,
-                prev: null
-            },
-            paymentsMade: [],
-            pagesPayment: {
-                page: null,
-                next: null,
-                prev: null
-            },
-            outstandingUninvoiced: [],
-            pagesUninvoiced: {
-                page: null,
-                next: null,
-                prev: null
-            },
+            error: null,
             stats: null,
-            jwt: ''
+            payments: [],
+            pages: {
+                page: null,
+                next: null,
+                prev: null
+            },
+            search: null,
+            supplierList: [],
         }
     },
     filters: {
@@ -230,188 +142,55 @@ export default {
     },
     created() {
         this.jwt = this.$store.state.jwt
-        this.handleSubmit()
+        this.getPayments(1)
+        this.getSupplierList()
     },
     methods: {
-        handleSubmit() {
-            this.getOutstandingPayments(1)
-            this.getOutstandingUninvoiced(1)
-            this.getPaymentsMade(1)
-            this.getPaymentStats()            
-        },
-        getOutstandingPayments(page) {
-            try {
-                this.axios.get('payments/due?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] === 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.outstandingPayments = response.data[0].body
-                        
-                        if (this.outstandingPayments) {
-                            this.outstandingPayments = this.filterUniqueInvoices(this.outstandingPayments)
-                        }
-                        this.pagesOutstanding.page = response.data[0].page
-                        this.pagesOutstanding.next = response.data[0].next
-                        this.pagesOutstanding.prev = response.data[0].prev
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error: get outstanding payments."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
-        },
-        filterUniqueInvoices(outstandingPayments) {
-            for (var i=0; i < outstandingPayments.length; i++) {
-                var all_invoices = outstandingPayments[i]['invoices']
-                var unique_invoices = []
-                for (var j=0; j < all_invoices.length; j++) {
-                    if (!unique_invoices.includes(all_invoices[j])) {
-                        unique_invoices.push(all_invoices[j])
-                    }
+        getPayments(page) {
+            this.axios.get('payments?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.payments = response.data.body
+                this.pages.page = response.data.page
+                this.pages.next = response.data.next
+                this.pages.prev = response.data.prev
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
                 }
-                outstandingPayments[i]['invoices'] = unique_invoices
-            }
-            return outstandingPayments
+            })
         },
-        getOutstandingUninvoiced(page) {
-            try {
-                this.axios.get('payments/due/uninvoiced?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] === 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.outstandingUninvoiced = response.data[0].body
-                        this.pagesUninvoiced.page = response.data[0].page
-                        this.pagesUninvoiced.next = response.data[0].next
-                        this.pagesUninvoiced.prev = response.data[0].prev
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error: get outstanding uninvoiced."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
-        },
-        getPaymentsMade(page) {
-            try {
-                this.axios.get('payments/made?page='+page, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] === 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.paymentsMade = response.data[0].body
-                        this.pagesPayment.page = response.data[0].page
-                        this.pagesPayment.next = response.data[0].next
-                        this.pagesPayment.prev = response.data[0].prev
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error (get payments made)."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+        getSupplierList(){
+            this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.supplierList = response.data.suppliers
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         getPaymentStats() {
-            try {
-                this.axios.get('payments/stats', { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] === 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.stats = response.data[0].body
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error (payment stats)."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.get('payments/stats', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.stats = response.data.body
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
-        recordInvoicedPayment(index) {
-            try {
-                var outstandingInvoices = this.outstandingPayments[index]
-                this.axios.post('payments', {'body': outstandingInvoices, 'from': 'view-invoiced'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] === 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.response = response
-                        this.handleSubmit()
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error (record invoiced payment)."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
-        },
-        recordUninvoicedPayment(index) {
-            try {
-                var outstandingUninvoiced = this.outstandingUninvoiced[index]
-                this.axios.post('payments', {'body': outstandingUninvoiced, 'from': 'view-uninvoiced'}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] === 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.response = response
-                        this.handleSubmit()
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error (record uninvoiced payment)."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
-        },
-        deletePayment(id) {
-            try {
-                this.axios.delete('payment/'+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] === 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.response = response
-                        this.handleSubmit()
-                    }
-                })
-                .catch(error => {
-                    this.response = error
-                    this.errorNotification = "Internal Server Error (delete payment)."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
-        },
+
         closeNotification() {
-            this.errorNotification = null
+            this.error = null
         }
     }
 }

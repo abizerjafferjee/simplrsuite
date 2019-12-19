@@ -174,92 +174,64 @@ export default {
             }
         },
         getProduct() {
-            try {
-                this.axios.get('products/'+this.productId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.product = response.data[0].body
-                        this.inventoryId = this.product['inventory'][0]
-                        if (this.inventoryId) {
-                            this.getInventory()
-                        }
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.get('products/'+this.productId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.product = response.data.body
+                this.inventoryId = this.product['inventory'][0]
+                if (this.inventoryId) {
+                    this.getInventory()
+                }
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         getInventory() {
-            try {
-                this.axios.get('inventory/'+this.inventoryId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.inventory = response.data[0].body
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error."
-                })
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.get('inventory/'+this.inventoryId, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.inventory = response.data[0].body
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         saveProduct() {
-            try {
-                this.axios.put('products?id='+this.product.id, {'body': this.product}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.response = response
-                        this.cachedProduct = Object.assign({}, this.product);
-                        this.cancelEdit('product')
-                    }
-                })
-                .catch(error => {
-                    this.response = error
-                    this.errorNotification = "Internal Server Error."
-                })
-            } catch(error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.put('products?id='+this.product.id, {'body': this.product}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.response = response
+                this.cachedProduct = Object.assign({}, this.product);
+                this.cancelEdit('product')
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         saveInventory() {
-            try {
-                this.axios.put('inventory?id='+this.inventory.id, {'body': this.inventory}, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.response = response
-                        this.cachedInventory = Object.assign({}, this.inventory);
-                        this.cancelEdit('inventory')
-                    }
-                })
-                .catch(error => {
-                    this.response = error
-                    this.errorNotification = "Internal Server Error."
-                })
-            } catch(error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.put('inventory?id='+this.inventory.id, {'body': this.inventory}, { headers: {'Content-Type': 'multipart/form-data', 'Authorization': `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.response = response
+                this.cachedInventory = Object.assign({}, this.inventory);
+                this.cancelEdit('inventory')
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         closeNotification() {
             this.errorNotification = null

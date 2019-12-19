@@ -83,6 +83,7 @@ class Invoice(db.Model):
     created = db.Column(db.DateTime(), default=datetime.now())
 
     items = relationship("Procurement", backref='invoice')
+    payment = relationship("Payment", backref='payment')
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -185,18 +186,14 @@ class CategorySchema(ma.ModelSchema):
     class Meta:
         model = Category
 
-class InventorySchema(ma.ModelSchema):
-    class Meta:
-        model = Inventory
-
-class InvoiceSchema(ma.ModelSchema):
-    class Meta:
-        model = Invoice
-
 class ProductSchema(ma.ModelSchema):
     class Meta:
         model = Product
     category = ma.Nested(CategorySchema)
+
+class InventorySchema(ma.ModelSchema):
+    class Meta:
+        model = Inventory
 
 class ProcurementSchema(ma.ModelSchema):
     class Meta:
@@ -206,29 +203,17 @@ class ProcurementSchema(ma.ModelSchema):
 class SupplierSchema(ma.ModelSchema):
     class Meta:
         model = Supplier
-    procurement = ma.Nested(ProcurementSchema)
+
+class InvoiceSchema(ma.ModelSchema):
+    class Meta:
+        model = Invoice
+    items = marshmallow.fields.List(ma.Nested(ProcurementSchema))
+    supplier = ma.Nested(SupplierSchema)
 
 class PaymentSchema(ma.ModelSchema):
     class Meta:
         model = Payment
-    supplier = ma.Nested(SupplierSchema)
-
-class OutstandingPaymentsSchema(ma.Schema):
-    supplier_id = marshmallow.fields.Integer()
-    total_cost = marshmallow.fields.Number()
-    invoices = marshmallow.fields.List(marshmallow.fields.String())
-    business_name = marshmallow.fields.String()
-
-class supplierInvoicesSchema(ma.Schema):
-    invoice = marshmallow.fields.String()
-    total_cost = marshmallow.fields.Number()
-    created = marshmallow.fields.Date()
-
-class supplierPurchasesSchema(ma.Schema):
-    id = marshmallow.fields.Integer()
-    description = marshmallow.fields.String()
-    total_cost = marshmallow.fields.Number()
-    created = marshmallow.fields.Date()
+    payment = ma.Nested(InvoiceSchema)
 
 class MailListSchema(ma.ModelSchema):
     class Meta:

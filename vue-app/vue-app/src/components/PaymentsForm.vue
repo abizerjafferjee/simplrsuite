@@ -10,15 +10,6 @@
         </ul>
         </nav>
 
-        <!-- <section class="hero is-info welcome is-small">
-            <div class="hero-body">
-                <div class="container">
-                    <p class="title">Record a Payment</p>
-                    <p class="subtitle">Add a record of a payment that you have made. Record an invoice payment, a payment for another purchase or a custom amount that you have paid.</p>
-                </div>
-            </div>
-        </section> -->
-
         <div class="notification" v-if="errorNotification">
             <button @click="closeNotification" class="delete"></button>
             {{ errorNotification }}
@@ -120,11 +111,11 @@ export default {
            payment: {
                supplier_id: null,
                invoices: [],
-               currency: "TZS",
                payment_type: null,
                receipt: null,
                cheque: null,
                bank_transfer: null,
+               date: null,
                reason: null,
            },
            suppliers: [],
@@ -177,82 +168,58 @@ export default {
             this.clearForm()
         },
         recordPayment() { 
-            try {
-                this.axios.post('payment', {'body': this.payment}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.response = response
-                        this.showSuccess()
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.showError()
-                })
-            } catch (error) {
-                this.response = error
+            this.axios.post('payment', {'body': this.payment}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                if (response.data[1] == 401) {
+                    this.response = response
+                    this.errorNotification = "Your session has expired. Please logout and login again."
+                } else {
+                    this.response = response
+                    this.showSuccess()
+                }
+            })
+            .catch(e => {
+                this.response = e
                 this.showError()
-            }
+            })
         },
         clearForm() {
            this.payment = {
                supplier_id: null,
-               amount: 0,
                invoices: [],
-               purchases: [],
-               currency: "TZS",
                payment_type: null,
                receipt: null,
                cheque: null,
                bank_transfer: null,
+               date: null,
                reason: null,
            }
         },
         getSuppliers() {
-            try {
-                this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.suppliers = response.data[0]['suppliers']
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error."
-                })
-
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.suppliers = response.data['suppliers']
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         getInvoices(){
-            try {
-                this.axios.get('invoices/' + this.payment.supplier_id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.invoices = response.data[0]['body']
-                        console.log(this.invoices)
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error."
-                })
-
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.get('invoices/' + this.payment.supplier_id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.invoices = response.data['body']
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         invalidSupplier() {
             if (this.payment.supplier_id === null) {

@@ -1,48 +1,50 @@
 <template>
     <div id="supplier-form">
-        <div class="tile is-parent">
-            <article class="tile is-child">
 
-                <nav class="breadcrumb" aria-label="breadcrumbs">
-                <ul>
-                    <li><router-link to="/suppliers">Suppliers</router-link></li>
-                    <li class="is-active">
-                        <a aria-current="page">Add Supplier</a>
-                    </li>
-                </ul>
-                </nav>
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><router-link to="/suppliers">Suppliers</router-link></li>
+            <li class="is-active">
+                <a aria-current="page">Add Supplier</a>
+            </li>
+        </ul>
+        </nav>
 
-                <section class="hero welcome is-small has-background-light">
-                    <div class="hero-body">
-                        <div class="container">
-                            <p class="title">Add Supplier</p>
-                            <p class="subtitle">Manage your supplier information. This will be helpful in inventory tracking.</p>
-                        </div>
-                    </div>
-                </section>
+        <div class="section notification" v-if="errorNotification">
+            <button @click="closeNotification" class="delete"></button>
+            {{ errorNotification }}
+        </div>
 
-                <br>
+        <div v-if="error && submitting">
+            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+        </div>
+        <p v-if="success" class="notification is-success">Supplier successfully added</p>
 
-                <div class="notification" v-if="errorNotification">
-                    <button @click="closeNotification" class="delete"></button>
-                    {{ errorNotification }}
-                </div>
+        <div class="section">
+            <div class="card card-content has-background-light">
 
-                <section>
-                    <div class="content">
-                        <div v-if="error && submitting">
-                            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
-                        </div>
-                        <p v-if="success" class="notification is-success">Supplier successfully added</p>
-
-                        <form @submit.prevent="handleSubmit">
-
+                <form @submit.prevent="handleSubmit">
+                    <div class="columns">
+                        <div class="column">
                             <label class="label">* Supplier Name</label>
                             <input class="input" ref="business_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.business_name" type="text" placeholder="e.g. thumbtack"/>
-
+                        </div>
+                        <div class="column">
                             <label class="label">Contact Name</label>
                             <input class="input" ref="contact_name" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.contact_person" type="text" placeholder="e.g. John Doe"/>
+                        </div>
+                    </div>
 
+                    <div class="columns">
+                        <div class="column">
+                            <label class="label">* Email</label>
+                            <div class="field">
+                                <div class="control">
+                                    <input ref="email" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.email" class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
                             <label class="label">* Phone Number</label>
                             <div class="field has-addons">
                             <p class="control">
@@ -60,37 +62,32 @@
                                 <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
                             </p>
                             </div>
+                        </div>
+                    </div>
 
-                            <label class="label">* Email</label>
-                            <div class="field">
-                                <div class="control">
-                                    <input ref="email" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.email" class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
-                                </div>
-                            </div>
-
-                            <label class="label">Plus Code</label>
+                    <div class="columns">
+                        <div class="column is-two-fifths">
+                            <label class="label">Simplr Post Address Link</label>
                             <div class="field">
                                 <div class="control">
                                     <input ref="plus_code" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.plus_code" class="input" type="text" placeholder="">
                                 </div>
                             </div>
+                        </div>
 
+                        <div class="column">
                             <label class="label">Address</label>
                             <div class="field">
                                 <div class="control">
                                     <input ref="address" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.address" class="input" type="text" placeholder="">
                                 </div>
                             </div>
-
-                            <label class="label">Additional Info</label>
-                            <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="supplier.additional_info"></textarea></div>
-
-                            <button id="submit" class="button is-primary" v-if="editing">Save</button>
-                            <button id="submit" class="button is-primary" v-else>Add Supplier</button>
-                        </form>
+                        </div>
                     </div>
-                </section>
-            </article>
+
+                    <button id="submit" class="button is-primary">Add Supplier</button>
+                </form>
+            </div>
         </div>
 
     </div>
@@ -117,7 +114,7 @@ export default {
                address: null,
                additional_info: null
            },
-           jwt: ''
+           jwt: '',
        }
    },
    created () {
@@ -155,25 +152,15 @@ export default {
             // this.$refs.category.focus()
         },
         addSupplier() {
-            try {
-                this.axios.post('suppliers', {'body': this.supplier}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] === 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.response = response
-                        this.showSuccess()
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.showError()
-                })
-            } catch (error) {
+            this.axios.post('suppliers', {'body': this.supplier}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.response = response
+                this.showSuccess()
+            })
+            .catch(error => {
                 this.response = error
                 this.showError()
-            }
+            })
         },
         clearForm() {
            this.supplier = {

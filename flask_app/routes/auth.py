@@ -14,7 +14,7 @@ AuthRoutes = Blueprint('AuthRoutes', __name__)
 @AuthRoutes.route('/profile', methods=["GET"])
 @token_required
 def profile(current_user):
-    return make_response(jsonify({'success':True, 'user': current_user.to_dict()}, 200))
+    return make_response(jsonify({'success':True, 'user': current_user.to_dict()}), 200)
 
 @AuthRoutes.route('/login', methods=["POST"])
 def login():
@@ -22,7 +22,7 @@ def login():
     user = User.authenticate(**req)
     user = User.query.filter_by(email=req['email']).first()
     if not user: 
-        return make_response(jsonify({'success':False, 'body':'Please check your login details and try again.'}, 401))
+        return make_response(jsonify({'success':False, 'body':'Please check your login details and try again.'}), 401)
     
     token = jwt.encode({
         'sub': user.email,
@@ -30,7 +30,7 @@ def login():
         'exp': datetime.utcnow() + timedelta(minutes=30)
     }, current_app.config['SECRET_KEY'])
 
-    return make_response(jsonify({'success':True, 'token': token.decode('UTF-8')}, 200))
+    return make_response(jsonify({'success':True, 'token': token.decode('UTF-8')}), 200)
 
 @AuthRoutes.route('/signup', methods=["POST"])
 def signup():
@@ -39,7 +39,7 @@ def signup():
     user = User.query.filter_by(email=req['email']).first()
 
     if user:
-        return make_response(jsonify({'success':False, 'body':'A user with this email already exists.'}, 200))
+        return make_response(jsonify({'success':False, 'body':'A user with this email already exists.'}), 200)
 
     new_user = User(email=req['email'], name=req['name'])
     new_user.set_password(req['password'])
@@ -47,7 +47,7 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
 
-    return make_response(jsonify({'success':True}, 200))
+    return make_response(jsonify({'success':True}), 200)
 
 # @AuthRoutes.route('/logout', methods=["GET"])
 # def logout():

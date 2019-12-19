@@ -3,7 +3,7 @@
 
         <nav class="breadcrumb" aria-label="breadcrumbs">
             <ul>
-                <li><router-link to="/inventory">Purchases</router-link></li>
+                <li><router-link to="/invoices">Invoices</router-link></li>
                 <li class="is-active">
                     <a aria-current="page">Add Invoice</a>
                 </li>
@@ -280,25 +280,15 @@ export default {
             this.success = false
         },
         addInvoice() {
-            try {
-                this.axios.post('invoice', {'body': this.invoice}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.response = response
-                        this.showSuccess()
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.showError()
-                })
-            } catch (error) {
-                this.response = error
+            this.axios.post('invoice', {'body': this.invoice}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.response = response
+                this.showSuccess()
+            })
+            .catch(e => {
+                this.response = e
                 this.showError()
-            }
+            })
         },
         showError() {
             this.error = true
@@ -327,46 +317,30 @@ export default {
             }
         },
         getProducts() {
-            try {
-                this.axios.get('products/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.products = response.data[0]['products']
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error."
-                })
-
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.get('products/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.products = response.data['products']
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         getSuppliers() {
-            try {
-                this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    if (response.data[1] == 401) {
-                        this.response = response
-                        this.errorNotification = "Your session has expired. Please logout and login again."
-                    } else {
-                        this.suppliers = response.data[0]['suppliers']
-                    }
-                })
-                .catch(e => {
-                    this.response = e
-                    this.errorNotification = "Internal Server Error."
-                })
-
-            } catch (error) {
-                this.response = error
-                this.errorNotification = "Connection Error."
-            }
+            this.axios.get('suppliers/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.suppliers = response.data['suppliers']
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         invalidSupplier() {
             if (this.invoice.supplier === null) {

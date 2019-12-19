@@ -1,7 +1,7 @@
 <template>
     <div id="dashboard">
-        <div class="container">
-            <div class="column">
+        <!-- <div class="container"> -->
+            <!-- <div class="column"> -->
                 <section class="hero is-info welcome is-small">
                     <div class="hero-body">
                         <div class="container">
@@ -14,7 +14,6 @@
                         </div>
                     </div>
                 </section>
-                <br>
 
                 <section class="hero notification">
                     <div class="hero-body">
@@ -115,8 +114,8 @@
                         </div>
                     </div>
                 </div> -->
-            </div>
-        </div>
+            <!-- </div> -->
+        <!-- </div> -->
     </div>
 </template>
 

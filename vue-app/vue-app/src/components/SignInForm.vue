@@ -90,27 +90,22 @@ export default {
             // this.$refs.category.focus()
         },
         signin() {
-            try {
-                this.$store.commit('setUserData', this.user.email)
-                this.axios.post('login', {'body': this.user})
-                .then(response => {
-                    if (response.data[0]['success']) {
-                        this.$store.commit('setJwtToken', response.data[0]['token'])
-                        this.showSuccess()
-                        this.$emit('isAuthenticated', this.$store.getters.isAuthenticated)
-                    } else {
-                        this.errors.push({'id':1, 'e': response.data[0]['body']})
-                        this.showError()
-                    }
-                })
-                .catch(e => {
-                    this.response = e
+            this.$store.commit('setUserData', this.user.email)
+            this.axios.post('login', {'body': this.user})
+            .then(response => {
+                if (response.data['success']) {
+                    this.$store.commit('setJwtToken', response.data['token'])
+                    this.showSuccess()
+                    this.$emit('isAuthenticated', this.$store.getters.isAuthenticated)
+                } else {
+                    this.errors.push({'id':1, 'e': response.data['body']})
                     this.showError()
-                })
-            } catch (error) {
+                }
+            })
+            .catch(error => {
                 this.response = error
                 this.showError()
-            }
+            })
         },
         clearForm() {
            this.user = {

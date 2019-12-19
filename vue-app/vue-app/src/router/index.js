@@ -4,11 +4,12 @@ import ProductForm from '@/components/ProductForm.vue'
 import ProductView from '@/components/ProductView'
 import ProductDetailView from '@/components/ProductDetailView'
 import MailListForm from '@/components/MailListForm'
-import ProcurementForm from '@/components/ProcurementForm'
-import ProcurementView from '@/components/ProcurementView'
+import InvoiceForm from '@/components/InvoiceForm'
+import InvoiceView from '@/components/InvoiceView'
 import SupplierForm from '@/components/SupplierForm'
 import SupplierView from '@/components/SupplierView'
 import Dashboard from '@/components/Dashboard'
+import OutstandingView from '@/components/OutstandingView'
 import PaymentsView from '@/components/PaymentsView'
 import PaymentsForm from '@/components/PaymentsForm'
 import SignUpForm from '@/components/SignUpForm'
@@ -32,6 +33,11 @@ const routes = [
         path: '/dashboard',
         name: 'Dashboard',
         component: Dashboard
+    },
+    {
+        path: '/outstanding',
+        name: 'OutstandingView',
+        component: OutstandingView
     },
     {
         path: '/payments',
@@ -69,14 +75,14 @@ const routes = [
         component: MailListForm
     },
     {
-        path: '/inventory',
-        name: 'ProcurementView',
-        component: ProcurementView
+        path: '/invoices',
+        name: 'InvoiceView',
+        component: InvoiceView
     },
     {
-        path: '/add-inventory',
-        name: 'ProcurementForm',
-        component: ProcurementForm
+        path: '/add-invoice',
+        name: 'InvoiceForm',
+        component: InvoiceForm
     },
     {
         path: '/suppliers',

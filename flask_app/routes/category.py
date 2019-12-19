@@ -26,16 +26,16 @@ def get(current_user):
             output = category_schema.dump(categories.items)
             return make_response(jsonify({'success':True, 'categories': output,
                                         'page': categories.page, 'prev': categories.has_prev,
-                                        'next': categories.has_next}, 200))   
+                                        'next': categories.has_next}), 200)  
         else:
             categories = Category.query.filter(Category.user==current_user.id)
             category_schema = CategorySchema(many=True)
             output = category_schema.dump(categories)
-            return make_response(jsonify({'success':True, 'categories': output}, 200))    
+            return make_response(jsonify({'success':True, 'categories': output}), 200) 
 
     except Exception as e:
         print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 @CategoryRoutes.route('/categories', methods=['POST'])
 @token_required
@@ -53,11 +53,10 @@ def add(current_user):
         db.session.commit()
         # category_schema = CategorySchema()
         # output = category_schema.dump(new_category)
-        return make_response(jsonify({'success': True}, 200))
+        return make_response(jsonify({'success': True}), 200)
 
     except Exception as e:
-        print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 @CategoryRoutes.route('/categories', methods=['DELETE'])
 @token_required
@@ -69,10 +68,9 @@ def delete(current_user):
         id = request.args.get('id', type=int)
         Category.query.filter_by(id=id).delete()
         db.session.commit()
-        return make_response(jsonify({'success': True}, 200))
+        return make_response(jsonify({'success': True}), 200)
     except Exception as e:
-        print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 @CategoryRoutes.route('/categories', methods=['PUT'])
 @token_required
@@ -90,11 +88,10 @@ def update(current_user):
         category.name = body['name'],
         db.session.commit()
 
-        return make_response(jsonify({'success': True}, 200))
+        return make_response(jsonify({'success': True}), 200)
 
     except Exception as e:
-        print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 @CategoryRoutes.route('/categories/file', methods=['GET'])
 @token_required
@@ -114,7 +111,6 @@ def add_many(current_user):
                 )
             db.session.add(category)
         db.session.commit()
-        return make_response(jsonify({'success': True}, 200))
+        return make_response(jsonify({'success': True}), 200)
     except Exception as e:
-        print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)

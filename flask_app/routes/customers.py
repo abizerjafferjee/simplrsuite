@@ -29,11 +29,11 @@ def add(current_user):
         
         db.session.add(maillist)
         db.session.commit()
-        return make_response(jsonify({'success': True}, 200))
+        return make_response(jsonify({'success': True}), 200)
         
     except Exception as e:
         print(e)
-        return make_response(jsonify({'success': False}, 400))
+        return make_response(jsonify({'success': False}), 400)
 
 @CustomerRoutes.route('/maillist', methods=['GET'])
 @token_required
@@ -54,7 +54,7 @@ def get(current_user):
     output = schema.dump(maillist.items)
     return make_response(jsonify({'success': True, 'body': output,'body': output,
                                     'page': maillist.page, 'prev': maillist.has_prev,
-                                    'next': maillist.has_next}, 200))
+                                    'next': maillist.has_next}), 200)
 
     # except Exception as e:
     #     print(e)
