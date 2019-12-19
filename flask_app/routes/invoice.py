@@ -40,6 +40,7 @@ def add_invoice(current_user):
         # print(invoice_form.id)
 
         for item in items:
+            print(item)
             # create procurement form
             procurement_form = Procurement(
                 user = current_user.id,
@@ -53,6 +54,7 @@ def add_invoice(current_user):
             )
 
             db.session.add(procurement_form)
+            print(procurement_form)
             
             # update inventory
             inventory_form = Inventory.query.filter(Inventory.user==current_user.id)\
