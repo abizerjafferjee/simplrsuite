@@ -67,7 +67,7 @@ def add_invoice(current_user):
                     product_id = item['product'],
                     quantity = float(item['quantity'])
                 )
-                db.session.add(inventory)
+                db.session.add(inventory_form)
 
         # create payment
         if is_paid:
@@ -90,6 +90,7 @@ def add_invoice(current_user):
         
         return make_response(jsonify({'success': True}), 200)
     except Exception as e:
+        print(e)
         return make_response(jsonify({'success': False}), 400)
 
 @InvoiceRoutes.route('/invoices', methods=['GET'])
