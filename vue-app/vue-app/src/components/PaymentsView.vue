@@ -1,28 +1,32 @@
 <template>
     <div id="payments-view">
 
-        <div class="section notification" v-if="error">
-            <button @click="closeNotification" class="delete"></button>
-            {{ error }}
+        <div class="section" v-if="error">
+            <div class="notification">
+                <button @click="closeNotification" class="delete"></button>
+                {{ error }}
+            </div>
         </div>
 
-        <section class="section welcome card card-content has-background-light">
-            <div class="columns has-text-centered">
-                <div class="column is-three-fifths">
-                    <div class="field is-grouped is-expanding">
-                        <div class="control is-expanded">
-                            <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
+        <div class="section">
+            <div class="welcome card card-content has-background-light">
+                <div class="columns has-text-centered">
+                    <div class="column is-three-fifths">
+                        <div class="field is-grouped is-expanding">
+                            <div class="control is-expanded">
+                                <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
+                            </div>
+                            <div class="control button is-primary">search</div>
                         </div>
-                        <div class="control button is-primary">search</div>
                     </div>
+                    <div class="column"></div>
                 </div>
-                <div class="column"></div>
             </div>
-        </section>
+        </div>
 
 
-        <div v-if="payments && payments.length===0" class="section notification">
-            You don't have a payment history. View your outstanding invoices and record payments.
+        <div v-if="payments && payments.length===0" class="section">
+            <div class="notification">You don't have a payment history. View your outstanding invoices and record payments.</div>
         </div>
 
 
