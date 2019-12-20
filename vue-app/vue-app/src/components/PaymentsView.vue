@@ -1,7 +1,7 @@
 <template>
     <div id="payments-view">
 
-        <div class="section" v-if="error">
+        <div v-if="error">
             <div class="notification">
                 <button @click="closeNotification" class="delete"></button>
                 {{ error }}
@@ -25,7 +25,7 @@
         </div>
 
 
-        <div v-if="payments && payments.length===0" class="section">
+        <div v-if="payments && payments.length===0">
             <div class="notification">You don't have a payment history. View your outstanding invoices and record payments.</div>
         </div>
 
@@ -71,11 +71,9 @@
             </div>
         </div>
 
-        <div class="section" v-if="payments">
-            <div class="level">
-                <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
-                <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
-            </div>
+        <div class="level" v-if="payments">
+            <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
+            <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
         </div>
         
 
