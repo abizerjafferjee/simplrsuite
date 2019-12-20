@@ -2,11 +2,11 @@
     <div id="category-view">
 
         <div class="notification" v-if="error">
-            <button @click="closeNotification" class="delete"></button>
+            <!-- <button @click="closeNotification" class="delete"></button> -->
             {{ error }}
         </div>
 
-        <section class="welcome card card-content has-background-light">
+        <div class="card card-content has-background-light" v-if="!error">
             <div class="columns">
                 <div class="column is-four-fifths">
                     <div class="field is-grouped">
@@ -18,14 +18,12 @@
                 </div>
                 <div class="column"></div>
             </div>
-        </section>
+        </div>
 
-        <div class="section">
-            <div class="notification" v-if="categories">You have {{ categories.length }} categories</div>
-            <div class="notification" v-else>You have no categories. Add a new category.</div>
-        </div>            
 
         <div class="section" v-if="categories">
+            <div class="title is-5" v-if="categories.length > 0">You have {{ categories.length }} categories</div>
+            <div class="notification" v-if="categories.length === 0">You have no categories. Add a new category.</div>        
 
             <div class="card-table">
                 <table class="card-body table is-stripped">
@@ -81,7 +79,7 @@ export default {
             category: {
                 name: '',
             },
-            categories: [],
+            categories: null,
             pages: {
                 page: null,
                 next: null,

@@ -1,12 +1,12 @@
 <template>
     <div id="product-table">
         
-        <div class="section notification" v-if="error">
-            <button @click="closeNotification" class="delete"></button>
+        <div class="notification" v-if="error">
+            <!-- <button @click="closeNotification" class="delete"></button> -->
             {{ error }}
         </div>
 
-        <section class="welcome card card-content has-background-light">
+        <div class="card card-content has-background-light" v-if="!error">
             <div class="columns">
                 <div class="column is-two-fifths">
                     <div class="field is-grouped is-expanding">
@@ -21,57 +21,46 @@
                     <router-link to="/add-supplier" class="button">Add Supplier</router-link>
                 </div>
             </div>
-        </section>
+        </div>
 
-
-        
-        
-        <div v-if="suppliers && suppliers.length < 1" class="notification">
+        <div v-if="suppliers && suppliers.length === 0" class="notification">
             You have no suppliers. Click Add Supplier to add your first supplier.
         </div>
 
-        <div class="section" v-else>
-            <div v-for="supplier in suppliers" :key="supplier.id">
-                <div class="card card-content" style="margin:0px 0px 10px 0px">
-                    <article class="media">
-                        <div class="media-content">
-                            <div class="content">
-                                <p class="title is-4 has-text-link">
-                                    {{ supplier.business_name }}
-                                </p>
-                            </div>
-                            <div class="level is-mobile">
-                                <div class="level-left is-size-6 has-text-grey">
-                                    <p class="level-item" aria-label="transactions" v-if="supplier.contact_person">
-                                        <font-awesome-icon class="font-margin" icon="at" size="lg" /> {{ supplier.contact_person }}
-                                    </p>
-                                    <p class="level-item" aria-label="transactions" v-if="supplier.email">
-                                        <font-awesome-icon class="font-margin" icon="envelope-square" size="lg" /> <a>{{ supplier.email }}</a>
-                                    </p>
-                                    <p class="level-item" aria-label="transactions" v-if="supplier.phone">
-                                        <font-awesome-icon class="font-margin" icon="phone-square-alt" size="lg" />{{ supplier.phone }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="level is-mobile">
-                                <div class="level-left is-size-6 has-text-grey">
-                                    <p class="level-item" aria-label="transactions" v-if="supplier.address">
-                                        <font-awesome-icon class="font-margin" icon="map-marker-alt" size="lg" />{{ supplier.address }}
-                                    </p>
-                                </div>
-                            </div>
+        <div class="section" v-if="suppliers && suppliers.length > 0">
+            <div class="card is-paddingless" v-for="supplier in suppliers" :key="supplier.id" style="margin:0px 0px 10px 0px">
+                <div class="card-content">
+                    <div class="title is-4 has-text-link">
+                        {{ supplier.business_name }}
+                    </div>
+                    <div class="level is-mobile">
+                        <div class="level-left is-size-6 has-text-grey">
+                            <p class="level-item" aria-label="transactions" v-if="supplier.contact_person">
+                                <font-awesome-icon class="font-margin" icon="at" size="lg" /> {{ supplier.contact_person }}
+                            </p>
+                            <p class="level-item" aria-label="transactions" v-if="supplier.email">
+                                <font-awesome-icon class="font-margin" icon="envelope-square" size="lg" /> <a>{{ supplier.email }}</a>
+                            </p>
+                            <p class="level-item" aria-label="transactions" v-if="supplier.phone">
+                                <font-awesome-icon class="font-margin" icon="phone-square-alt" size="lg" />{{ supplier.phone }}
+                            </p>
                         </div>
-                    </article>
+                    </div>
+                    <div class="level is-mobile">
+                        <div class="level-left is-size-6 has-text-grey">
+                            <p class="level-item" aria-label="transactions" v-if="supplier.address">
+                                <font-awesome-icon class="font-margin" icon="map-marker-alt" size="lg" />{{ supplier.address }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="level" role="navigation" aria-label="pagination">
+                <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getSuppliers(pages.page-1)">Previous</a>
+                <a class="pagination-next level-right" :disabled="pages.next==false" @click="getSuppliers(pages.page+1)">Next page</a>
             </div>
         </div>
 
-        <div class="section" v-if="suppliers.length > 0">
-            <nav class="pagination" role="navigation" aria-label="pagination">
-                <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getSuppliers(pages.page-1)">Previous</a>
-                <a class="button pagination-next" :disabled="pages.next==false" @click="getSuppliers(pages.page+1)">Next page</a>
-            </nav>
-        </div>
 
     </div>
 </template>
@@ -88,7 +77,7 @@ export default {
             jwt: '',
             response: null,
             error: null,
-            suppliers: [],
+            suppliers: null,
             pages: {
                 page: null,
                 next: null,

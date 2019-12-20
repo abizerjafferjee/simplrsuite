@@ -1,12 +1,12 @@
 <template>
     <div id="product-table">
 
-        <div class="section notification" v-if="error">
-            <button @click="closeNotification" class="delete"></button>
+        <div class="notification" v-if="error">
+            <!-- <button @click="closeNotification" class="delete"></button> -->
             {{ error }}
         </div>
 
-        <section class="welcome card card-content has-background-light">
+        <div class="card card-content has-background-light" v-if="!error">
             <div class="columns">
                 <div class="column is-three-fifths">
                     <div class="field is-grouped is-expanding">
@@ -21,13 +21,13 @@
                     <router-link to="/add-product" class="button">Add Product</router-link>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <div v-if="products && products.length < 1" class="notification">
+        <div v-if="products && products.length === 0" class="notification">
             You have no products in your catalog. Click Add Products to add your first product.
         </div>
 
-        <div class="section" v-else>
+        <div class="section" v-if="products && products.length > 0">
 
             <div class="columns is-multiline is-scrollable">
                 <div class="column is-4" v-for="product in products" :key="product.id">
@@ -47,11 +47,10 @@
                 </div>
             </div>
 
-            
-            <nav class="pagination" role="navigation" aria-label="pagination">
-                <a class="button pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getProducts(pages.page-1)">Previous</a>
-                <a class="button pagination-next" :disabled="pages.next==false" @click="getProducts(pages.page+1)">Next page</a>
-            </nav>
+            <div class="level" role="navigation" aria-label="pagination">
+                <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getProducts(pages.page-1)">Previous</a>
+                <a class="pagination-next level-right" :disabled="pages.next==false" @click="getProducts(pages.page+1)">Next page</a>
+            </div>
 
         </div>
     </div>
@@ -68,7 +67,7 @@ export default {
     },
     data() {
         return {
-            products: [],
+            products: null,
             pages: {
                 page: null,
                 next: null,

@@ -1,8 +1,8 @@
 <template>
     <div id="mail-form">
 
-        <div class="section notification" v-if="error">
-            <button @click="closeNotification" class="delete"></button>
+        <div class="notification" v-if="error">
+            <!-- <button @click="closeNotification" class="delete"></button> -->
             {{ error }}
         </div>
 
@@ -11,7 +11,7 @@
         </div>
         <p v-if="success" class="notification is-success">Contact successfully added</p>
 
-        <div class="section">
+        <div class="section" v-if="!errors">
             <div class="card card-content has-background-light">
                 <form @submit.prevent="handleSubmit">
                     <div class="columns">
@@ -66,42 +66,42 @@
             </div>
         </div>
 
-        <div class="section">
-            <div class="card card-table" v-if="maillist">
-                <table class="table is-fullwidth is-striped">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Business/ Organization</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="contact in maillist" v-bind:key="contact.id">
-                            <td>{{ contact.name }}
-                            <td>{{ contact.business }}</td>
-                            <td>{{ contact.email }}</td>
-                            <td>{{ contact.phone }}
-                            <td>{{ contact.remark }}</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td><a class="pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getMaillist(pages.page-1)">Previous</a></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><a class="pagination-next" :disabled="pages.next==false" @click="getMaillist(pages.page+1)">Next page</a></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <div class="notification" v-else>
-                <div class="title has-text-grey has-text-centered">No contacts in your maillist.</div>
-            </div>
+        <div class="notification" v-if="maillist && maillist.length === 0">
+            No contacts in your maillist.
         </div>
+
+        <div class="card card-table" v-if="maillist && maillist.length > 0">
+            <table class="table is-fullwidth is-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Business/ Organization</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="contact in maillist" v-bind:key="contact.id">
+                        <td>{{ contact.name }}
+                        <td>{{ contact.business }}</td>
+                        <td>{{ contact.email }}</td>
+                        <td>{{ contact.phone }}
+                        <td>{{ contact.remark }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><a class="pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getMaillist(pages.page-1)">Previous</a></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><a class="pagination-next" :disabled="pages.next==false" @click="getMaillist(pages.page+1)">Next page</a></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
     </div>
 </template>
 
@@ -122,7 +122,7 @@ export default {
                phone_code: "+255",
                remark: null
            },
-           maillist: [],
+           maillist: null,
            pages: {
                page: null,
                next: null,

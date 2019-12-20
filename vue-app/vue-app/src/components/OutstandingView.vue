@@ -1,28 +1,26 @@
 <template>
     <div id="outstanding-invoices-view">
 
-        <div class="section notification" v-if="error">
-            <button @click="closeNotification" class="delete"></button>
+        <div class="notification" v-if="error">
+            <!-- <button @click="closeNotification" class="delete"></button> -->
             {{ error }}
         </div>
 
-        <section class="welcome card card-content has-background-light">
+        <div class="card card-content has-background-light" v-if="!error">
             <div class="columns">
                 <div class="column is-four-fifths"></div>
                 <div class="column">
                     <router-link to="/record-payment" class="button">Record Payment</router-link>
                 </div>
             </div>
-        </section>
+        </div>
 
-
-        <div v-if="!invoices" class="section notification">
+        <div class="notification" v-if="invoices && invoices.length===0">
             You have 0 invoices. Click Add Invoice to add a new invoice.
         </div>
 
-
-        <div class="section has-text-centered" v-if="invoices.length>0">
-            <div class="box has-background-light">
+        <div class="section has-text-centered" v-if="invoices && invoices.length>0">
+            <div class="box has-background-light is-paddingless">
                 <div class="columns">
                     <div class="column">Supplier</div>
                     <div class="column">Invoice Number</div>
@@ -31,7 +29,7 @@
                     <div class="column">Invoice Date</div>
                 </div>
             </div>
-            <div class="card card-content" v-for="(invoice, index) in invoices" v-bind:key="index" style="margin:0px 0px 10px 0px">
+            <div class="card card-content is-paddingless" v-for="(invoice, index) in invoices" v-bind:key="index" style="margin:0px 0px 10px 0px">
                 <div class="level">
                     <div class="column"><div class="title is-6">{{ invoice.supplier.business_name }}</div></div>
                     <div class="column"><div class="title is-6 has-text-info">{{ invoice.invoice_number }}</div></div>
@@ -48,11 +46,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="level">
-            <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getInvoices(pages.page-1)">Previous</a>
-            <a class="pagination-next level-right" :disabled="pages.next==false" @click="getInvoices(pages.page+1)">Next page</a>
+            <div class="level">
+                <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getInvoices(pages.page-1)">Previous</a>
+                <a class="pagination-next level-right" :disabled="pages.next==false" @click="getInvoices(pages.page+1)">Next page</a>
+            </div>
         </div>
         
     </div>
@@ -73,7 +70,7 @@ export default {
             response: null,
             error: null,
             stats: null,
-            invoices: [],
+            invoices: null,
             pages: {
                 page: null,
                 next: null,

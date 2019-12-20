@@ -1,37 +1,31 @@
 <template>
     <div id="payments-view">
 
-        <div v-if="error">
-            <div class="notification">
-                <button @click="closeNotification" class="delete"></button>
-                {{ error }}
-            </div>
+        <div class="notification" v-if="error">
+            <!-- <button @click="closeNotification" class="delete"></button> -->
+            {{ error }}
         </div>
 
-        <div class="section">
-            <div class="welcome card card-content has-background-light">
-                <div class="columns has-text-centered">
-                    <div class="column is-three-fifths">
-                        <div class="field is-grouped is-expanding">
-                            <div class="control is-expanded">
-                                <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
-                            </div>
-                            <div class="control button is-primary">search</div>
+        <div class="card card-content has-background-light" v-if="!error"> 
+            <div class="columns has-text-centered">
+                <div class="column is-three-fifths">
+                    <div class="field is-grouped is-expanding">
+                        <div class="control is-expanded">
+                            <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
                         </div>
+                        <div class="control button is-primary">search</div>
                     </div>
-                    <div class="column"></div>
                 </div>
+                <div class="column"></div>
             </div>
         </div>
 
-
-        <div v-if="payments && payments.length===0">
-            <div class="notification">You don't have a payment history. View your outstanding invoices and record payments.</div>
+        <div class="notification" v-if="payments && payments.length===0">
+            You don't have a payment history. View your outstanding invoices and record payments.
         </div>
-
 
         <div class="section has-text-centered" v-if="payments && payments.length>0">
-            <div class="box has-background-light">
+            <div class="box has-background-light is-paddingless">
                 <div class="columns">
                     <div class="column">Supplier</div>
                     <div class="column">Invoice Number</div>
@@ -41,7 +35,7 @@
                     <div class="column">Date</div>
                 </div>
             </div>
-            <div class="card card-content" v-for="(payment, index) in payments" v-bind:key="index" style="margin:0px 0px 10px 0px">
+            <div class="card card-content is-paddingless" v-for="(payment, index) in payments" v-bind:key="index" style="margin:0px 0px 10px 0px">
                 <div class="columns">
                     <div class="column"><div class="title is-6">{{ payment.payment.supplier.business_name }}</div></div>
                     <div class="column"><div class="title is-6 has-text-info">{{ payment.payment.invoice_number }}</div></div>
@@ -66,15 +60,14 @@
                         <div class="title is-6" v-if="payment.date">{{ payment.date }}</div>
                         <div class="title is-6" v-else>No Date</div>
                     </div>
-
                 </div>
+            </div>
+            <div class="level">
+                <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
+                <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
             </div>
         </div>
 
-        <div class="level" v-if="payments">
-            <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
-            <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
-        </div>
         
 
         <!-- <section class="info-tiles">
@@ -208,4 +201,6 @@ button {
 .font-margin {
     margin: 0px 5px 0px 0px;
 }
+
+
 </style>
