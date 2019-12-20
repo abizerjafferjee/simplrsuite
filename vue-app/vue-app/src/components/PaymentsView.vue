@@ -6,7 +6,7 @@
             {{ error }}
         </div>
 
-        <section class="welcome card card-content has-background-light">
+        <section class="section welcome card card-content has-background-light">
             <div class="columns has-text-centered">
                 <div class="column is-three-fifths">
                     <div class="field is-grouped is-expanding">
@@ -21,12 +21,12 @@
         </section>
 
 
-        <div v-if="payments.length===0" class="section notification">
+        <div v-if="payments && payments.length===0" class="section notification">
             You don't have a payment history. View your outstanding invoices and record payments.
         </div>
 
 
-        <div class="section has-text-centered" v-if="payments.length>0">
+        <div class="section has-text-centered" v-if="payments && payments.length>0">
             <div class="box has-background-light">
                 <div class="columns">
                     <div class="column">Supplier</div>
@@ -67,9 +67,11 @@
             </div>
         </div>
 
-        <div class="level">
-            <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
-            <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
+        <div class="section" v-if="payments">
+            <div class="level">
+                <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
+                <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
+            </div>
         </div>
         
 
@@ -122,7 +124,7 @@ export default {
             response: null,
             error: null,
             stats: null,
-            payments: [],
+            payments: null,
             pages: {
                 page: null,
                 next: null,
