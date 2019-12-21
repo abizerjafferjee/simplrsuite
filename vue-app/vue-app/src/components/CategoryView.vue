@@ -1,11 +1,9 @@
 <template>
     <div id="category-view">
 
-        <div class="section">
-            <div class="notification" v-if="error">
-                <!-- <button @click="closeNotification" class="delete"></button> -->
-                {{ error }}
-            </div>
+        <div class="level">
+            <div class="title is-6 has-text-danger" v-if="error">{{ error }}</div>
+            <div class="title is-6 has-text-success" v-else-if="success">{{ success }}</div>
             <div v-else></div>
         </div>
 
@@ -15,7 +13,7 @@
                 <div class="column is-four-fifths">
                     <div class="field is-grouped">
                         <p class="control is-expanded">
-                            <input v-model="category.name" class="input" type="text" placeholder="Type category name">
+                            <input v-model="category" @focus="clearStatus" class="input" type="text" placeholder="Type category name">
                         </p>
                         <a @click="addCategory()" class="button is-primary">Add Category</a>
                     </div>
@@ -31,9 +29,9 @@
                     <div class="column">Actions</div>
                 </div>
             </div>
-            <div class="card has-background-info is-paddingless" v-if="categories && categories.length>0">
+            <!-- <div class="card has-background-info is-paddingless" v-if="categories && categories.length>0">
                 <div class="column"><div class="title is-5 has-text-white">You have {{ categories.length }} categories.</div></div>
-            </div>
+            </div> -->
             <div class="has-background-light" style="min-height:500px">
                 <div class="notification" v-if="categories && categories.length===0">You have no categories. Add a new category.</div>
                 <div class="card is-paddingless" v-for="category in categories" :key="category.id" v-else-if="categories && categories.length > 0">
@@ -76,12 +74,11 @@ export default {
     data() {
         return {
             jwt: '',
+            error: null,
+            success: null,
             editing: null,
             response: null,
-            error: null,
-            category: {
-                name: '',
-            },
+            category: null,
             categories: null,
             pages: {
                 page: null,
@@ -115,6 +112,7 @@ export default {
             this.axios.delete('categories?id='+id, { headers: { Authorization: `Bearer: ${this.jwt}`}})
             .then(response => {
                 this.response = response
+                this.success = "Category deleted."
                 this.getCategories(this.pages.page)
             })
             .catch(error => {
@@ -126,33 +124,35 @@ export default {
             })
         },
         addCategory() {
-            if (this.invalidCategory()) {
-                this.error = "Cannot add empty category"
-            } else {
-                this.axios.post('categories', {'body': this.category}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
-                .then(response => {
-                    this.response = response
-                    this.getCategories(this.pages.page)
-                })
-                .catch(error => {
-                    if (error.response.status === 401) {
-                        this.error = "Your session has expired. Please login again."
-                    } else {
-                        this.error = "Internal Server Error"
-                    }
-                })
-            }
+            this.axios.post('categories', {'body': this.category}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.response = response
+                this.success = "Category added."
+                this.getCategories(this.pages.page)
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else if (error.response.status === 400) {
+                    this.error = error.response.data['message']
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
         editCategory(updatedCategory) {
             this.axios.put('categories?id='+updatedCategory.id, {'body': updatedCategory}, { headers: {'Content-Type': 'application/json', 'Authorization': `Bearer: ${this.jwt}`}})
             .then(response => {
                 this.response = response
-                this.getCategories(this.pages.page)
+                this.success = "Category updated."
                 this.editing = null
+                this.getCategories(this.pages.page)
             })
             .catch(error => {
                 if (error.response.status === 401) {
                     this.error = "Your session has expired. Please login again."
+                } else if (error.response.status === 400) {
+                    this.error = error.response.data['message']
                 } else {
                     this.error = "Internal Server Error"
                 }
@@ -166,14 +166,10 @@ export default {
             Object.assign(category, this.cachedCategory)
             this.editing = null
         },
-        closeNotification() {
+        clearStatus() {
             this.error = null
-        },
-        invalidCategory() {
-            if (this.category.name === '') {
-                return true
-            }
-            return false
+            this.success = null
+            this.category = ''
         },
     }
 }

@@ -131,11 +131,10 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'))
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    description = db.Column(db.String())
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    description = db.Column(db.String(), unique=True)
     sku = db.Column(db.String())
     code = db.Column(db.String())
-    product_type = db.Column(db.String())
     packing_type = db.Column(db.String())
     packing = db.Column(db.String())
     currency = db.Column(db.String())
@@ -156,7 +155,7 @@ class Category(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'))
-    name = db.Column(db.String())
+    name = db.Column(db.String(), unique=True)
     created = db.Column(db.DateTime(), default=datetime.now())
     products = relationship("Product", backref='category')
 

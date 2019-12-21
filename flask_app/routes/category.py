@@ -46,17 +46,16 @@ def add(current_user):
     try:
         body = json.loads(request.data)['body']
         new_category = Category(
-            name = body['name'],
+            name = body,
             user = current_user.id,
             )
         db.session.add(new_category)
         db.session.commit()
-        # category_schema = CategorySchema()
-        # output = category_schema.dump(new_category)
+
         return make_response(jsonify({'success': True}), 200)
 
     except Exception as e:
-        return make_response(jsonify({'success': False}), 400)
+        return make_response(jsonify({'success': False, 'message': 'Category already exists.'}), 400)
 
 @CategoryRoutes.route('/categories', methods=['DELETE'])
 @token_required
@@ -85,7 +84,7 @@ def update(current_user):
         body = req['body']
         category = Category.query.get(id)
 
-        category.name = body['name'],
+        category.name = body['name']
         db.session.commit()
 
         return make_response(jsonify({'success': True}), 200)

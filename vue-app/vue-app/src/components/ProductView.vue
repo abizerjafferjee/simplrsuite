@@ -1,12 +1,9 @@
 <template>
     <div id="product-table">
 
-        <div class="section">
-            <div class="notification" v-if="error">
-                <!-- <button @click="closeNotification" class="delete"></button> -->
-                {{ error }}
-            </div>
-            <div></div>
+        <div class="level">
+            <div class="title is-6 has-text-danger" v-if="error">{{ error }}</div>
+            <div v-else></div>
         </div>
 
         <article class="card has-text-centered">
@@ -15,9 +12,9 @@
                     <div class="column is-three-fifths">
                         <div class="field is-grouped is-expanding">
                             <div class="control is-expanded">
-                                <model-select class="input is-large" ref="search" :options="productNames" v-model="search" placeholder="search products"></model-select>
+                                <model-select class="input is-large" ref="search" :options="productNames" v-model="productSearch" placeholder="search products"></model-select>
                             </div>
-                            <div class="control button is-primary">search</div>
+                            <div class="control button is-primary" @click="searchProducts()">search</div>
                         </div>
                     </div>
                     <div class="column"></div>
@@ -33,7 +30,7 @@
                         <div class="card">
                             <div class="card-image">
                                 <img height=200 width=200 :src="require('../assets/uploads/' + product.image_path)" v-if="product.image_path">
-                                <img heigth=200 src="../assets/ecommerce-default-product.png" alt="Placeholder image" v-else>
+                                <img heigth=200 width=200 src="../assets/ecommerce-default-product.png" alt="Placeholder image" v-else>
                             </div>
                             <div class="card-content is-size-6 has-text-grey">
                                 <!-- <div class="content"> -->
@@ -75,7 +72,7 @@ export default {
                 prev: null
             },
             productNames: [],
-            search: null,
+            productSearch: null,
             response: null,
             error: null,
             jwt: ''
@@ -92,6 +89,7 @@ export default {
     created() {
         this.jwt = this.$store.state.jwt
         this.getProducts(1)
+        this.getProductNames()
     },
     methods: {
         getProducts(page) {
@@ -110,8 +108,31 @@ export default {
                 }
             })
         },
-        closeNotification() {
-            this.error = null
+        searchProducts() {
+            this.axios.get('products/search?product='+this.productSearch, { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.products = response.data.body
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
+        },
+        getProductNames() {
+            this.axios.get('products/names', { headers: { Authorization: `Bearer: ${this.jwt}`}})
+            .then(response => {
+                this.productNames = response.data.body
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else {
+                    this.error = "Internal Server Error"
+                }
+            })
         },
     }
 }

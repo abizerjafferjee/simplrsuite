@@ -52,24 +52,31 @@ def add(current_user):
             file.save(write_path)
 
         body = json.loads(request.form['body'])
+        
+        if not body['category']:
+            raise Exception('No category selected.')
 
-        category = Category.query.filter_by(name=body['category']).first()
-        product = Product(
-            user = current_user.id,
-            category = category,
-            description = body['description'],
-            product_type = body['product_type'],
-            code = body['code'],
-            packing_type = body['packing_type'],
-            packing = body['packing'],
-            currency = body['currency'],
-            price = float(body['price']) if body['price'] else None,
-            image_path = filename,
-            additional_info = body['additional_info']
-        )
+        category = Category.query.get(body['category'])
+        
+        try:
+            product = Product(
+                user = current_user.id,
+                category = category,
+                description = body['description'],
+                code = body['code'],
+                packing_type = body['packing_type'],
+                packing = body['packing'],
+                currency = body['currency'],
+                price = float(body['price']) if body['price'] else None,
+                image_path = filename,
+                additional_info = body['additional_info']
+            )
 
-        db.session.add(product)
-        db.session.flush()
+            db.session.add(product)
+            db.session.flush()
+        except:
+            raise Exception('Product already exists.')
+
         product.sku = generateSKU(product.id, product.category_id, product.description)
         db.session.commit()
 
@@ -78,11 +85,12 @@ def add(current_user):
 
         return make_response(jsonify({'success': True, 'body': output}), 200)
     except Exception as e:
-        return make_response(jsonify({'success': False}), 400)
+        print(e)
+        return make_response(jsonify({'success': False, 'message':str(e)}), 400)
 
 @ProductRoutes.route('/products', methods=['PUT'])
 @token_required
-def put(current_user):
+def update_product(current_user):
     """
     Update a product in db
     *Modify to handle category updates
@@ -93,7 +101,6 @@ def put(current_user):
         updatedProduct = json.loads(request.data)['body']
         d = Product.query.filter_by(id=id).first()
         d.description = updatedProduct['description']
-        d.product_type = updatedProduct['product_type']
         d.packing = updatedProduct['packing']
         db.session.commit()
         return make_response(jsonify({'success': True}), 200)
@@ -103,7 +110,7 @@ def put(current_user):
 
 @ProductRoutes.route('/products', methods=['DELETE'])
 @token_required
-def delete(current_user):
+def delete_product(current_user):
     """
     Delete a product in db by id
     """
@@ -117,7 +124,7 @@ def delete(current_user):
 
 @ProductRoutes.route('/products/<int:id>', methods=['GET'])
 @token_required
-def get(current_user, id):
+def get_product(current_user, id):
     """
     Get a product from db by id
     """
@@ -139,7 +146,8 @@ def get_products(current_user):
     """
     try:
         page = request.args.get('page', type=int)
-        per_page = 12
+        per_page = 9
+
         products = Product.query\
             .filter(Product.user==current_user.id)\
             .paginate(page=page, per_page=per_page, error_out=False)
@@ -153,6 +161,26 @@ def get_products(current_user):
         print(e)
         return make_response(jsonify({'success': False}, 400))
 
+@ProductRoutes.route('/products/search', methods=['GET'])
+@token_required
+def search_products(current_user):
+    """
+    Search and paginate products for product view
+    """
+    try:
+        product = request.args.get('product', type=int)
+        products = Product.query\
+            .filter(Product.user==current_user.id)\
+            .filter(Product.id==product)\
+            .all()
+
+        product_schema = ProductSchema(many=True)
+        output = product_schema.dump(products)
+        return make_response(jsonify({'success': True, 'body': output}), 200)
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'success': False}, 400))
+
 @ProductRoutes.route('/products/names', methods=['GET'])
 @token_required
 def get_names(current_user):
@@ -161,8 +189,8 @@ def get_names(current_user):
     """
     try:
         products = Product.query.filter(Product.user==current_user.id)
-        product_names = [{'value': p.id, 'text': p.description, 'packing_type': p.packing_type} for p in products]
-        return make_response(jsonify({'success': True, 'products': product_names}), 200)
+        product_names = [{'value': p.id, 'text': p.description} for p in products]
+        return make_response(jsonify({'success': True, 'body': product_names}), 200)
     except Exception as e:
         return make_response(jsonify({'success': False}), 400)
 
