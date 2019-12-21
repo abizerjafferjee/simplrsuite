@@ -1,20 +1,21 @@
 <template>
     <div id="mail-form">
 
-        <div class="notification" v-if="error">
-            <!-- <button @click="closeNotification" class="delete"></button> -->
-            {{ error }}
+        <div class="section">
+            <div class="notification" v-if="error">
+                <!-- <button @click="closeNotification" class="delete"></button> -->
+                {{ error }}
+            </div>
+            <div v-if="error && submitting">
+                <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
+            </div>
+            <p v-if="success" class="notification is-success">Contact successfully added</p>
         </div>
 
-        <div v-if="error && submitting">
-            <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
-        </div>
-        <p v-if="success" class="notification is-success">Contact successfully added</p>
-
-        <div class="section" v-if="!errors">
-            <div class="card card-content has-background-light">
+        <div class="section">
+            <div class="card is-paddingless has-background-light">
                 <form @submit.prevent="handleSubmit">
-                    <div class="columns">
+                    <div class="level">
                         <div class="column">
                             <label class="label">* Full Name</label>
                             <input class="input" ref="name" @focus="clearStatus" @keypress="clearStatus" v-model="contact.name" type="text"/>
@@ -54,7 +55,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="columns">
+                    <div class="level">
                         <div class="column">
                             <label class="label">Remarks/ Comments</label>
                             <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="contact.remark"></textarea></div>
@@ -66,48 +67,59 @@
             </div>
         </div>
 
-        <div class="notification" v-if="maillist && maillist.length === 0">
-            No contacts in your maillist.
-        </div>
-
-        <div class="card card-table" v-if="maillist && maillist.length > 0">
-            <table class="table is-fullwidth is-striped">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Business/ Organization</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="contact in maillist" v-bind:key="contact.id">
-                        <td>{{ contact.name }}
-                        <td>{{ contact.business }}</td>
-                        <td>{{ contact.email }}</td>
-                        <td>{{ contact.phone }}
-                        <td>{{ contact.remark }}</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td><a class="pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getMaillist(pages.page-1)">Previous</a></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><a class="pagination-next" :disabled="pages.next==false" @click="getMaillist(pages.page+1)">Next page</a></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+        <article class="card has-text-centered">
+            <!-- <div class="card has-background-info has-text-white is-paddingless">
+                <div class="level">
+                    <div class="column is-three-fifths">
+                        <div class="field is-grouped is-expanding">
+                            <div class="control is-expanded">
+                                <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
+                            </div>
+                            <div class="control button is-primary">search</div>
+                        </div>
+                    </div>
+                    <div class="column"></div>
+                </div>
+            </div> -->
+            <div class="card has-background-info has-text-white is-paddingless">
+                <div class="level">
+                    <div class="column">Name</div>
+                    <div class="column">Organization</div>
+                    <div class="column">Email</div>
+                    <div class="column">Phone Number</div>
+                    <div class="column">Remarks</div>
+                </div>
+            </div>
+            <div class="has-background-light" style="min-height:500px">
+                <div class="notification" v-if="maillist && maillist.length===0">No contacts in your maillist. Add a contact using the form above.</div>
+                <div class="card is-paddingless" v-for="contact in maillist" v-bind:key="contact.id" v-else-if="maillist && maillist.length > 0">
+                    <div class="level">
+                        <div class="column"><div class="title is-6">{{ contact.name }}</div></div>
+                        <div class="column"><div class="title is-6 has-text-info">{{ contact.business }}</div></div>
+                        <div class="column"><div class="title is-6">{{ contact.email }}</div></div>
+                        <div class="column"><div class="title is-6">{{ contact.phone }}</div></div>
+                        <div class="column"><div class="title is-6">{{ contact.remark }}</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card is-paddingless">
+                <div class="level">
+                    <a class="pagination-previous" title="This is the first page" :disabled="pages.prev==false" @click="getMaillist(pages.page-1)">Previous</a>
+                    <a class="pagination-next" :disabled="pages.next==false" @click="getMaillist(pages.page+1)">Next page</a>
+                </div>
+            </div>
+        </article>
 
     </div>
 </template>
 
 <script>
+import { ModelSelect } from 'vue-search-select';
 export default {
    name: 'mail-form',
+    components: {
+        ModelSelect,
+    },
    data() {
        return {
            submitting: false,

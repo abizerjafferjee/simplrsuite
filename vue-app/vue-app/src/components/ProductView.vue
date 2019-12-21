@@ -1,58 +1,59 @@
 <template>
     <div id="product-table">
 
-        <div class="notification" v-if="error">
-            <!-- <button @click="closeNotification" class="delete"></button> -->
-            {{ error }}
+        <div class="section">
+            <div class="notification" v-if="error">
+                <!-- <button @click="closeNotification" class="delete"></button> -->
+                {{ error }}
+            </div>
+            <div></div>
         </div>
 
-        <div class="card card-content has-background-light" v-if="!error">
-            <div class="columns">
-                <div class="column is-three-fifths">
-                    <div class="field is-grouped is-expanding">
-                        <div class="control is-expanded">
-                            <model-select class="input is-large" ref="search" :options="productNames" v-model="search" placeholder="search products"></model-select>
+        <article class="card has-text-centered">
+            <div class="card has-background-info has-text-white is-paddingless">
+                <div class="level">
+                    <div class="column is-three-fifths">
+                        <div class="field is-grouped is-expanding">
+                            <div class="control is-expanded">
+                                <model-select class="input is-large" ref="search" :options="productNames" v-model="search" placeholder="search products"></model-select>
+                            </div>
+                            <div class="control button is-primary">search</div>
                         </div>
-                        <div class="control button is-primary">search</div>
+                    </div>
+                    <div class="column"></div>
+                    <div class="column">
+                        <router-link to="/add-product" class="button">Add Product</router-link>
                     </div>
                 </div>
-                <div class="column"></div>
-                <div class="column">
-                    <router-link to="/add-product" class="button">Add Product</router-link>
-                </div>
             </div>
-        </div>
-
-        <div v-if="products && products.length === 0" class="notification">
-            You have no products in your catalog. Click Add Products to add your first product.
-        </div>
-
-        <div class="section" v-if="products && products.length > 0">
-
-            <div class="columns is-multiline is-scrollable">
-                <div class="column is-4" v-for="product in products" :key="product.id">
-                    <div class="card">
-                        <div class="card-image">
-                            <img :src="require('../assets/uploads/' + product.image_path)" v-if="product.image_path">
-                            <img heigth=300 src="../assets/ecommerce-default-product.png" alt="Placeholder image" v-else>
-                        </div>
-                        <div class="card-content is-size-6 has-text-grey">
-                            <div class="content">
-                                    <p class="subtitle"><router-link :to="{ path: '/product-detail', query: {productId: product.id}}">{{ product.description }}</router-link></p>
-                                    <p>{{ product.category.name }}</p>
-                                    <p>{{ product.currency }} {{ product.price | currency }}</p>
+            <div class="card card-content has-background-light" style="min-height:500px">
+                <div class="notification" v-if="products && products.length===0">You have no products in your catalog. Click Add Products to add your first product.</div>
+                <div class="columns is-multiline is-scrollable" v-else>
+                    <div class="column is-4" v-for="product in products" :key="product.id">
+                        <div class="card">
+                            <div class="card-image">
+                                <img height=200 width=200 :src="require('../assets/uploads/' + product.image_path)" v-if="product.image_path">
+                                <img heigth=200 src="../assets/ecommerce-default-product.png" alt="Placeholder image" v-else>
+                            </div>
+                            <div class="card-content is-size-6 has-text-grey">
+                                <!-- <div class="content"> -->
+                                        <p class="title is-6"><router-link :to="{ path: '/product-detail', query: {productId: product.id}}">{{ product.description }}</router-link></p>
+                                        <p>{{ product.category.name }}</p>
+                                        <p>{{ product.currency }} {{ product.price | currency }}</p>
+                                <!-- </div> -->
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="level" role="navigation" aria-label="pagination">
-                <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getProducts(pages.page-1)">Previous</a>
-                <a class="pagination-next level-right" :disabled="pages.next==false" @click="getProducts(pages.page+1)">Next page</a>
+            <div class="card is-paddingless">
+                <div class="level">
+                    <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getProducts(pages.page-1)">Previous</a>
+                    <a class="pagination-next level-right" :disabled="pages.next==false" @click="getProducts(pages.page+1)">Next page</a>
+                </div>
             </div>
+        </article>
 
-        </div>
     </div>
 </template>
 

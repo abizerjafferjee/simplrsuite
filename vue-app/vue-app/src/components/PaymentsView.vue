@@ -1,32 +1,30 @@
 <template>
     <div id="payments-view">
 
-        <div class="notification" v-if="error">
-            <!-- <button @click="closeNotification" class="delete"></button> -->
-            {{ error }}
-        </div>
-
-        <div class="card card-content has-background-light" v-if="!error"> 
-            <div class="columns has-text-centered">
-                <div class="column is-three-fifths">
-                    <div class="field is-grouped is-expanding">
-                        <div class="control is-expanded">
-                            <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
-                        </div>
-                        <div class="control button is-primary">search</div>
-                    </div>
-                </div>
-                <div class="column"></div>
+        <div class="section">
+            <div class="notification" v-if="error">
+                <!-- <button @click="closeNotification" class="delete"></button> -->
+                {{ error }}
             </div>
+            <div v-else></div>
         </div>
 
-        <div class="notification" v-if="payments && payments.length===0">
-            You don't have a payment history. View your outstanding invoices and record payments.
-        </div>
-
-        <div class="section has-text-centered" v-if="payments && payments.length>0">
-            <div class="box has-background-light is-paddingless">
-                <div class="columns">
+        <article class="card has-text-centered">
+            <div class="card has-background-info has-text-white is-paddingless">
+                <div class="level">
+                    <div class="column is-three-fifths">
+                        <div class="field is-grouped is-expanding">
+                            <div class="control is-expanded">
+                                <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
+                            </div>
+                            <div class="control button is-primary">search</div>
+                        </div>
+                    </div>
+                    <div class="column"></div>
+                </div>
+            </div>
+            <div class="card has-background-info has-text-white is-paddingless">
+                <div class="level">
                     <div class="column">Supplier</div>
                     <div class="column">Invoice Number</div>
                     <div class="column">Payment Method</div>
@@ -35,40 +33,43 @@
                     <div class="column">Date</div>
                 </div>
             </div>
-            <div class="card card-content is-paddingless" v-for="(payment, index) in payments" v-bind:key="index" style="margin:0px 0px 10px 0px">
-                <div class="columns">
-                    <div class="column"><div class="title is-6">{{ payment.payment.supplier.business_name }}</div></div>
-                    <div class="column"><div class="title is-6 has-text-info">{{ payment.payment.invoice_number }}</div></div>
-                    <div class="column">
-                        <div class="title is-6" v-if="payment.payment_type === 'BANK'">Bank Transfer</div>
-                        <div class="title is-6" v-else-if="payment.payment_type === 'CHEQUE'">Cheque</div>
-                        <div class="title is-6" v-else-if="payment.payment_type === 'CASH'">Cash</div>
-                        <div class="title is-6" v-else>No Payment Method</div>
-                    </div>
-                    <div class="column">
-                        <div class="title is-6" v-if="payment.payment_type === 'BANK' && payment.bank_transfer">{{ payment.bank_transfer }}</div>
-                        <div class="title is-6" v-else-if="payment.payment_type === 'CHEQUE' && payment.cheque">{{ payment.cheque }}</div>
-                        <div class="title is-6" v-else>No Transaction Details</div>
-                    </div>
+            <div class="has-background-light" style="min-height:500px">
+                <div class="notification" v-if="payments && payments.length===0">You don't have a payment history. View your outstanding invoices and record payments.</div>
+                <div class="card is-paddingless" v-for="(payment, index) in payments" v-bind:key="index" v-else-if="payments && payments.length > 0">
+                    <div class="level">
+                        <div class="column"><div class="title is-6">{{ payment.payment.supplier.business_name }}</div></div>
+                        <div class="column"><div class="title is-6 has-text-info">{{ payment.payment.invoice_number }}</div></div>
+                        <div class="column">
+                            <div class="title is-6" v-if="payment.payment_type === 'BANK'">Bank Transfer</div>
+                            <div class="title is-6" v-else-if="payment.payment_type === 'CHEQUE'">Cheque</div>
+                            <div class="title is-6" v-else-if="payment.payment_type === 'CASH'">Cash</div>
+                            <div class="title is-6" v-else>No Payment Method</div>
+                        </div>
+                        <div class="column">
+                            <div class="title is-6" v-if="payment.payment_type === 'BANK' && payment.bank_transfer">{{ payment.bank_transfer }}</div>
+                            <div class="title is-6" v-else-if="payment.payment_type === 'CHEQUE' && payment.cheque">{{ payment.cheque }}</div>
+                            <div class="title is-6" v-else>No Transaction Details</div>
+                        </div>
 
-                    <div class="column">
-                        <div class="title is-6" v-if="payment.receipt">{{ payment.receipt }}</div>
-                        <div class="title is-6" v-else>No Receipt</div>
-                    </div>
+                        <div class="column">
+                            <div class="title is-6" v-if="payment.receipt">{{ payment.receipt }}</div>
+                            <div class="title is-6" v-else>No Receipt</div>
+                        </div>
 
-                    <div class="column">
-                        <div class="title is-6" v-if="payment.date">{{ payment.date }}</div>
-                        <div class="title is-6" v-else>No Date</div>
+                        <div class="column">
+                            <div class="title is-6" v-if="payment.date">{{ payment.date }}</div>
+                            <div class="title is-6" v-else>No Date</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="level">
-                <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
-                <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
+            <div class="card is-paddingless">
+                <div class="level">
+                    <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getPayments(pages.page-1)">Previous</a>
+                    <a class="pagination-next level-right" :disabled="pages.next==false" @click="getPayments(pages.page+1)">Next page</a>
+                </div>
             </div>
-        </div>
-
-        
+        </article>
 
         <!-- <section class="info-tiles">
             <div class="tile is-ancestor has-text-centered" v-if="stats">

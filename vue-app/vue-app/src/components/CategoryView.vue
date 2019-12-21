@@ -1,65 +1,68 @@
 <template>
     <div id="category-view">
 
-        <div class="notification" v-if="error">
-            <!-- <button @click="closeNotification" class="delete"></button> -->
-            {{ error }}
+        <div class="section">
+            <div class="notification" v-if="error">
+                <!-- <button @click="closeNotification" class="delete"></button> -->
+                {{ error }}
+            </div>
+            <div v-else></div>
         </div>
 
-        <div class="card card-content has-background-light" v-if="!error">
-            <div class="columns">
+        <article class="card has-text-centered">
+            <div class="card has-background-info has-text-white is-paddingless">
+                <div class="level">
                 <div class="column is-four-fifths">
                     <div class="field is-grouped">
                         <p class="control is-expanded">
                             <input v-model="category.name" class="input" type="text" placeholder="Type category name">
                         </p>
-                        <a @click="addCategory()" class="button is-info">Add Category</a>
+                        <a @click="addCategory()" class="button is-primary">Add Category</a>
                     </div>
                 </div>
                 <div class="column"></div>
+                </div>
             </div>
-        </div>
+            <div class="card has-background-info has-text-white is-paddingless">
+                <div class="level">
+                    <div class="column">Category Id</div>
+                    <div class="column is-two-fifths">Category</div>
+                    <div class="column">Number of Products</div>
+                    <div class="column">Actions</div>
+                </div>
+            </div>
+            <div class="card has-background-info is-paddingless" v-if="categories && categories.length>0">
+                <div class="column"><div class="title is-5 has-text-white">You have {{ categories.length }} categories.</div></div>
+            </div>
+            <div class="has-background-light" style="min-height:500px">
+                <div class="notification" v-if="categories && categories.length===0">You have no categories. Add a new category.</div>
+                <div class="card is-paddingless" v-for="category in categories" :key="category.id" v-else-if="categories && categories.length > 0">
+                    <div class="level">
+                        <div class="column"><div class="title is-6">{{ category.id }}</div></div>
+                        <div class="column is-two-fifths">
+                            <div class="title is-6" v-if="editing === category.id"><input type="text" v-model="category.name"></div>
+                            <div class="title is-6" v-else>{{ category.name }}</div>
+                        </div>
+                        <div class="column"><div class="title is-6" v-if="category.products">{{ category.products.length }}</div></div>
 
-
-        <div class="section" v-if="categories">
-            <div class="title is-5" v-if="categories.length > 0">You have {{ categories.length }} categories</div>
-            <div class="notification" v-if="categories.length === 0">You have no categories. Add a new category.</div>        
-
-            <div class="card-table">
-                <table class="card-body table is-stripped">
-                    <thead>
-                        <tr>
-                            <th>Category Id</th>
-                            <th>Category</th>
-                            <th>Number of Products</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="category in categories" :key="category.id">
-                            <td>{{ category.id }}</td>
-                            <td v-if="editing === category.id"><input type="text" v-model="category.name"></td>
-                            <td v-else>{{ category.name }}</td>
-                            <td v-if="category.products">{{ category.products.length }}</td>
-
-                            <td v-if="editing == category.id">
-                                <button class="button is-small is-success" @click="editCategory(category)"><font-awesome-icon class="font-margin" icon="save" size="lg" /></button>&nbsp;
-                                <button class="button is-small muted-button" @click="cancelEdit(category)"><font-awesome-icon class="font-margin" icon="times" size="lg" /></button>
-                            </td>
-                            <td v-else>
-                                <button class="button is-small is-info" @click="editMode(category)"><font-awesome-icon class="font-margin" icon="pen" size="lg" /></button>&nbsp;
-                                <button class="button is-small is-danger" @click="deleteCategory(category.id)"><font-awesome-icon class="font-margin" icon="trash" size="lg" /></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <footer class="card-footer level">
+                        <div class="column" v-if="editing == category.id">
+                            <button class="button is-small is-success" @click="editCategory(category)"><font-awesome-icon class="font-margin" icon="save" size="lg" /></button>&nbsp;
+                            <button class="button is-small muted-button" @click="cancelEdit(category)"><font-awesome-icon class="font-margin" icon="times" size="lg" /></button>
+                        </div>
+                        <div class="column" v-else>
+                            <button class="button is-small is-info" @click="editMode(category)"><font-awesome-icon class="font-margin" icon="pen" size="lg" /></button>&nbsp;
+                            <button class="button is-small is-danger" @click="deleteCategory(category.id)"><font-awesome-icon class="font-margin" icon="trash" size="lg" /></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card is-paddingless">
+                <div class="level">
                     <a class="pagination-previous level-left" title="This is the first page" :disabled="pages.prev==false" @click="getCategories(pages.page-1)">Previous</a>
                     <a class="pagination-next level-right" :disabled="pages.next==false" @click="getCategories(pages.page+1)">Next page</a>
-                </footer>
+                </div>
             </div>
-
-        </div>
+        </article>
 
     </div>
 </template>
