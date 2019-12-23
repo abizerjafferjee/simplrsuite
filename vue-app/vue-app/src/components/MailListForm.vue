@@ -1,86 +1,67 @@
 <template>
     <div id="mail-form">
 
-        <div class="section">
-            <div class="notification" v-if="error">
-                <!-- <button @click="closeNotification" class="delete"></button> -->
-                {{ error }}
-            </div>
-            <div v-if="error && submitting">
-                <p class="notification is-danger" v-for="e in errors" v-bind:key="e.id">{{ e.e }}</p>
-            </div>
-            <p v-if="success" class="notification is-success">Contact successfully added</p>
+        <div class="level">
+            <div class="title is-6 has-text-danger" v-if="error">{{ error }}</div>
+            <div class="title is-6 has-text-success" v-if="success">{{ success }}</div>
+            <div v-else></div>
         </div>
 
-        <div class="section">
-            <div class="card is-paddingless has-background-light">
-                <form @submit.prevent="handleSubmit">
-                    <div class="level">
-                        <div class="column">
-                            <label class="label">* Full Name</label>
-                            <input class="input" ref="name" @focus="clearStatus" @keypress="clearStatus" v-model="contact.name" type="text"/>
-                        </div>
-
-                        <div class="column">
-                            <label class="label">Business/ Organization</label>
-                            <input class="input" ref="business" @focus="clearStatus" @keypress="clearStatus" v-model="contact.business" type="text" placeholder="e.g. Thumbtack"/>
-                        </div>
-
-                        <div class="column">
-                            <label class="label">* Email</label>
-                            <div class="field">
-                                <div class="control">
-                                    <input ref="email" @focus="clearStatus" @keypress="clearStatus" v-model="contact.email" class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="column">
-                            <label class="label">* Phone Number</label>
-                            <div class="field has-addons">
-                            <p class="control">
-                                <span class="select">
-                                <select class="button is-light" ref="phone_code" @focus="clearStatus" @keypress="clearStatus" v-model="contact.phone_code" type="text">
-                                    <option>+255</option>
-                                    <option>+254</option>
-                                    <option>+86</option>
-                                    <option>+971</option>
-                                    <option>+1</option>
-                                </select>
-                                </span>
-                            </p>
-                            <p class="control is-expanded">
-                                <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="contact.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
-                            </p>
-                            </div>
-                        </div>
+        <div class="card">
+            <div class="card-header card-header-title has-background-info has-text-white">Add a Contact</div>
+            <form class="card-content" @submit.prevent="handleSubmit">
+                <div class="columns is-paddingless">
+                    <div class="column">
+                        <label class="label">* Full Name</label>
+                        <input class="input" ref="name" @focus="clearStatus" @keypress="clearStatus" v-model="contact.name" type="text"/>
                     </div>
-                    <div class="level">
-                        <div class="column">
-                            <label class="label">Remarks/ Comments</label>
-                            <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="contact.remark"></textarea></div>
+
+                    <div class="column">
+                        <label class="label">Business/ Organization</label>
+                        <input class="input" ref="business" @focus="clearStatus" @keypress="clearStatus" v-model="contact.business" type="text" placeholder="e.g. Thumbtack"/>
+                    </div>
+
+                    <div class="column">
+                        <label class="label">* Email</label>
+                        <div class="field">
+                            <div class="control">
+                                <input ref="email" @focus="clearStatus" @keypress="clearStatus" v-model="contact.email" class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
+                            </div>
                         </div>
                     </div>
                     
-                    <button id="submit" class="button is-primary">Add Contact</button>
-                </form>
-            </div>
-        </div>
-
-        <article class="card has-text-centered">
-            <!-- <div class="card has-background-info has-text-white is-paddingless">
-                <div class="level">
-                    <div class="column is-three-fifths">
-                        <div class="field is-grouped is-expanding">
-                            <div class="control is-expanded">
-                                <model-select class="input is-large" ref="search" :options="supplierList" v-model="search" placeholder="search suppliers"></model-select>
-                            </div>
-                            <div class="control button is-primary">search</div>
+                    <div class="column">
+                        <label class="label">* Phone Number</label>
+                        <div class="field has-addons">
+                        <p class="control">
+                            <span class="select">
+                            <select class="button is-light" ref="phone_code" @focus="clearStatus" @keypress="clearStatus" v-model="contact.phone_code" type="text">
+                                <option>+255</option>
+                                <option>+254</option>
+                                <option>+86</option>
+                                <option>+971</option>
+                                <option>+1</option>
+                            </select>
+                            </span>
+                        </p>
+                        <p class="control is-expanded">
+                            <input ref="phone" @focus="clearStatus" @keypress="clearStatus" v-model="contact.phone" class="input" type="tel" placeholder="Do not enter the first zero.">
+                        </p>
                         </div>
                     </div>
-                    <div class="column"></div>
                 </div>
-            </div> -->
+                <div class="columns is-paddingless">
+                    <div class="column">
+                        <label class="label">Remarks/ Comments</label>
+                        <div class="field"><textarea class="textarea" ref="additional_info" @focus="clearStatus" @keypress="clearStatus" v-model="contact.remark"></textarea></div>
+                    </div>
+                </div>
+                
+                <button id="submit" class="button is-primary">Add Contact</button>
+            </form>
+        </div>
+        <br>
+        <article class="card has-text-centered">
             <div class="card has-background-info has-text-white is-paddingless">
                 <div class="level">
                     <div class="column">Name</div>
@@ -122,10 +103,10 @@ export default {
     },
    data() {
        return {
-           submitting: false,
-           errors: [],
+           jwt: '',
+           response: null,
            error: null,
-           success: false,
+           success: null,
            contact: {
                name: null,
                business: null,
@@ -140,8 +121,6 @@ export default {
                next: null,
                prev: null
            },
-           response: null,
-           jwt: '',
        }
    },
    created: function() {
@@ -150,40 +129,29 @@ export default {
    },
    methods: {
         handleSubmit() {
-            this.submitting = true
-            if (this.invalidName() || this.invalidPhone() || this.invalidEmail()) {
-                this.showError()
-                return
-            }
             this.clearStatus()
             this.addContact()
         },
         clearStatus() {
-            this.error = false
-            this.success = false
-            this.errors = []
-        },
-        showError() {
-            this.error = true
-            this.submitting = true
-            this.success = false
-        },
-        showSuccess() {
-            this.error = false
-            this.submitting = false
-            this.success = true
-            this.clearForm()
+            this.error = null
+            this.success = null
         },
         addContact() {
             this.axios.post('maillist', {'body': this.contact}, { headers: { Authorization: `Bearer: ${this.jwt}`}})
             .then(response => {
                 this.response = response
-                this.showSuccess()
+                this.success = "Contact added."
+                this.clearForm()
                 this.getMaillist(1)
             })
             .catch(e => {
-                this.response = e
-                this.showError()
+                if (error.response.status === 401) {
+                    this.error = "Your session has expired. Please login again."
+                } else if (error.response.status == 400) {
+                    this.error = "Error in submitting form."
+                } else {
+                    this.error = "Internal Server Error."
+                }
             })
         },
         getMaillist(page) {
@@ -197,6 +165,8 @@ export default {
             .catch(error => {
                 if (error.response.status === 401) {
                     this.error = "Your session has expired. Please login again."
+                } else if (error.response.status == 400) {
+                    this.error = "Error in retrieving contacts."
                 } else {
                     this.error = "Internal Server Error"
                 }
@@ -220,39 +190,6 @@ export default {
             var re = /^\+?\d{9}$/;
             return re.test(phone);
         },
-        invalidName() {
-           if (this.contact.name === null) {
-               this.errors.push({'id':1, 'e':'!Name is Empty.'})
-               return true
-           } else {
-               return false
-           }
-        },
-        invalidPhone() {
-            if (this.contact.phone === null) {
-                this.errors.push({'id':2, 'e':'!Phone Number is Empty.'})
-                return true
-            } else if (!this.validPhone(this.contact.phone)) {
-                this.errors.push({'id': 5, 'e':'!Phone Number should be 9 digits.'})
-                return true
-            } else {
-                return false
-            }
-        },
-        invalidEmail() {
-            if (this.contact.email === null) {
-                this.errors.push({'id':3, 'e':'!Email is Empty.'})
-                return true
-            } else if (!this.validEmail(this.contact.email)) {
-                this.errors.push({'id':4, 'e':'!Email is invalid.'})
-                return true
-            } else {
-                return false
-            }
-        },
-        closeNotification() {
-            this.error = null
-        }
     }
   
 }

@@ -75,7 +75,7 @@ def add(current_user):
             db.session.add(product)
             db.session.flush()
         except:
-            raise Exception('Product already exists.')
+            raise Exception('Product name cannot be empty.')
 
         product.sku = generateSKU(product.id, product.category_id, product.description)
         db.session.commit()

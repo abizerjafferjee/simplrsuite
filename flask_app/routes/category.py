@@ -55,7 +55,7 @@ def add(current_user):
         return make_response(jsonify({'success': True}), 200)
 
     except Exception as e:
-        return make_response(jsonify({'success': False, 'message': 'Category already exists.'}), 400)
+        return make_response(jsonify({'success': False, 'message': 'Category name cannot be empty.'}), 400)
 
 @CategoryRoutes.route('/categories', methods=['DELETE'])
 @token_required

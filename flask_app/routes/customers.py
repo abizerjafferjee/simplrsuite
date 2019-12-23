@@ -32,7 +32,6 @@ def add(current_user):
         return make_response(jsonify({'success': True}), 200)
         
     except Exception as e:
-        print(e)
         return make_response(jsonify({'success': False}), 400)
 
 @CustomerRoutes.route('/maillist', methods=['GET'])
@@ -42,20 +41,18 @@ def get(current_user):
     Handles get request for getting a supplier by id, post request for adding
     new supplier and put request for editing a supplier's information.
     """
-    # try:
-    page = request.args.get('page', type=int)
-    per_page = 12
+    try:
+        page = request.args.get('page', type=int)
+        per_page = 12
 
-    maillist = MailList.query\
-        .filter(MailList.user==current_user.id)\
-        .order_by(MailList.created.desc())\
-        .paginate(page=page, per_page=per_page, error_out=False)
-    schema = MailListSchema(many=True)
-    output = schema.dump(maillist.items)
-    return make_response(jsonify({'success': True, 'body': output,'body': output,
-                                    'page': maillist.page, 'prev': maillist.has_prev,
-                                    'next': maillist.has_next}), 200)
-
-    # except Exception as e:
-    #     print(e)
-    #     return make_response(jsonify({'success': False}, 400))
+        maillist = MailList.query\
+            .filter(MailList.user==current_user.id)\
+            .order_by(MailList.created.desc())\
+            .paginate(page=page, per_page=per_page, error_out=False)
+        schema = MailListSchema(many=True)
+        output = schema.dump(maillist.items)
+        return make_response(jsonify({'success': True, 'body': output,'body': output,
+                                        'page': maillist.page, 'prev': maillist.has_prev,
+                                        'next': maillist.has_next}), 200)
+    except Exception as e:
+        return make_response(jsonify({'success': False}, 400))
