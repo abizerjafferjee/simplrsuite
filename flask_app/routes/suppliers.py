@@ -18,25 +18,29 @@ def add(current_user):
     try:
         req = json.loads(request.data)
         body = req['body']
+
+        if not body['business_name']:
+            raise Exception('Supplier name cannot be empty.')
+        elif not body['email']:
+            raise Exception('Email cannot be empty.')
+        
         supplier = Supplier(
             user = current_user.id,
             business_name = body['business_name'],
             contact_person = body['contact_person'],
             email = body['email'],
-            phone = body['phone_code'] + body['phone'],
+            phone = body['phone_code'] + body['phone'] if body['phone'] else None,
             plus_code = body['plus_code'],
-            address = body['address'],
-            additional_info = body['additional_info']
+            address = body['address']
         )
         
         db.session.add(supplier)
         db.session.commit()
-        supplier_schema = SupplierSchema()
-        output = supplier_schema.dump(supplier)
-        return make_response(jsonify({'success': True, 'body': output}), 200)
+
+        return make_response(jsonify({'success': True}), 200)
         
     except Exception as e:
-        return make_response(jsonify({'success': False}), 400)
+        return make_response(jsonify({'success': False, 'message':str(e)}), 400)
 
 @SupplierRoutes.route('/suppliers', methods=['GET'])
 @token_required
@@ -94,13 +98,12 @@ def update(current_user):
         body = req['body']
         supplier = Supplier.query.get(id)
 
-        supplier.business_name = body['business_name'],
-        supplier.contact_person = body['contact_person'],
-        supplier.email = body['email'],
-        supplier.phone = body['phone'],
-        supplier.plus_code = body['plus_code'],
-        supplier.address = body['address'],
-        supplier.additional_info = body['additional_info']
+        supplier.business_name = body['business_name']
+        supplier.contact_person = body['contact_person']
+        supplier.email = body['email']
+        supplier.phone = body['phone']
+        supplier.plus_code = body['plus_code']
+        supplier.address = body['address']
         db.session.commit()
 
         supplier_schema = SupplierSchema()
@@ -109,4 +112,22 @@ def update(current_user):
 
     except Exception as e:
         return make_response(jsonify({'success': False}), 400)
-        
+
+@SupplierRoutes.route('/suppliers/search', methods=['GET'])
+@token_required
+def search_suppliers(current_user):
+    """
+    Search and paginate products for product view
+    """
+    try:
+        supplier = request.args.get('supplier', type=int)
+        suppliers = Supplier.query\
+            .filter(Supplier.user==current_user.id)\
+            .filter(Supplier.id==supplier)\
+            .all()
+
+        supplier_schema = SupplierSchema(many=True)
+        output = supplier_schema.dump(suppliers)
+        return make_response(jsonify({'success': True, 'body': output}), 200)
+    except Exception as e:
+        return make_response(jsonify({'success': False}, 400))

@@ -95,12 +95,8 @@
 </template>
 
 <script>
-import { ModelSelect } from 'vue-search-select';
 export default {
    name: 'mail-form',
-    components: {
-        ModelSelect,
-    },
    data() {
        return {
            jwt: '',
@@ -144,7 +140,7 @@ export default {
                 this.clearForm()
                 this.getMaillist(1)
             })
-            .catch(e => {
+            .catch(error => {
                 if (error.response.status === 401) {
                     this.error = "Your session has expired. Please login again."
                 } else if (error.response.status == 400) {

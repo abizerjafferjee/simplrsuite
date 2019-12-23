@@ -33,11 +33,9 @@
                                 <img heigth=200 width=200 src="../assets/ecommerce-default-product.png" alt="Placeholder image" v-else>
                             </div>
                             <div class="card-content is-size-6 has-text-grey">
-                                <!-- <div class="content"> -->
-                                        <p class="title is-6"><router-link :to="{ path: '/product-detail', query: {productId: product.id}}">{{ product.description }}</router-link></p>
-                                        <p>{{ product.category.name }}</p>
-                                        <p>{{ product.currency }} {{ product.price | currency }}</p>
-                                <!-- </div> -->
+                                <p class="title is-6"><router-link :to="{ path: '/product-detail', query: {productId: product.id}}">{{ product.description }}</router-link></p>
+                                <p>{{ product.category.name }}</p>
+                                <p>{{ product.currency }} {{ product.price | currency }}</p>
                             </div>
                         </div>
                     </div>

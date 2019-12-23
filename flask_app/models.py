@@ -117,7 +117,6 @@ class Supplier(db.Model):
     phone = db.Column(db.String())
     plus_code = db.Column(db.String())
     address = db.Column(db.String())
-    additional_info = db.Column(db.String())
     created = db.Column(db.DateTime(), default=datetime.now())
 
     invoices = relationship("Invoice", backref='supplier')
