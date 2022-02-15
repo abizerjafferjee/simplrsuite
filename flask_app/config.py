@@ -4,7 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     DEBUG = True
     TESTING = True
-    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Qsaxzop15@localhost/thumbtack'
+    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:pw@localhost/thumbtack'
     SQLALCHEMY_DATABASE_URI = 'postgresql://simplr_suite:admin@localhost/simplr_suite'
     CSRF_ENABLED = True
     SECRET_KEY = '5S73gu33234qWSC1O2'
@@ -19,5 +19,5 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = True
-    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Qsaxzop15@localhost/thumbtack'
+    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:pw@localhost/thumbtack'
     SQLALCHEMY_DATABASE_URI = 'postgresql://simplr_suite:admin@localhost/simplr_suite'
